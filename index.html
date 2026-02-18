@@ -1003,9 +1003,7 @@ function renderList(){
     var arc=isArc(p);
     var compsList=getCompsForTopa(p._idx);
     var hasComps=compsList.length>0;
-    // In archive view, only show properties that have a matched comp
-    if(showingArchive && !hasComps) return;
-    var markerColor=(arc&&hasComps)?'#d97706':(hasComps?'#d97706':'#059669');
+    var markerColor=hasComps?'#d97706':(arc?'#94a3b8':'#059669');
     items.push({kind:'topa',p:p,i:i,color:markerColor,compsList:compsList});
     // Show matched comp rows beneath the TOPA property
     // In archive view, only show comps whose linked TOPA is also archived
@@ -1027,7 +1025,7 @@ function renderList(){
   cnt.textContent=topaCount+' '+lbl+'propert'+(topaCount===1?'y':'ies')+(shownComps&&!showingArchive?' · '+shownComps+' comp'+(shownComps===1?'':' s'):'');
 
   if(!items.length){
-    el.innerHTML='<div class="no-res">'+(showingArchive?'No archived properties with sale comps yet.':'No properties match the current filters.')+'</div>';
+    el.innerHTML='<div class="no-res">'+(showingArchive?'No archived properties yet. These appear once a TOPA date is more than 420 days ago.':'No properties match the current filters.')+'</div>';
     return;
   }
 
