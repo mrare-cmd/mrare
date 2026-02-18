@@ -1683,12 +1683,21 @@ renderMarkers = async function(){
     // Three color states: archived=gray, topa+comp=gold, topa-only=navy
     var color = arc ? '#94a3b8' : (hasComps ? '#d97706' : '#059669');
     var days=daysIn(p.date); var ppuVal=getPPU(p);
+    var compsList = getCompsForTopa(topaOrigIdx);
+    var sold = hasComps && compsList[0] && compsList[0].date;
+    var soldDate = sold ? compsList[0].date : null;
+    var daysAtSale = sold ? Math.max(0, Math.round((new Date(soldDate) - new Date(p.date)) / 86400000)) : days;
     var segsThresh=[5,50,185,305,420];
     var segColors=['#16a34a','#22c55e','#d97706','#ea580c','#dc2626'];
-    var popSegHtml=segsThresh.map(function(t,si){
-      var filled=days>=t;
-      return '<div style="flex:1;height:4px;border-radius:1px;background:'+(filled?segColors[si]:'rgba(255,255,255,0.15)')+'"></div>';
-    }).join('');
+    var popSegHtml;
+    if(sold){
+      popSegHtml = segsThresh.map(function(){ return '<div style="flex:1;height:4px;border-radius:1px;background:#d97706"></div>'; }).join('');
+    } else {
+      popSegHtml = segsThresh.map(function(t,si){
+        var filled=days>=t;
+        return '<div style="flex:1;height:4px;border-radius:1px;background:'+(filled?segColors[si]:'rgba(255,255,255,0.15)')+'"></div>';
+      }).join('');
+    }
     var ms=getMilestonePhase(days);
     var accordionId='acc-'+i;
 
