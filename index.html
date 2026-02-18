@@ -292,9 +292,9 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
 .comps-sidebar { padding: 10px 14px; border-top: 2px solid var(--comp-bg); flex-shrink: 0; max-height: 220px; overflow-y: auto; }
 .comps-sidebar::-webkit-scrollbar { width: 3px; }
 .comps-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-.comp-list-item { padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.comp-list-item { padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; transition: opacity 0.1s; }
 .comp-list-item:last-child { border-bottom: none; }
-.comp-list-item:hover { opacity: 0.8; }
+.comp-list-item:hover { opacity: 0.75; }
 .cli-addr { font-size: 0.7rem; font-weight: 700; color: var(--comp); line-height: 1.3; }
 .cli-meta { font-size: 0.62rem; color: var(--muted); margin-top: 2px; display: flex; gap: 6px; }
 .cli-meta strong { color: var(--navy); }
@@ -334,12 +334,25 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
 .match-no-candidates { padding: 14px; background: var(--off-white); border-radius: 7px; text-align: center; font-size: 0.7rem; color: var(--muted); }
 .match-progress { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
 
-/* Comp popup tab system */
-.pu-tabs { display: flex; gap: 0; margin: 8px -1px 0; border-top: 1px solid rgba(255,255,255,0.12); }
-.pu-tab { flex: 1; padding: 6px 4px; text-align: center; font-family: var(--font); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; cursor: pointer; background: transparent; color: rgba(255,255,255,0.45); border: none; border-bottom: 2px solid transparent; transition: all 0.12s; }
-.pu-tab.active { color: var(--white); border-bottom-color: var(--comp-light); }
-.pu-tab-content { display: none; padding-top: 10px; }
-.pu-tab-content.active { display: block; }
+/* Comp accordion in popup (below TOPA info, collapsible) */
+.pu-comp-accordion { margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 8px; }
+.pu-comp-accordion-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; padding: 3px 0; user-select: none;
+}
+.pu-comp-accordion-lbl {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  color: #c4b5fd; display: flex; align-items: center; gap: 6px;
+}
+.pu-comp-accordion-badge {
+  background: #7c3aed; color: white; border-radius: 8px;
+  padding: 1px 6px; font-size: 0.55rem; font-weight: 700;
+}
+.pu-comp-chevron { font-size: 0.65rem; color: rgba(255,255,255,0.4); transition: transform 0.18s; display: inline-block; }
+.pu-comp-chevron.open { transform: rotate(180deg); }
+.pu-comp-accordion-body { overflow: hidden; max-height: 0; transition: max-height 0.22s ease; }
+.pu-comp-accordion-body.open { max-height: 600px; }
+.pu-comp-accordion-inner { padding-top: 8px; }
 .pu-comp-card { background: rgba(124,58,237,0.18); border: 1px solid rgba(167,139,250,0.3); border-radius: 6px; padding: 9px 11px; margin-bottom: 7px; }
 .pu-comp-card:last-child { margin-bottom: 0; }
 .pu-comp-addr { font-size: 0.68rem; font-weight: 700; color: #c4b5fd; line-height: 1.3; margin-bottom: 5px; }
@@ -348,21 +361,87 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
 .pu-comp-f span { font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.9); }
 .pu-comp-f.wide { grid-column: 1/-1; }
 .pu-comp-notes { font-size: 0.62rem; color: rgba(255,255,255,0.55); margin-top: 5px; font-style: italic; line-height: 1.4; }
-.no-comps-msg { font-size: 0.68rem; color: rgba(255,255,255,0.4); text-align: center; padding: 12px 0; }
 
-/* Comps sidebar */
-.comps-sidebar-hdr { padding: 9px 14px 0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.comps-sidebar-hdr .sec-lbl { margin-bottom: 0; color: var(--comp); }
+/* Floating comps detail panel (opens when clicking a comp in sidebar) */
+.comp-detail-panel {
+  position: fixed; top: 70px; right: 18px; z-index: 1200;
+  width: 340px; max-height: calc(100vh - 88px);
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: 11px; box-shadow: 0 8px 36px rgba(8,25,55,0.18);
+  display: none; flex-direction: column; overflow: hidden;
+}
+.comp-detail-panel.open { display: flex; }
+.comp-detail-hdr {
+  background: #7c3aed; color: white; padding: 14px 16px 12px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-shrink: 0; border-radius: 10px 10px 0 0;
+}
+.comp-detail-hdr h4 { font-size: 0.88rem; font-weight: 800; line-height: 1.3; }
+.comp-detail-hdr .cdh-sub { font-size: 0.63rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+.comp-detail-close {
+  background: rgba(255,255,255,0.15); border: none; color: white;
+  width: 24px; height: 24px; border-radius: 50%; font-size: 0.8rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-left: 10px; margin-top: 1px; font-family: var(--font);
+  transition: background 0.12s;
+}
+.comp-detail-close:hover { background: rgba(255,255,255,0.28); }
+.comp-detail-body { overflow-y: auto; padding: 14px 16px; flex: 1; }
+.comp-detail-body::-webkit-scrollbar { width: 3px; }
+.comp-detail-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.cdg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-bottom: 12px; }
+.cdg-f label { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 2px; }
+.cdg-f span { font-size: 0.8rem; font-weight: 600; color: var(--navy); }
+.cdg-f.wide { grid-column: 1/-1; }
+.cd-section-lbl { font-size: 0.55rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--comp); margin: 10px 0 6px; padding-top: 10px; border-top: 1px solid var(--border); }
+.cd-notes { font-size: 0.68rem; color: var(--muted); line-height: 1.5; font-style: italic; padding: 8px 10px; background: var(--off-white); border-radius: 5px; }
+.cd-topa-link { margin-top: 10px; padding: 8px 10px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; font-size: 0.67rem; color: var(--accent); font-weight: 600; }
+
+/* Comps sidebar header */
 .comp-cnt-badge { font-size: 0.6rem; font-weight: 700; background: var(--comp-bg); color: var(--comp); padding: 1px 6px; border-radius: 9px; }
 .btn-comp-export { font-size: 0.58rem; font-weight: 700; padding: 2px 7px; background: transparent; border: 1px solid var(--comp-light); color: var(--comp); border-radius: 3px; cursor: pointer; font-family: var(--font); transition: all 0.12s; }
 .btn-comp-export:hover { background: var(--comp-bg); }
 
-/* Unmatched comp marker color in legend */
-.leg-dot-comp { background: #7c3aed; }
-
 /* JSON export panel */
 .comp-export-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
 
+
+
+/* Match modal */
+.match-modal { position: fixed; inset: 0; background: rgba(8,25,55,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+.match-modal.open { display: flex; }
+.match-box { background: var(--white); border-radius: 12px; width: 90vw; max-width: 780px; max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(8,25,55,0.3); }
+.match-box::-webkit-scrollbar { width: 4px; }
+.match-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.match-hdr { background: var(--comp); color: white; padding: 18px 24px 16px; border-radius: 12px 12px 0 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+.match-hdr h2 { font-size: 1.1rem; font-weight: 800; }
+.match-hdr p { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 3px; }
+.match-body { padding: 20px 24px; }
+.match-comp-card { background: var(--comp-bg); border: 1px solid var(--comp-light); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+.match-comp-card h4 { font-size: 0.78rem; font-weight: 800; color: var(--comp); margin-bottom: 3px; }
+.match-comp-card .mc-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.68rem; color: var(--navy); }
+.match-comp-card .mc-meta span { font-weight: 600; }
+.match-section-lbl { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 12px 0 7px; }
+.match-candidate { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 2px solid var(--border); border-radius: 7px; margin-bottom: 7px; cursor: pointer; transition: all 0.12s; }
+.match-candidate:hover { border-color: var(--comp-light); background: var(--comp-bg); }
+.match-candidate.selected { border-color: var(--comp); background: var(--comp-bg); }
+.mc-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px; transition: all 0.12s; }
+.match-candidate.selected .mc-radio { border-color: var(--comp); background: var(--comp); }
+.mc-info h5 { font-size: 0.73rem; font-weight: 700; color: var(--navy); }
+.mc-info p { font-size: 0.63rem; color: var(--muted); margin-top: 1px; }
+.mc-score { font-size: 0.58rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+.mc-score-hi { background: var(--green-bg); color: var(--green); }
+.mc-score-med { background: #fef3c7; color: #92400e; }
+.match-btn-row { display: flex; gap: 7px; margin-top: 12px; }
+.match-btn-accept { flex: 1; padding: 8px; background: var(--comp); color: white; border: none; font-family: var(--font); font-size: 0.7rem; font-weight: 700; cursor: pointer; border-radius: 5px; transition: background 0.12s; }
+.match-btn-accept:hover { background: #6d28d9; }
+.match-btn-skip { flex: 1; padding: 8px; background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: var(--font); font-size: 0.7rem; font-weight: 600; cursor: pointer; border-radius: 5px; transition: all 0.12s; }
+.match-btn-skip:hover { background: var(--off-white); }
+.match-no-candidates { padding: 14px; background: var(--off-white); border-radius: 7px; text-align: center; font-size: 0.7rem; color: var(--muted); }
+.match-progress { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+/* Unmatched comp marker color in legend */
+.leg-dot-comp { background: #7c3aed; }
 /* ════════════════ LEAFLET POPUP ════════════════ */
 .leaflet-popup-content-wrapper { background: var(--navy); color: var(--white); border-radius: 8px; border: none; box-shadow: 0 8px 24px rgba(8,25,55,0.4); }
 .leaflet-popup-tip { background: var(--navy); }
@@ -510,11 +589,24 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
     <div id="map"></div>
     <div class="map-legend">
       <div class="leg-ttl">Legend</div>
-      <div class="leg-row"><div class="leg-dot" style="background:#16a34a"></div>w/ Contract</div>
-      <div class="leg-row"><div class="leg-dot" style="background:#dc2626"></div>w/o Contract</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#16a34a"></div>TOPA w/ Contract</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#dc2626"></div>TOPA w/o Contract</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#d97706"></div>TOPA + Sale Comp</div>
       <div class="leg-row"><div class="leg-dot" style="background:#94a3b8"></div>Archived (420+ days)</div>
-      <div class="leg-row"><div class="leg-dot" style="background:#7c3aed"></div>Sale Comp (no TOPA)</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#7c3aed"></div>Sale Comp only</div>
     </div>
+
+<!-- Floating Comp Detail Panel -->
+<div class="comp-detail-panel" id="comp-detail-panel">
+  <div class="comp-detail-hdr">
+    <div>
+      <h4 id="cdp-title">Sale Comp</h4>
+      <div class="cdh-sub" id="cdp-sub"></div>
+    </div>
+    <button class="comp-detail-close" id="comp-detail-close">✕</button>
+  </div>
+  <div class="comp-detail-body" id="cdp-body"></div>
+</div>
   </div>
 </div>
 
@@ -1423,6 +1515,7 @@ window.focusComp = async function(ci){
   var c = compsData[ci];
   var coords = await geocode(c.address);
   if(coords) map.flyTo(coords, 16, {animate:true, duration:0.8});
+  openCompDetail(ci);
 };
 
 // ── COMP POPUP TABS in TOPA popup ─────────────────────────────────────────────
@@ -1457,31 +1550,78 @@ function buildCompsTabHtml(topaPropIdx){
   }).join('');
 }
 
-// Patch renderMarkers to add comp tabs to popups
-// (Override inline popup HTML builder to include tabs when comps exist)
+// ── COMP ACCORDION in TOPA popup ─────────────────────────────────────────────
+function buildCompsAccordionHtml(topaPropIdx, accordionId){
+  var cs = getCompsForTopa(topaPropIdx);
+  if(!cs.length) return '';
+  var cardsHtml = cs.map(function(c){
+    var ppu = (c.price && c.units) ? Math.round(c.price/c.units) : c.ppu;
+    var ppsf = c.ppsf || (c.price && c.sf ? Math.round(c.price/c.sf*100)/100 : null);
+    return '<div class="pu-comp-card">'+
+      '<div class="pu-comp-addr">'+(c.name ? c.name+' — ' : '')+c.address+'</div>'+
+      '<div class="pu-comp-grid">'+
+      (c.date ? '<div class="pu-comp-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
+      (c.price ? '<div class="pu-comp-f"><label>Sale Price</label><span>'+fmtFull$(c.price)+'</span></div>' : '')+
+      (c.units ? '<div class="pu-comp-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
+      (ppu ? '<div class="pu-comp-f"><label>Price / Unit</label><span>$'+ppu.toLocaleString()+'</span></div>' : '')+
+      (c.sf ? '<div class="pu-comp-f"><label>Bldg SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
+      (ppsf ? '<div class="pu-comp-f"><label>Price / SF</label><span>$'+ppsf+'</span></div>' : '')+
+      (c.yearBuilt ? '<div class="pu-comp-f"><label>Year Built</label><span>'+c.yearBuilt+'</span></div>' : '')+
+      (c.capRate ? '<div class="pu-comp-f"><label>Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
+      (c.pfCapRate ? '<div class="pu-comp-f"><label>PF Cap Rate</label><span>'+c.pfCapRate+'%</span></div>' : '')+
+      (c.buyer ? '<div class="pu-comp-f wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
+      (c.seller ? '<div class="pu-comp-f wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
+      (c.broker ? '<div class="pu-comp-f wide"><label>Listing Broker</label><span>'+c.broker+'</span></div>' : '')+
+      '</div>'+
+      (c.notes ? '<div class="pu-comp-notes">'+c.notes+'</div>' : '')+
+    '</div>';
+  }).join('');
+  return '<div class="pu-comp-accordion">'+
+    '<div class="pu-comp-accordion-hdr" onclick="toggleCompAccordion(\"' +accordionId+ '\")">'+
+      '<span class="pu-comp-accordion-lbl">'+
+        '🏷 Sale Comps <span class="pu-comp-accordion-badge">'+cs.length+'</span>'+
+      '</span>'+
+      '<span class="pu-comp-chevron" id="chev-'+accordionId+'">▼</span>'+
+    '</div>'+
+    '<div class="pu-comp-accordion-body" id="body-'+accordionId+'">'+
+      '<div class="pu-comp-accordion-inner">'+cardsHtml+'</div>'+
+    '</div>'+
+  '</div>';
+}
+
+window.toggleCompAccordion = function(id){
+  var body = document.getElementById('body-'+id);
+  var chev = document.getElementById('chev-'+id);
+  if(!body) return;
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+};
+
+// Patch renderMarkers: three color states + collapsible accordion popup
 var _origRenderMarkers = renderMarkers;
 renderMarkers = async function(){
   markers.forEach(function(m){map.removeLayer(m);});
   markers=[];
   for(var i=0;i<filteredData.length;i++){
     var p=filteredData[i];
-    // Find the original index in allData for comp lookup
     var topaOrigIdx = allData.indexOf(p);
     var coords=await geocode(p.address);
     if(!coords) continue;
     var arc=isArc(p); var isC=p.type==='w/ Contract';
-    var color=arc?'#94a3b8':(isC?'#16a34a':'#dc2626');
+    var hasComps = getCompsForTopa(topaOrigIdx).length > 0;
+    // Three color states: archived=gray, topa+comp=gold, topa-only=green/red
+    var color = arc ? '#94a3b8' : (hasComps ? '#d97706' : (isC ? '#16a34a' : '#dc2626'));
     var days=daysIn(p.date); var ppuVal=getPPU(p);
     var segsThresh=[5,50,185,305,420];
     var segColors=['#16a34a','#22c55e','#d97706','#ea580c','#dc2626'];
     var popSegHtml=segsThresh.map(function(t,si){
       var filled=days>=t;
-      return '<div style="flex:1;height:4px;border-radius:1px;background:'+(filled?segColors[si]:'rgba(255,255,255,0.15)')+'\"></div>';
+      return '<div style="flex:1;height:4px;border-radius:1px;background:'+(filled?segColors[si]:'rgba(255,255,255,0.15)')+'"></div>';
     }).join('');
     var ms=getMilestonePhase(days);
-    var hasComps = getCompsForTopa(topaOrigIdx).length > 0;
+    var accordionId='acc-'+i;
 
-    var topaTabHtml = '<div class="pu-addr">'+p.address+'</div>'+
+    var html='<div class="pu-addr">'+p.address+'</div>'+
       (p.name?'<div class="pu-name">'+p.name+'</div>':'')+
       '<div class="pu-grid">'+
       '<div class="pu-f"><label>TOPA Date</label><span>'+fmtDate(p.date)+'</span></div>'+
@@ -1504,22 +1644,8 @@ renderMarkers = async function(){
       '<div class="pu-milestones" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1)">'+
       '<div style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px">Current Phase</div>'+
       '<div style="font-size:0.75rem;font-weight:700;color:white">'+ms.label+'</div>'+
-      '</div>';
-
-    var popupId = 'popup-topa-'+i;
-    var html;
-    if(hasComps){
-      html = '<div id="'+popupId+'">'+
-        '<div class="pu-tabs">'+
-          '<button class="pu-tab active" onclick="switchPuTab(\''+popupId+'\',0,this)">TOPA Info</button>'+
-          '<button class="pu-tab" onclick="switchPuTab(\''+popupId+'\',1,this)">Sale Comps <span style=\"background:#7c3aed;color:white;border-radius:8px;padding:0 5px;font-size:0.55rem;\">'+getCompsForTopa(topaOrigIdx).length+'</span></button>'+
-        '</div>'+
-        '<div class="pu-tab-content active" data-tab-panel="0">'+topaTabHtml+'</div>'+
-        '<div class="pu-tab-content" data-tab-panel="1">'+buildCompsTabHtml(topaOrigIdx)+'</div>'+
-      '</div>';
-    } else {
-      html = topaTabHtml;
-    }
+      '</div>'+
+      (hasComps ? buildCompsAccordionHtml(topaOrigIdx, accordionId) : '');
 
     (function(idx){
       var opacity=arc?'0.5':'1';
@@ -1528,25 +1654,52 @@ renderMarkers = async function(){
         html:'<div style="width:16px;height:16px;border-radius:50%;background:'+color+';border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);opacity:'+opacity+';cursor:pointer;"></div>',
         iconSize:[16,16],iconAnchor:[8,8],popupAnchor:[0,-10]
       });
-      var mk=L.marker(coords,{icon:icon}).bindPopup(html,{maxWidth:330});
+      var mk=L.marker(coords,{icon:icon}).bindPopup(html,{maxWidth:320});
       mk.on('click',function(){hlItem(idx);});
       mk.addTo(map);
       markers.push(mk);
     })(i);
   }
-  // Also render comp markers
   renderCompMarkers();
 };
 
-window.switchPuTab = function(popupId, tabIdx, btn){
-  var container = document.getElementById(popupId);
-  if(!container) return;
-  container.querySelectorAll('.pu-tab').forEach(function(t){ t.classList.remove('active'); });
-  container.querySelectorAll('.pu-tab-content').forEach(function(p){ p.classList.remove('active'); });
-  btn.classList.add('active');
-  var panel = container.querySelector('[data-tab-panel="'+tabIdx+'"]');
-  if(panel) panel.classList.add('active');
-};
+// ── FLOATING COMP DETAIL PANEL ────────────────────────────────────────────────
+function openCompDetail(ci){
+  var c = compsData[ci];
+  if(!c) return;
+  var ppu = (c.price && c.units) ? Math.round(c.price/c.units) : c.ppu;
+  var ppsf = c.ppsf || (c.price && c.sf ? Math.round(c.price/c.sf*100)/100 : null);
+  document.getElementById('cdp-title').textContent = c.name || c.address;
+  document.getElementById('cdp-sub').textContent = c.name ? c.address : (c.date ? fmtDate(c.date) : '');
+  var linkedTopa = (c.topaId !== null && c.topaId !== undefined && allData[c.topaId])
+    ? '<div class="cd-topa-link">✓ Linked to TOPA: '+allData[c.topaId].address+'</div>' : '';
+  document.getElementById('cdp-body').innerHTML =
+    '<div class="cdg">'+
+    (c.date ? '<div class="cdg-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
+    (c.price ? '<div class="cdg-f"><label>Sale Price</label><span>'+fmtFull$(c.price)+'</span></div>' : '')+
+    (c.units ? '<div class="cdg-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
+    (ppu ? '<div class="cdg-f"><label>Price / Unit</label><span>$'+ppu.toLocaleString()+'</span></div>' : '')+
+    (c.sf ? '<div class="cdg-f"><label>Building SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
+    (ppsf ? '<div class="cdg-f"><label>Price / SF</label><span>$'+ppsf+'</span></div>' : '')+
+    (c.yearBuilt ? '<div class="cdg-f"><label>Year Built</label><span>'+c.yearBuilt+'</span></div>' : '')+
+    (c.bldgClass ? '<div class="cdg-f"><label>Class</label><span>'+c.bldgClass+'</span></div>' : '')+
+    (c.capRate ? '<div class="cdg-f"><label>Actual Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
+    (c.pfCapRate ? '<div class="cdg-f"><label>PF Cap Rate</label><span>'+c.pfCapRate+'%</span></div>' : '')+
+    (c.affType ? '<div class="cdg-f wide"><label>Affordable Type</label><span>'+c.affType+'</span></div>' : '')+
+    '</div>'+
+    ((c.buyer||c.seller||c.broker) ? '<div class="cd-section-lbl">Parties</div><div class="cdg">'+
+    (c.buyer ? '<div class="cdg-f wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
+    (c.seller ? '<div class="cdg-f wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
+    (c.broker ? '<div class="cdg-f wide"><label>Listing Broker</label><span>'+c.broker+'</span></div>' : '')+
+    '</div>' : '')+
+    (c.notes ? '<div class="cd-section-lbl">Notes</div><div class="cd-notes">'+c.notes+'</div>' : '')+
+    linkedTopa;
+  document.getElementById('comp-detail-panel').classList.add('open');
+}
+
+document.getElementById('comp-detail-close').addEventListener('click', function(){
+  document.getElementById('comp-detail-panel').classList.remove('open');
+});
 
 // ── JSON EXPORT ───────────────────────────────────────────────────────────────
 document.getElementById('btn-export-comps').addEventListener('click', function(){
