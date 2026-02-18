@@ -136,6 +136,8 @@ select.full:focus { border-color: var(--accent); background: var(--white); }
 .bdg-g { background: var(--green-bg); color: var(--green); }
 .bdg-r { background: var(--red-bg); color: var(--red); }
 .bdg-n { background: rgba(8,25,55,0.07); color: var(--navy); }
+.pi-comp { opacity:0.9; }
+.pi-comp:hover { opacity:1; background: rgba(124,58,237,0.06) !important; }
 .bdg-gr { background: var(--gray-bg); color: var(--gray); border: 1px solid var(--border); }
 .bdg-arc { background: #fef3c7; color: #92400e; }
 .pi-price { font-size: 0.7rem; font-weight: 700; color: var(--navy); margin-left: auto; }
@@ -579,8 +581,7 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
     <div id="map"></div>
     <div class="map-legend">
       <div class="leg-ttl">Legend</div>
-      <div class="leg-row"><div class="leg-dot" style="background:#16a34a"></div>TOPA w/ Contract</div>
-      <div class="leg-row"><div class="leg-dot" style="background:#dc2626"></div>TOPA w/o Contract</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#1a3a6b"></div>TOPA (active)</div>
       <div class="leg-row"><div class="leg-dot" style="background:#d97706"></div>TOPA + Sale Comp</div>
       <div class="leg-row"><div class="leg-dot" style="background:#94a3b8"></div>Archived (420+ days)</div>
       <div class="leg-row"><div class="leg-dot" style="background:#7c3aed"></div>Sale Comp only</div>
@@ -995,36 +996,74 @@ function renderList(){
   var el=document.getElementById('prop-list');
   var cnt=document.getElementById('res-count');
   var lbl=showingArchive?'archived ':'';
-  cnt.textContent=filteredData.length+' '+lbl+'propert'+(filteredData.length===1?'y':'ies');
-  if(!filteredData.length){
+
+  // Build mixed list: TOPA properties + linked comps interleaved
+  var items=[];
+  filteredData.forEach(function(p,i){
+    var arc=isArc(p); var hasComps=getCompsForTopa(p._idx).length>0;
+    var markerColor=arc?'#94a3b8':(hasComps?'#d97706':'#1a3a6b');
+    items.push({kind:'topa',p:p,i:i,color:markerColor});
+    // Inline matched comps directly below their TOPA property
+    getCompsForTopa(p._idx).forEach(function(c,ci){
+      items.push({kind:'comp',c:c,ci:compsData.indexOf(c),color:'#d97706'});
+    });
+  });
+  // Unmatched comps at the bottom
+  compsData.filter(function(c){ return c.topaId===null||c.topaId===undefined; }).forEach(function(c){
+    items.push({kind:'comp',c:c,ci:compsData.indexOf(c),color:'#7c3aed'});
+  });
+
+  var topaCount=filteredData.length;
+  var compCount=compsData.length;
+  cnt.textContent=topaCount+' '+lbl+'propert'+(topaCount===1?'y':'ies')+(compCount?' · '+compCount+' comp'+(compCount===1?'':'s'):'');
+
+  if(!items.length){
     el.innerHTML='<div class="no-res">'+(showingArchive?'No archived properties yet. These will appear once a TOPA date is more than 420 days ago.':'No properties match the current filters.')+'</div>';
     return;
   }
-  el.innerHTML=filteredData.map(function(p,i){
-    var ppuVal=getPPU(p); var isC=p.type==='w/ Contract'; var arc=isArc(p);
-    var days=daysIn(p.date);
-    // Build 5-segment milestone bar: [5, 45, 135, 120, 120] = 420 total
-    var segs=[5,50,185,305,420];
-    var segHtml=segs.map(function(threshold,si){
-      var cls=days>=threshold?'filled-'+(si+1):'';
-      return '<div class="days-seg '+cls+'"></div>';
-    }).join('');
-    var ms=getMilestonePhase(days);
-    return '<div class="pi'+(arc?' arc':'')+'" data-idx="'+i+'" onclick="focusProp('+i+')">'
-      +'<div class="pi-addr">'+p.address+'</div>'
-      +(p.name?'<div class="pi-name">'+p.name+'</div>':'')
-      +'<div class="pi-meta">'
-      +'<span class="bdg '+(isC?'bdg-g':'bdg-r')+'">'+p.type+'</span>'
-      +'<span class="bdg bdg-n">'+p.units+' units</span>'
-      +(ppuVal?'<span class="bdg bdg-gr">'+fmt$(ppuVal)+'/unit</span>':'')
-      +'<span class="pi-price">'+fmt$(p.price)+'</span>'
-      +'</div>'
-      +'<div class="pi-days"><strong>'+days+'d</strong> in TOPA'
-      +'<span class="days-bar">'+segHtml+'</span>'
-      +(arc?'<span class="bdg bdg-arc">Archived</span>':'<span>'+Math.max(0,TOPA_LIMIT-days)+'d left</span>')
-      +'</div>'
-      +'<div class="pi-phase">'+ms.label+'</div>'
-      +'</div>';
+
+  el.innerHTML=items.map(function(item){
+    if(item.kind==='topa'){
+      var p=item.p; var i=item.i;
+      var ppuVal=getPPU(p); var isC=p.type==='w/ Contract'; var arc=isArc(p);
+      var days=daysIn(p.date);
+      var segs=[5,50,185,305,420];
+      var segHtml=segs.map(function(threshold,si){
+        var cls=days>=threshold?'filled-'+(si+1):'';
+        return '<div class="days-seg '+cls+'"></div>';
+      }).join('');
+      var ms=getMilestonePhase(days);
+      return '<div class="pi'+(arc?' arc':'')+'" data-idx="'+i+'" onclick="focusProp('+i+')" style="border-left:3px solid '+item.color+';">'
+        +'<div class="pi-addr">'+p.address+'</div>'
+        +(p.name?'<div class="pi-name">'+p.name+'</div>':'')
+        +'<div class="pi-meta">'
+        +'<span class="bdg bdg-n">'+p.units+' units</span>'
+        +(ppuVal?'<span class="bdg bdg-gr">'+fmt$(ppuVal)+'/unit</span>':'')
+        +'<span class="pi-price">'+fmt$(p.price)+'</span>'
+        +'</div>'
+        +'<div class="pi-days"><strong>'+days+'d</strong> in TOPA'
+        +'<span class="days-bar">'+segHtml+'</span>'
+        +(arc?'<span class="bdg bdg-arc">Archived</span>':'<span>'+Math.max(0,TOPA_LIMIT-days)+'d left</span>')
+        +'</div>'
+        +'<div class="pi-phase">'+ms.label+'</div>'
+        +'</div>';
+    } else {
+      // Comp row
+      var c=item.c; var ci=item.ci;
+      var ppu=(c.price&&c.units)?Math.round(c.price/c.units):c.ppu;
+      var matched=(c.topaId!==null&&c.topaId!==undefined);
+      return '<div class="pi pi-comp" onclick="focusComp('+ci+')" style="border-left:3px solid '+item.color+';background:rgba(124,58,237,0.04);">'
+        +'<div style="font-size:0.52rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:'+(matched?'#d97706':'#7c3aed')+';margin-bottom:2px;">'+(matched?'▸ SALE COMP':'◦ SALE COMP (unmatched)')+'</div>'
+        +'<div class="pi-addr" style="font-size:0.72rem;">'+(c.name||c.address)+'</div>'
+        +(c.name?'<div class="pi-name">'+c.address+'</div>':'')
+        +'<div class="pi-meta">'
+        +(c.date?'<span class="bdg bdg-n">'+fmtDate(c.date)+'</span>':'')
+        +(c.units?'<span class="bdg bdg-n">'+c.units+' units</span>':'')
+        +(ppu?'<span class="bdg bdg-gr">'+fmt$(ppu)+'/unit</span>':'')
+        +(c.price?'<span class="pi-price">'+fmt$(c.price)+'</span>':'')
+        +'</div>'
+        +'</div>';
+    }
   }).join('');
 }
 
@@ -1100,13 +1139,11 @@ async function focusProp(idx){
   var p=filteredData[idx];
   var coords=await geocode(p.address);
   if(!coords) return;
-  // Cancel any pending stale popup opens
   clearTimeout(window._popupTimer);
   map.flyTo(coords,16,{animate:true,duration:0.8});
-  // After flight, open the marker that belongs to THIS specific property object
+  // Use property-bound marker reference, not array index (avoids stale index after async re-render)
   window._popupTimer=setTimeout(function(){
-    // Find the marker whose filteredData index matches idx — markers are built in filteredData order
-    if(markers[idx]) markers[idx].openPopup();
+    if(p._marker) p._marker.openPopup();
   },900);
 }
 function hlItem(idx){
@@ -1224,8 +1261,9 @@ var matchSelectedCandidate = null;
       if(Array.isArray(d) && d.length){
         d.forEach(function(c){ if(!compsDupe(c)) compsData.push(c); });
         renderCompsSidebar();
-        renderCompMarkers();
+        applyFilters(); // redraws markers with gold for matched comps
         showCompMsg('✓ Loaded '+d.length+' comps from data/sales_comps.json','ok');
+        renderList();
       }
     })
     .catch(function(){ /* no remote file — that's fine */ });
@@ -1370,7 +1408,7 @@ function runMatching(){
     if(skipped) parts.push(skipped+' comp'+(skipped===1?' has':'s have')+' no potential TOPA match and were skipped.');
     if(!parts.length) parts.push('All comps are already matched or there are no comps loaded.');
     alert(parts.join(' '));
-    renderCompsSidebar(); renderCompMarkers(); applyFilters();
+    refreshAfterCompChange();
     return;
   }
   var noticeParts = [];
@@ -1395,7 +1433,7 @@ function showMatchStep(){
     progressLbl.textContent = 'Matching complete!';
     body.innerHTML = '<div style="text-align:center;padding:24px 0;"><div style="font-size:2rem;margin-bottom:8px;">✅</div><div style="font-size:0.9rem;font-weight:700;color:var(--navy);">All comps reviewed.</div><div style="font-size:0.73rem;color:var(--muted);margin-top:6px;">Matched comps will appear in their TOPA property popup and sidebar. Unmatched comps appear on the map in purple.</div></div>';
     btnAccept.style.display='none'; btnSkip.style.display='none'; btnDone.style.display='block';
-    renderCompsSidebar(); renderCompMarkers(); return;
+    refreshAfterCompChange(); return;
   }
 
   matchSelectedCandidate = null;
@@ -1540,6 +1578,13 @@ window.focusComp = async function(ci){
   openCompDetail(ci);
 };
 
+// Ensure the mixed list re-renders when comp data changes
+function refreshAfterCompChange(){
+  renderCompsSidebar();
+  renderList();
+  applyFilters();
+}
+
 // ── COMP POPUP TABS in TOPA popup ─────────────────────────────────────────────
 function getCompsForTopa(topaPropIdx){
   return compsData.filter(function(c){ return c.topaId === topaPropIdx; });
@@ -1634,8 +1679,8 @@ renderMarkers = async function(){
     if(!coords) continue;
     var arc=isArc(p); var isC=p.type==='w/ Contract';
     var hasComps = getCompsForTopa(topaOrigIdx).length > 0;
-    // Three color states: archived=gray, topa+comp=gold, topa-only=green/red
-    var color = arc ? '#94a3b8' : (hasComps ? '#d97706' : (isC ? '#16a34a' : '#dc2626'));
+    // Three color states: archived=gray, topa+comp=gold, topa-only=navy
+    var color = arc ? '#94a3b8' : (hasComps ? '#d97706' : '#1a3a6b');
     var days=daysIn(p.date); var ppuVal=getPPU(p);
     var segsThresh=[5,50,185,305,420];
     var segColors=['#16a34a','#22c55e','#d97706','#ea580c','#dc2626'];
@@ -1683,6 +1728,7 @@ renderMarkers = async function(){
       mk.on('click',function(){hlItem(idx);});
       mk.addTo(map);
       markers.push(mk);
+      p._marker = mk; // bind to property for focusProp lookup
     })(i);
   }
   renderCompMarkers();
@@ -1759,7 +1805,7 @@ document.getElementById('btn-comp-paste-imp').addEventListener('click', function
   var rows = t.split('\n').map(function(l){ return l.split('\t'); });
   var s = isCompHdr(rows[0]) ? 1 : 0;
   var n = importComps(rows.slice(s));
-  if(n>0){ showCompMsg('✓ Added '+n+' comp'+(n===1?'':'s')+'. Run Address Matching to link them.','ok'); document.getElementById('comp-paste-input').value=''; renderCompsSidebar(); renderCompMarkers(); }
+  if(n>0){ showCompMsg('✓ Added '+n+' comp'+(n===1?'':'s')+'. Run Address Matching to link them.','ok'); document.getElementById('comp-paste-input').value=''; refreshAfterCompChange(); }
   else showCompMsg('No valid rows found. Check column order.','err');
 });
 
@@ -1786,7 +1832,7 @@ document.getElementById('btn-comp-csv-imp').addEventListener('click', function()
     }).filter(function(r){ return r.some(function(c){ return c; }); });
     var s = isCompHdr(rows[0]) ? 1 : 0;
     var n = importComps(rows.slice(s));
-    if(n>0){ showCompMsg('✓ Added '+n+' comps from CSV.','ok'); document.getElementById('comp-drop-lbl').textContent='Drop CSV here or click to browse'; renderCompsSidebar(); renderCompMarkers(); }
+    if(n>0){ showCompMsg('✓ Added '+n+' comps from CSV.','ok'); document.getElementById('comp-drop-lbl').textContent='Drop CSV here or click to browse'; refreshAfterCompChange(); }
     else showCompMsg('No valid rows found.','err');
   };
   reader.readAsText(file);
@@ -1823,7 +1869,7 @@ document.getElementById('btn-comp-manual-add').addEventListener('click', functio
   // Clear form
   ['cm-address','cm-name','cm-price','cm-units','cm-sf','cm-year','cm-class','cm-cap','cm-pfcap','cm-buyer','cm-seller','cm-broker','cm-aff','cm-notes'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('cm-date').value='';
-  renderCompsSidebar(); renderCompMarkers();
+  refreshAfterCompChange();
 });
 
 // JSON load
@@ -1848,7 +1894,7 @@ document.getElementById('btn-comp-json-imp').addEventListener('click', function(
       data.forEach(function(c){ if(c.address && !compsDupe(c)){ compsData.push(c); n++; } });
       showCompMsg('✓ Loaded '+n+' comps from JSON ('+(data.length-n)+' dupes skipped).','ok');
       document.getElementById('comp-json-lbl').textContent='Drop sales_comps.json here or click to browse';
-      renderCompsSidebar(); renderCompMarkers();
+      refreshAfterCompChange();
     }catch(err){ showCompMsg('Invalid JSON file.','err'); }
   };
   reader.readAsText(file);
@@ -1861,7 +1907,7 @@ document.getElementById('btn-run-matching').addEventListener('click', runMatchin
 document.getElementById('btn-clr-comps').addEventListener('click', function(){
   if(!compsData.length){ showCompMsg('No comps to clear.','err'); return; }
   if(!confirm('Clear all '+compsData.length+' sales comps? This cannot be undone.')) return;
-  compsData = []; renderCompsSidebar(); renderCompMarkers(); applyFilters();
+  compsData = []; refreshAfterCompChange();
   showCompMsg('All comps cleared.','ok');
 });
 
