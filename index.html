@@ -1703,8 +1703,8 @@ renderMarkers = async function(){
     if(!coords) continue;
     var arc=isArc(p); var isC=p.type==='w/ Contract';
     var hasComps = getCompsForTopa(topaOrigIdx).length > 0;
-    // Three color states: archived=gray, topa+comp=gold, topa-only=navy
-    var color = arc ? '#94a3b8' : (hasComps ? '#d97706' : '#059669');
+    // Color: gray if archived with no comp, gold if has comp (active or archived), emerald if active with no comp
+    var color = hasComps ? '#d97706' : (arc ? '#94a3b8' : '#059669');
     var days=daysIn(p.date); var ppuVal=getPPU(p);
     var compsList = getCompsForTopa(topaOrigIdx);
     var sold = hasComps && compsList[0] && compsList[0].date;
