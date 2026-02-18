@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TOPA Pipeline Dashboard</title>
+
+  <!-- Font (optional). If your company blocks Google Fonts, remove this line. -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet (local, from your repo). -->
+  <link rel="stylesheet" href="./vendor/leaflet/leaflet.css"/>
+
+  <style>
+    @font-face { font-family: 'Proxima Nova'; src: local('Proxima Nova'), local('ProximaNova-Regular'); font-weight: 400; }
+    @font-face { font-family: 'Proxima Nova'; src: local('Proxima Nova Semibold'), local('ProximaNova-Semibold'); font-weight: 600; }
+    @font-face { font-family: 'Proxima Nova'; src: local('Proxima Nova Bold'), local('ProximaNova-Bold'); font-weight: 700; }
+    @font-face { font-family: 'Proxima Nova'; src: local('Proxima Nova Extrabold'), local('ProximaNova-Extrabold'); font-weight: 800; }
+
+    :root {
+      --navy: #081937;
+      --navy-mid: #0d2548;
+      --navy-light: #1a3a6b;
+      --navy-border: rgba(255,255,255,0.1);
+      --white: #ffffff;
+      --off-white: #f4f6f9;
+      --border: #e2e8f0;
+      --muted: #64748b;
+      --green: #16a34a;
+      --green-bg: #dcfce7;
+      --red: #dc2626;
+      --red-bg: #fee2e2;
+      --gray: #94a3b8;
+      --gray-bg: #f1f5f9;
+      --accent: #2563eb;
+      --gold: #d97706;
+      --font: 'Proxima Nova', 'Nunito', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: var(--font); background: var(--off-white); color: var(--navy); display: flex; flex-direction: column; font-size: 13px; }
+
+    header {
+      background: var(--navy);
+      color: var(--white);
+      height: 58px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--navy-light);
+      flex-shrink: 0;
+    }
+    .hdr-brand {
+      display: flex; flex-direction: column; justify-content: center;
+      border-right: 1px solid var(--navy-border);
+      padding-right: 20px; margin-right: 20px; height: 100%;
+    }
+    .hdr-brand h1 { font-size: 1.15rem; font-weight: 800; color: var(--white); letter-spacing: 0.01em; line-height: 1; }
+    .hdr-brand .sub { font-size: 0.6rem; color: rgba(255,255,255,0.4); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 3px; }
+
+    .hdr-asof { display: flex; flex-direction: column; justify-content: center; }
+    .hdr-asof .asof-lbl { font-size: 0.58rem; color: rgba(255,255,255,0.38); letter-spacing: 0.12em; text-transform: uppercase; }
+    .hdr-asof .asof-val { font-size: 1.05rem; font-weight: 700; color: var(--white); margin-top: 1px; }
+
+    .hdr-stats { display: flex; gap: 0; margin-left: auto; height: 100%; }
+    .stat-blk {
+      display: flex; flex-direction: column; justify-content: center; align-items: flex-end;
+      padding: 0 18px; border-left: 1px solid var(--navy-border);
+    }
+    .stat-blk .v { font-size: 1.05rem; font-weight: 700; color: var(--white); line-height: 1; }
+    .stat-blk .l { font-size: 0.57rem; color: rgba(255,255,255,0.38); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 3px; }
+
+    .hdr-btns { display: flex; gap: 8px; margin-left: 16px; align-items: center; }
+    .hdr-btn {
+      padding: 6px 13px; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.65);
+      background: transparent; font-family: var(--font); font-size: 0.68rem; font-weight: 600;
+      cursor: pointer; border-radius: 5px; transition: all 0.14s; white-space: nowrap;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .hdr-btn:hover, .hdr-btn.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.45); color: var(--white); }
+    .badge-cnt { background: var(--gold); color: var(--white); border-radius: 9px; padding: 1px 6px; font-size: 0.6rem; font-weight: 700; }
+
+    .layout { display: grid; grid-template-columns: 278px 1fr; flex: 1; overflow: hidden; }
+
+    .sidebar { background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+
+    .sidebar-filters { padding: 13px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .sec-lbl { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); margin-bottom: 9px; }
+    .fg { margin-bottom: 7px; }
+    .fg label { font-size: 0.62rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 3px; }
+    .rr { display: flex; gap: 4px; align-items: center; }
+    .rr input { flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid var(--border); background: var(--off-white); font-family: var(--font); font-size: 0.7rem; color: var(--navy); border-radius: 4px; outline: none; transition: border-color 0.12s; }
+    .rr input:focus { border-color: var(--accent); background: var(--white); }
+    .rr span { font-size: 0.65rem; color: var(--muted); flex-shrink: 0; }
+    select.full { width: 100%; padding: 5px 7px; border: 1px solid var(--border); background: var(--off-white); font-family: var(--font); font-size: 0.73rem; color: var(--navy); border-radius: 4px; outline: none; transition: border-color 0.12s; }
+    select.full:focus { border-color: var(--accent); background: var(--white); }
+    .chips { display: flex; gap: 4px; flex-wrap: wrap; }
+    .chip { padding: 3px 9px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.63rem; font-weight: 600; cursor: pointer; background: var(--off-white); color: var(--muted); transition: all 0.12s; user-select: none; }
+    .chip.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+    .chip:hover:not(.active) { border-color: var(--navy); color: var(--navy); background: var(--white); }
+    .btn-reset { width: 100%; padding: 5px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: var(--font); font-size: 0.63rem; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.12s; margin-top: 5px; }
+    .btn-reset:hover { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+    .res-count { padding: 6px 14px; font-size: 0.63rem; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); background: var(--off-white); flex-shrink: 0; }
+
+    .prop-list { flex: 1; overflow-y: auto; }
+    .prop-list::-webkit-scrollbar { width: 3px; }
+    .prop-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .pi { padding: 9px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+    .pi:hover { background: var(--off-white); }
+    .pi.hl { background: #eff6ff; border-left: 3px solid var(--accent); padding-left: 11px; }
+    .pi.arc { opacity: 0.65; }
+    .pi-addr { font-size: 0.77rem; font-weight: 700; line-height: 1.3; color: var(--navy); }
+    .pi-name { font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; }
+    .pi-meta { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+    .bdg { font-size: 0.58rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+    .bdg-g { background: var(--green-bg); color: var(--green); }
+    .bdg-r { background: var(--red-bg); color: var(--red); }
+    .bdg-n { background: rgba(8,25,55,0.07); color: var(--navy); }
+    .bdg-gr { background: var(--gray-bg); color: var(--gray); border: 1px solid var(--border); }
+    .bdg-arc { background: #fef3c7; color: #92400e; }
+    .pi-price { font-size: 0.7rem; font-weight: 700; color: var(--navy); margin-left: auto; }
+    .pi-days { font-size: 0.6rem; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+    .pi-days strong { font-weight: 700; color: var(--navy); }
+    .days-bar { display: inline-flex; gap: 1px; width: 80px; height: 4px; vertical-align: middle; }
+    .days-seg { flex: 1; border-radius: 1px; background: var(--border); transition: background 0.2s; }
+    .days-seg.filled-1 { background: #16a34a; }
+    .days-seg.filled-2 { background: #22c55e; }
+    .days-seg.filled-3 { background: var(--gold); }
+    .days-seg.filled-4 { background: #ea580c; }
+    .days-seg.filled-5 { background: var(--red); }
+    .pi-phase { font-size: 0.6rem; font-weight: 600; color: var(--accent); margin-top: 2px; letter-spacing: 0.01em; }
+    .no-res { padding: 24px 14px; text-align: center; color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
+
+    .arc-banner { display: none; background: #fffbeb; border-bottom: 1px solid #fde68a; padding: 5px 14px; font-size: 0.67rem; color: #92400e; font-weight: 600; flex-shrink: 0; align-items: center; gap: 8px; }
+    .arc-banner.on { display: flex; }
+    .arc-close { margin-left: auto; cursor: pointer; font-weight: 700; background: none; border: none; color: #b45309; font-size: 0.75rem; padding: 0 2px; font-family: var(--font); }
+
+    #map-container { position: relative; }
+    #map { width: 100%; height: 100%; }
+    .map-legend { position: absolute; bottom: 26px; left: 12px; z-index: 500; background: rgba(255,255,255,0.97); border: 1px solid var(--border); border-radius: 7px; padding: 10px 13px; font-size: 0.65rem; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+    .leg-ttl { font-size: 0.56rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .leg-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; color: var(--navy); font-weight: 600; }
+    .leg-row:last-child { margin-bottom: 0; }
+    .leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 2px solid white; box-shadow: 0 0 0 1px rgba(0,0,0,0.12); }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(8,25,55,0.55); z-index: 2000;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(3px);
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 12px; width: 90vw; max-width: 960px;
+      max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(8,25,55,0.35);
+      display: flex; flex-direction: column;
+    }
+    .modal::-webkit-scrollbar { width: 4px; }
+    .modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .modal-hdr {
+      background: var(--navy); color: var(--white); padding: 20px 28px 18px;
+      border-radius: 12px 12px 0 0; flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .modal-hdr h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; }
+    .modal-hdr p { font-size: 0.73rem; color: rgba(255,255,255,0.55); margin-top: 4px; max-width: 640px; line-height: 1.5; }
+    .modal-close { background: rgba(255,255,255,0.12); border: none; color: var(--white); width: 30px; height: 30px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 16px; margin-top: 2px; transition: background 0.12s; font-family: var(--font); }
+    .modal-close:hover { background: rgba(255,255,255,0.25); }
+    .modal-body { padding: 28px; }
+
+    .tl-track {
+      display: flex; align-items: stretch;
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 2px 8px rgba(8,25,55,0.1);
+      margin-bottom: 24px;
+    }
+    .tl-seg {
+      flex: 1; padding: 12px 10px 10px; background: var(--off-white);
+      border-right: 2px solid var(--white); position: relative; min-width: 0;
+      transition: background 0.15s;
+    }
+    .tl-seg:last-child { border-right: none; }
+    .tl-seg:hover { background: #e8edf5; }
+    .tl-seg.seg-start { flex: 0 0 72px; background: var(--navy); }
+    .tl-seg-days { font-size: 0.8rem; font-weight: 800; color: var(--navy); line-height: 1; }
+    .tl-seg.seg-start .tl-seg-days { color: var(--white); font-size: 0.72rem; }
+    .tl-seg-unit { font-size: 0.56rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+    .tl-seg.seg-start .tl-seg-unit { color: rgba(255,255,255,0.5); }
+    .tl-seg-lbl { font-size: 0.67rem; font-weight: 700; color: var(--navy); margin-top: 6px; line-height: 1.3; }
+    .tl-seg.seg-start .tl-seg-lbl { color: rgba(255,255,255,0.85); font-size: 0.62rem; }
+
+    .tl-events-row { display: flex; margin-bottom: 20px; }
+    .tl-event-spacer { flex: 0 0 72px; }
+    .tl-events { flex: 1; display: flex; gap: 0; }
+    .tl-event-col { flex: 1; padding: 0 6px; display: flex; flex-direction: column; gap: 6px; }
+
+    .tl-event {
+      border-radius: 6px; padding: 8px 10px; font-size: 0.67rem; line-height: 1.4;
+      border-left: 3px solid transparent; position: relative;
+    }
+    .tl-event-if { background: #e8f0fb; border-left-color: var(--accent); color: #1e3a6e; }
+    .tl-event-good { background: var(--green-bg); border-left-color: var(--green); color: #14532d; }
+    .tl-event-bad { background: var(--red-bg); border-left-color: var(--red); color: #7f1d1d; }
+    .tl-event strong { font-weight: 700; display: block; margin-bottom: 2px; }
+    .tl-event .tag { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+    .tag-if { background: var(--accent); color: white; }
+    .tag-then { background: var(--green); color: white; }
+    .tag-close { background: var(--red); color: white; }
+
+    .tl-total { text-align: center; padding: 10px 16px; background: var(--navy); border-radius: 7px; color: var(--white); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; }
+    .tl-total span { color: rgba(255,255,255,0.55); font-weight: 400; }
+
+    .import-toggle { position: fixed; bottom: 18px; right: 18px; z-index: 1000; background: var(--navy); color: var(--white); border: none; padding: 9px 15px; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 7px; box-shadow: 0 4px 16px rgba(8,25,55,0.3); transition: all 0.14s; }
+    .import-toggle:hover { background: var(--navy-light); transform: translateY(-1px); }
+    .import-panel { position: fixed; bottom: 58px; right: 18px; z-index: 1000; background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 17px; width: 385px; box-shadow: 0 8px 32px rgba(8,25,55,0.15); display: none; }
+    .import-panel.open { display: block; }
+    .import-panel h3 { font-size: 0.95rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; }
+    .import-panel > p { font-size: 0.7rem; color: var(--muted); margin-bottom: 9px; line-height: 1.5; }
+    .col-hint { font-size: 0.6rem; color: var(--muted); margin-bottom: 11px; padding: 7px 9px; background: var(--off-white); border-radius: 4px; line-height: 1.8; border: 1px solid var(--border); }
+    .imp-tabs { display: flex; margin-bottom: 11px; background: var(--off-white); border-radius: 5px; padding: 3px; gap: 2px; }
+    .imp-tab { flex: 1; padding: 5px; text-align: center; font-family: var(--font); font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; border-radius: 3px; background: transparent; color: var(--muted); border: none; transition: all 0.12s; }
+    .imp-tab.active { background: var(--white); color: var(--navy); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .imp-content { display: none; }
+    .imp-content.active { display: block; }
+    textarea { width: 100%; height: 88px; padding: 8px; border: 1px solid var(--border); background: var(--off-white); font-family: monospace; font-size: 0.67rem; color: var(--navy); resize: vertical; border-radius: 4px; outline: none; margin-bottom: 7px; transition: border-color 0.12s; }
+    textarea:focus { border-color: var(--accent); background: var(--white); }
+    .btn-imp { width: 100%; padding: 7px; background: var(--navy); color: white; border: none; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 4px; transition: background 0.12s; margin-bottom: 5px; }
+    .btn-imp:hover { background: var(--navy-light); }
+    .btn-clr { width: 100%; padding: 5px; background: transparent; color: var(--red); border: 1px solid #fca5a5; font-family: var(--font); font-size: 0.63rem; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.12s; margin-bottom: 5px; }
+    .btn-clr:hover { background: var(--red-bg); }
+    .btn-exp { width: 100%; padding: 5px; background: transparent; color: var(--accent); border: 1px solid #93c5fd; font-family: var(--font); font-size: 0.63rem; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.12s; margin-bottom: 5px; }
+    .btn-exp:hover { background: #eff6ff; }
+    .file-drop { border: 2px dashed var(--border); border-radius: 5px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.12s; margin-bottom: 7px; }
+    .file-drop:hover, .file-drop.dov { border-color: var(--accent); background: #eff6ff; }
+    .file-drop p { font-size: 0.7rem; color: var(--muted); }
+    .file-drop input { display: none; }
+    .imp-msg { font-size: 0.65rem; font-weight: 600; padding: 6px 9px; border-radius: 4px; margin-top: 6px; display: none; }
+    .imp-msg.ok { background: var(--green-bg); color: var(--green); display: block; }
+    .imp-msg.err { background: var(--red-bg); color: var(--red); display: block; }
+
+    .leaflet-popup-content-wrapper { background: var(--navy); color: var(--white); border-radius: 8px; border: none; box-shadow: 0 8px 24px rgba(8,25,55,0.4); }
+    .leaflet-popup-tip { background: var(--navy); }
+    .leaflet-popup-content { margin: 13px 15px; font-family: var(--font); min-width: 215px; }
+    .leaflet-popup-close-button { color: rgba(255,255,255,0.35) !important; font-size: 17px !important; }
+    .pu-addr { font-size: 0.83rem; font-weight: 700; margin-bottom: 1px; line-height: 1.3; }
+    .pu-name { font-size: 0.67rem; color: rgba(255,255,255,0.45); margin-bottom: 9px; }
+    .pu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 14px; margin-bottom: 9px; }
+    .pu-f label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.38); display: block; margin-bottom: 1px; }
+    .pu-f span { font-size: 0.77rem; font-weight: 500; }
+    .pu-f.wide { grid-column: 1 / -1; }
+    .pu-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+    .pu-tag { padding: 2px 7px; border-radius: 3px; font-size: 0.6rem; font-weight: 700; }
+    .pu-tag.c { background: var(--green); color: white; }
+    .pu-tag.nc { background: var(--red); color: white; }
+    .pu-tag.arc { background: var(--gray); color: white; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="hdr-brand">
+      <h1>TOPA Pipeline</h1>
+      <div class="sub">DC Multifamily · Offer of Sale Tracker</div>
+    </div>
+    <div class="hdr-asof">
+      <div class="asof-lbl">As of</div>
+      <div class="asof-val" id="asof-date">—</div>
+    </div>
+    <div class="hdr-stats">
+      <div class="stat-blk"><span class="v" id="stat-props">—</span><span class="l">Active</span></div>
+      <div class="stat-blk"><span class="v" id="stat-units">—</span><span class="l">Units</span></div>
+      <div class="stat-blk"><span class="v" id="stat-vol">—</span><span class="l">Volume</span></div>
+      <div class="stat-blk"><span class="v" id="stat-ppu">—</span><span class="l">Avg $/Unit</span></div>
+    </div>
+    <div class="hdr-btns">
+      <button class="hdr-btn" id="btn-timeline">TOPA Timeline</button>
+      <button class="hdr-btn" id="btn-archive">Archived <span class="badge-cnt" id="arc-cnt">0</span></button>
+    </div>
+  </header>
+
+  <div class="arc-banner" id="arc-banner">
+    Showing archived properties. Archive threshold is 420+ days since TOPA date.
+    <button class="arc-close" id="arc-close">Back to Active</button>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-filters">
+        <div class="sec-lbl">Filters</div>
+
+        <div class="fg">
+          <label>Type of Offering</label>
+          <div class="chips" id="chips-type">
+            <div class="chip active" data-val="all">All</div>
+            <div class="chip" data-val="w/ Contract">w/ Contract</div>
+            <div class="chip" data-val="w/o Contract">w/o Contract</div>
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>FOIA Source</label>
+          <select class="full" id="filter-foia">
+            <option value="">All Sources</option>
+            <option value="FOIA">FOIA</option>
+            <option value="Greysteel">Greysteel</option>
+            <option value="Requested">Requested</option>
+            <option value="Submitted">Submitted</option>
+            <option value="-">None / Unknown</option>
+          </select>
+        </div>
+
+        <div class="fg">
+          <label>Units</label>
+          <div class="rr">
+            <input type="number" id="u-min" placeholder="Min" min="0">
+            <span>–</span>
+            <input type="number" id="u-max" placeholder="Max" min="0">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Price ($)</label>
+          <div class="rr">
+            <input type="number" id="p-min" placeholder="Min" min="0" step="100000">
+            <span>–</span>
+            <input type="number" id="p-max" placeholder="Max" min="0" step="100000">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Price / Unit ($)</label>
+          <div class="rr">
+            <input type="number" id="ppu-min" placeholder="Min" min="0" step="5000">
+            <span>–</span>
+            <input type="number" id="ppu-max" placeholder="Max" min="0" step="5000">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>TOPA Date Range</label>
+          <div class="rr">
+            <input type="date" id="d-min">
+            <span>–</span>
+            <input type="date" id="d-max">
+          </div>
+        </div>
+
+        <div class="fg">
+          <label>Sort By</label>
+          <select class="full" id="sort-by">
+            <option value="date-desc">TOPA Date (Newest)</option>
+            <option value="date-asc">TOPA Date (Oldest)</option>
+            <option value="days-asc">Days in TOPA (Fewest)</option>
+            <option value="days-desc">Days in TOPA (Most)</option>
+            <option value="price-desc">Price (High to Low)</option>
+            <option value="price-asc">Price (Low to High)</option>
+            <option value="units-desc">Units (High to Low)</option>
+            <option value="units-asc">Units (Low to High)</option>
+            <option value="ppu-desc">Price/Unit (High to Low)</option>
+            <option value="ppu-asc">Price/Unit (Low to High)</option>
+          </select>
+        </div>
+
+        <button class="btn-reset" id="btn-reset">Reset All Filters</button>
+      </div>
+
+      <div class="res-count" id="res-count">— properties</div>
+      <div class="prop-list" id="prop-list"></div>
+    </div>
+
+    <div id="map-container">
+      <div id="map"></div>
+      <div class="map-legend">
+        <div class="leg-ttl">Legend</div>
+        <div class="leg-row"><div class="leg-dot" style="background:#16a34a"></div>w/ Contract</div>
+        <div class="leg-row"><div class="leg-dot" style="background:#dc2626"></div>w/o Contract</div>
+        <div class="leg-row"><div class="leg-dot" style="background:#94a3b8"></div>Archived (420+ days)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="tl-modal">
+    <div class="modal">
+      <div class="modal-hdr">
+        <div>
+          <h2>TOPA Timeline</h2>
+          <p>The Tenant Opportunity to Purchase Act (TOPA) gives residents an opportunity to purchase when an owner plans to sell. This timeline summarizes common windows after notice and contract execution.</p>
+        </div>
+        <button class="modal-close" id="tl-close">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="tl-track">
+          <div class="tl-seg seg-start">
+            <div class="tl-seg-days">Day 0</div>
+            <div class="tl-seg-unit">Start</div>
+            <div class="tl-seg-lbl">Tenants Notified</div>
+          </div>
+          <div class="tl-seg">
+            <div class="tl-seg-days">5</div>
+            <div class="tl-seg-unit">days</div>
+            <div class="tl-seg-lbl" style="color:var(--muted);font-size:0.6rem">Offer posted</div>
+          </div>
+          <div class="tl-seg" style="background:#dbeafe">
+            <div class="tl-seg-days" style="color:var(--accent)">45</div>
+            <div class="tl-seg-unit">days</div>
+            <div class="tl-seg-lbl">TA Formation Window</div>
+          </div>
+          <div class="tl-seg" style="background:#dbeafe">
+            <div class="tl-seg-days" style="color:var(--accent)">135</div>
+            <div class="tl-seg-unit">days</div>
+            <div class="tl-seg-lbl">TA Contract &amp; Deposit</div>
+          </div>
+          <div class="tl-seg" style="background:#dbeafe">
+            <div class="tl-seg-days" style="color:var(--accent)">120</div>
+            <div class="tl-seg-unit">days</div>
+            <div class="tl-seg-lbl">TA Secure Financing</div>
+          </div>
+          <div class="tl-seg" style="background:#dbeafe">
+            <div class="tl-seg-days" style="color:var(--accent)">120</div>
+            <div class="tl-seg-unit">days</div>
+            <div class="tl-seg-lbl">TA Financing Extension</div>
+          </div>
+          <div class="tl-seg" style="background:#dcfce7">
+            <div class="tl-seg-days" style="color:var(--green)">Closing</div>
+            <div class="tl-seg-unit">period</div>
+            <div class="tl-seg-lbl">Tenants Go to Closing</div>
+          </div>
+        </div>
+
+        <div class="tl-total">
+          420 DAYS MAX TOPA TIMELINE
+          <span> · Individual matters can end sooner if the TA exits</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="import-toggle" id="import-toggle">Import Data</button>
+  <div class="import-panel" id="import-panel">
+    <h3>Import Properties</h3>
+    <p>Append new properties via CSV or paste from Excel. Imported data is saved only in your browser unless you export it and commit it to GitHub.</p>
+
+    <div class="col-hint">
+      Expected columns (in order):<br>
+      TOPA Date · Address · Deal Name · Type · Units · Price · Price/Unit · FOIA · Buyer · Owner
+    </div>
+
+    <div class="imp-tabs">
+      <button class="imp-tab active" data-tab="paste">Paste from Excel</button>
+      <button class="imp-tab" data-tab="csv">Upload CSV</button>
+    </div>
+
+    <div class="imp-content active" id="tab-paste">
+      <textarea id="paste-input" placeholder="Paste tab separated rows from Excel. Header row is auto detected."></textarea>
+      <button class="btn-imp" id="btn-paste-imp">Import Pasted Data</button>
+    </div>
+
+    <div class="imp-content" id="tab-csv">
+      <div class="file-drop" id="file-drop">
+        <p id="drop-lbl">Drop CSV here or click to browse</p>
+        <input type="file" id="csv-input" accept=".csv,.txt">
+      </div>
+      <button class="btn-imp" id="btn-csv-imp">Import CSV</button>
+    </div>
+
+    <button class="btn-exp" id="btn-exp-json">Export Imported Data as JSON</button>
+    <button class="btn-clr" id="btn-clr-all">Clear Imported Data</button>
+
+    <div class="imp-msg" id="imp-msg"></div>
+  </div>
+
+  <!-- Leaflet (local, from your repo). -->
+  <script src="./vendor/leaflet/leaflet.js"></script>
+
+  <script>
+    // ------------------------------------------------------------------------
+    // GitHub Pages friendly data model
+    //
+    // Shared data for everyone should live in: ./data/properties.json
+    // This file is not required, but strongly recommended for sharing.
+    //
+    // Imported data is saved in the viewer's browser (local only) by default.
+    // ------------------------------------------------------------------------
+
+    // IMPORTANT: force Leaflet icon paths to your repo folder
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: './vendor/leaflet/images/marker-icon-2x.png',
+      iconUrl: './vendor/leaflet/images/marker-icon.png',
+      shadowUrl: './vendor/leaflet/images/marker-shadow.png'
+    });
+
+    var STORAGE_KEY = 'topa_imported_rows_v1';
+
+    // Hand-verified DC coordinates cache (optional). Keep empty if you want.
+    var GEO = {};
+
+    // TOPA thresholds
+    var TOPA_LIMIT = 420;
+
+    // Data containers
+    var baseData = [];      // loaded from ./data/properties.json (shared)
+    var importedData = [];  // loaded from localStorage (per user)
+    var allData = [];       // base + imported
+    var filteredData = [];
+
+    var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+    var activeType = 'all';
+    var showingArchive = false;
+
+    var map;
+    var markers = [];
+
+    // Helpers
+    function daysIn(dateStr){
+      if(!dateStr) return 0;
+      var d = new Date(dateStr);
+      if (isNaN(d)) return 0;
+      d.setHours(0,0,0,0);
+      return Math.floor((TODAY - d) / 86400000);
+    }
+    function isArc(p){ return daysIn(p.date) > TOPA_LIMIT; }
+    function fmt$(n){
+      if(n==null || isNaN(n)) return '—';
+      if(n>=1e9) return '$'+(n/1e9).toFixed(2)+'B';
+      if(n>=1e6) return '$'+(n/1e6).toFixed(n%1e6===0?0:1)+'M';
+      if(n>=1000) return '$'+Math.round(n/1000)+'K';
+      return '$'+Number(n).toLocaleString();
+    }
+    function fmtFull$(n){
+      return (n==null || isNaN(n)) ? '—' : '$'+Number(n).toLocaleString();
+    }
+    function getPPU(p){
+      return (p.price && p.units) ? Math.round(p.price / p.units) : null;
+    }
+    function fmtDate(s){
+      if(!s) return '—';
+      var pt = s.split('-');
+      if (pt.length !== 3) return '—';
+      var mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return mo[parseInt(pt[1],10)-1]+' '+parseInt(pt[2],10)+', '+pt[0];
+    }
+    function safeStr(x){ return (x==null) ? '' : String(x); }
+
+    function getMilestonePhase(days){
+      if(days<=5) return {label:"Tenants Notified"};
+      if(days<=50) return {label:"TA Formation Window"};
+      if(days<=185) return {label:"TA Contract & Deposit"};
+      if(days<=305) return {label:"TA Securing Financing"};
+      if(days<=420) return {label:"TA Financing Extension"};
+      return {label:"Process Concluded"};
+    }
+
+    function getActiveMostRecentDate(){
+      var active = allData.filter(function(p){ return !isArc(p) && p.date; });
+      if(active.length){
+        return active.reduce(function(a,b){ return a.date > b.date ? a : b; }).date;
+      }
+      var any = allData.filter(function(p){return p.date;});
+      if(any.length) return any.reduce(function(a,b){ return a.date > b.date ? a : b; }).date;
+      return null;
+    }
+
+    // Map init
+    function initMap(){
+      map = L.map('map', {center:[38.9072,-77.0369], zoom:12});
+
+      // CARTO tiles. If your company blocks this, swap to another provider.
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap © CARTO',
+        maxZoom: 19
+      }).addTo(map);
+
+      // DC boundary. If blocked, it fails silently.
+      fetch('https://raw.githubusercontent.com/unitedstates/districts/gh-pages/states/DC/shape.geojson')
+        .then(function(r){ return r.json(); })
+        .then(function(data){
+          L.geoJSON(data, { style:{color:'#081937', weight:3.5, fillOpacity:0, opacity:0.9} }).addTo(map);
+        })
+        .catch(function(){});
+    }
+
+    // Geocode with cache and light throttling
+    var _geoQueue = Promise.resolve();
+    function geocode(addr){
+      if(!addr) return Promise.resolve(null);
+      if(GEO[addr]) return Promise.resolve(GEO[addr]);
+
+      // queue calls to avoid hammering Nominatim
+      _geoQueue = _geoQueue.then(function(){
+        return new Promise(function(res){
+          setTimeout(res, 120); // throttle
+        }).then(function(){
+          return fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(addr + ', Washington DC') + '&limit=1', {
+            headers: { 'Accept': 'application/json' }
+          });
+        }).then(function(r){ return r.json(); })
+        .then(function(d){
+          if(d && d[0]){
+            var c = [parseFloat(d[0].lat), parseFloat(d[0].lon)];
+            GEO[addr] = c;
+            return c;
+          }
+          return null;
+        })
+        .catch(function(){ return null; });
+      });
+
+      return _geoQueue;
+    }
+
+    function clearMarkers(){
+      markers.forEach(function(m){ try{ map.removeLayer(m); }catch(e){} });
+      markers = [];
+    }
+
+    async function renderMarkers(){
+      clearMarkers();
+      for(var i=0;i<filteredData.length;i++){
+        var p = filteredData[i];
+        var coords = await geocode(p.address);
+        if(!coords) continue;
+
+        var arc = isArc(p);
+        var isC = p.type === 'w/ Contract';
+        var color = arc ? '#94a3b8' : (isC ? '#16a34a' : '#dc2626');
+
+        var days = daysIn(p.date);
+        var ppuVal = getPPU(p);
+        var ms = getMilestonePhase(days);
+
+        var html =
+          '<div class="pu-addr">' + safeStr(p.address) + '</div>' +
+          (p.name ? '<div class="pu-name">' + safeStr(p.name) + '</div>' : '') +
+          '<div class="pu-grid">' +
+            '<div class="pu-f"><label>TOPA Date</label><span>' + fmtDate(p.date) + '</span></div>' +
+            '<div class="pu-f"><label>Units</label><span>' + Number(p.units||0).toLocaleString() + '</span></div>' +
+            '<div class="pu-f"><label>Price</label><span>' + fmtFull$(p.price) + '</span></div>' +
+            '<div class="pu-f"><label>Price / Unit</label><span>' + (ppuVal ? '$'+ppuVal.toLocaleString() : '—') + '</span></div>' +
+            (p.buyer ? '<div class="pu-f wide"><label>Buyer</label><span>' + safeStr(p.buyer) + '</span></div>' : '') +
+            (p.owner ? '<div class="pu-f wide"><label>Owner / Seller</label><span>' + safeStr(p.owner) + '</span></div>' : '') +
+            '<div class="pu-f"><label>FOIA</label><span>' + (p.foia ? safeStr(p.foia) : '—') + '</span></div>' +
+          '</div>' +
+          '<div class="pu-tags"><span class="pu-tag ' + (arc ? 'arc' : (isC ? 'c' : 'nc')) + '">' + safeStr(p.type || '—') + '</span></div>' +
+          '<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1)">' +
+            '<div style="font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:4px">TOPA</div>' +
+            '<div style="display:flex;justify-content:space-between;font-size:0.67rem">' +
+              '<strong style="color:white;font-weight:700">' + days + ' days</strong>' +
+              '<span style="color:rgba(255,255,255,0.45)">' + (arc ? 'Archived' : Math.max(0, TOPA_LIMIT - days) + ' days left') + '</span>' +
+            '</div>' +
+            '<div style="margin-top:6px;font-size:0.72rem;font-weight:700;color:white">' + safeStr(ms.label) + '</div>' +
+          '</div>';
+
+        (function(idx){
+          var opacity = arc ? '0.5' : '1';
+          var icon = L.divIcon({
+            className: '',
+            html: '<div style="width:16px;height:16px;border-radius:50%;background:' + color + ';border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);opacity:' + opacity + ';cursor:pointer;"></div>',
+            iconSize: [16,16],
+            iconAnchor: [8,8],
+            popupAnchor: [0,-10]
+          });
+          var mk = L.marker(coords, {icon:icon}).bindPopup(html, {maxWidth: 310});
+          mk.on('click', function(){ highlightListItem(idx); });
+          mk.addTo(map);
+          markers.push(mk);
+        })(i);
+      }
+    }
+
+    function renderList(){
+      var el = document.getElementById('prop-list');
+      var cnt = document.getElementById('res-count');
+      var lbl = showingArchive ? 'archived ' : '';
+      cnt.textContent = filteredData.length + ' ' + lbl + 'propert' + (filteredData.length===1 ? 'y' : 'ies');
+
+      if(!filteredData.length){
+        el.innerHTML = '<div class="no-res">' + (showingArchive ? 'No archived properties match the current filters.' : 'No properties match the current filters.') + '</div>';
+        return;
+      }
+
+      el.innerHTML = filteredData.map(function(p,i){
+        var ppuVal = getPPU(p);
+        var isC = p.type === 'w/ Contract';
+        var arc = isArc(p);
+        var days = daysIn(p.date);
+        var segs = [5,50,185,305,420];
+        var segHtml = segs.map(function(threshold,si){
+          var cls = days >= threshold ? ('filled-' + (si+1)) : '';
+          return '<div class="days-seg ' + cls + '"></div>';
+        }).join('');
+        var ms = getMilestonePhase(days);
+
+        return '<div class="pi' + (arc ? ' arc' : '') + '" data-idx="' + i + '">' +
+          '<div class="pi-addr">' + safeStr(p.address) + '</div>' +
+          (p.name ? '<div class="pi-name">' + safeStr(p.name) + '</div>' : '') +
+          '<div class="pi-meta">' +
+            '<span class="bdg ' + (isC ? 'bdg-g' : 'bdg-r') + '">' + safeStr(p.type || '—') + '</span>' +
+            '<span class="bdg bdg-n">' + Number(p.units||0).toLocaleString() + ' units</span>' +
+            (ppuVal ? '<span class="bdg bdg-gr">' + fmt$(ppuVal) + '/unit</span>' : '') +
+            '<span class="pi-price">' + fmt$(p.price) + '</span>' +
+          '</div>' +
+          '<div class="pi-days"><strong>' + days + 'd</strong> in TOPA' +
+            '<span class="days-bar">' + segHtml + '</span>' +
+            (arc ? '<span class="bdg bdg-arc">Archived</span>' : '<span>' + Math.max(0, TOPA_LIMIT - days) + 'd left</span>') +
+          '</div>' +
+          '<div class="pi-phase">' + safeStr(ms.label) + '</div>' +
+        '</div>';
+      }).join('');
+
+      // click handlers
+      document.querySelectorAll('.pi').forEach(function(node){
+        node.addEventListener('click', function(){
+          var idx = parseInt(node.getAttribute('data-idx'), 10);
+          focusProp(idx);
+        });
+      });
+    }
+
+    function highlightListItem(idx){
+      document.querySelectorAll('.pi').forEach(function(e){ e.classList.remove('hl'); });
+      var el = document.querySelector('.pi[data-idx="' + idx + '"]');
+      if(el){
+        el.classList.add('hl');
+        el.scrollIntoView({behavior:'smooth', block:'nearest'});
+      }
+    }
+
+    async function focusProp(idx){
+      highlightListItem(idx);
+      var p = filteredData[idx];
+      var coords = await geocode(p.address);
+      if(coords){
+        map.flyTo(coords, 16, {animate:true, duration:0.8});
+        setTimeout(function(){
+          if(markers[idx]) markers[idx].openPopup();
+        }, 900);
+      }
+    }
+
+    function updateStats(){
+      var active = allData.filter(function(p){ return !isArc(p); });
+      var u = active.reduce(function(s,p){ return s + (p.units||0); }, 0);
+      var v = active.reduce(function(s,p){ return s + (p.price||0); }, 0);
+      var pa = active.filter(function(p){ return p.price && p.units; }).map(function(p){ return p.price/p.units; });
+      var avgPpu = pa.length ? pa.reduce(function(a,b){ return a+b; },0)/pa.length : null;
+
+      document.getElementById('stat-props').textContent = active.length.toLocaleString();
+      document.getElementById('stat-units').textContent = u.toLocaleString();
+      document.getElementById('stat-vol').textContent = fmt$(v);
+      document.getElementById('stat-ppu').textContent = avgPpu ? ('$' + Math.round(avgPpu).toLocaleString()) : '—';
+
+      document.getElementById('arc-cnt').textContent = allData.filter(function(p){ return isArc(p); }).length.toLocaleString();
+
+      var asof = getActiveMostRecentDate();
+      document.getElementById('asof-date').textContent = asof ? fmtDate(asof) : '—';
+    }
+
+    function applyFilters(){
+      var foia = document.getElementById('filter-foia').value;
+      var sort = document.getElementById('sort-by').value;
+      var uMin = parseFloat(document.getElementById('u-min').value); if(isNaN(uMin)) uMin = null;
+      var uMax = parseFloat(document.getElementById('u-max').value); if(isNaN(uMax)) uMax = null;
+      var pMin = parseFloat(document.getElementById('p-min').value); if(isNaN(pMin)) pMin = null;
+      var pMax = parseFloat(document.getElementById('p-max').value); if(isNaN(pMax)) pMax = null;
+      var ppuMin = parseFloat(document.getElementById('ppu-min').value); if(isNaN(ppuMin)) ppuMin = null;
+      var ppuMax = parseFloat(document.getElementById('ppu-max').value); if(isNaN(ppuMax)) ppuMax = null;
+      var dMin = document.getElementById('d-min').value || null;
+      var dMax = document.getElementById('d-max').value || null;
+
+      var pool = allData.filter(function(p){ return showingArchive ? isArc(p) : !isArc(p); });
+
+      filteredData = pool.filter(function(p){
+        if(activeType !== 'all' && p.type !== activeType) return false;
+        if(foia && p.foia !== foia) return false;
+        if(uMin != null && (p.units||0) < uMin) return false;
+        if(uMax != null && (p.units||0) > uMax) return false;
+        if(pMin != null && (p.price==null || p.price < pMin)) return false;
+        if(pMax != null && (p.price==null || p.price > pMax)) return false;
+
+        var pp = getPPU(p);
+        if(ppuMin != null && (pp==null || pp < ppuMin)) return false;
+        if(ppuMax != null && (pp==null || pp > ppuMax)) return false;
+
+        if(dMin && p.date && p.date < dMin) return false;
+        if(dMax && p.date && p.date > dMax) return false;
+
+        return true;
+      });
+
+      filteredData.sort(function(a,b){
+        switch(sort){
+          case 'date-desc': return (b.date||'').localeCompare(a.date||'');
+          case 'date-asc': return (a.date||'').localeCompare(b.date||'');
+          case 'days-desc': return daysIn(b.date) - daysIn(a.date);
+          case 'days-asc': return daysIn(a.date) - daysIn(b.date);
+          case 'price-desc': return (b.price||0) - (a.price||0);
+          case 'price-asc': return (a.price||0) - (b.price||0);
+          case 'units-desc': return (b.units||0) - (a.units||0);
+          case 'units-asc': return (a.units||0) - (b.units||0);
+          case 'ppu-desc': return (getPPU(b)||0) - (getPPU(a)||0);
+          case 'ppu-asc': return (getPPU(a)||0) - (getPPU(b)||0);
+          default: return 0;
+        }
+      });
+
+      updateStats();
+      renderList();
+      renderMarkers();
+    }
+
+    // Import parsing
+    function isHdr(cells){
+      var f = (cells[0] || '').toLowerCase();
+      return f.includes('date') || f.includes('topa');
+    }
+
+    function parseRow(cells){
+      if(!cells[1] || !String(cells[1]).trim()) return null;
+
+      var dr = cells[0] ? String(cells[0]).trim() : '';
+      var dv = '';
+      if(dr){
+        var d = new Date(dr);
+        if(!isNaN(d)) dv = d.toISOString().split('T')[0];
+      }
+
+      var units = parseInt(cells[4], 10); if(isNaN(units)) units = 0;
+
+      var priceRaw = cells[5] ? String(cells[5]).replace(/[$,\s]/g,'') : '';
+      var price = parseFloat(priceRaw); if(isNaN(price)) price = null;
+
+      return {
+        date: dv,
+        address: String(cells[1]).trim(),
+        name: cells[2] ? String(cells[2]).trim() : '',
+        type: cells[3] ? String(cells[3]).trim() : '',
+        units: units,
+        price: price,
+        foia: cells[7] ? String(cells[7]).trim() : '',
+        buyer: cells[8] ? String(cells[8]).trim() : '',
+        owner: cells[9] ? String(cells[9]).trim() : ''
+      };
+    }
+
+    function showMsg(t, tp){
+      var e = document.getElementById('imp-msg');
+      e.textContent = t;
+      e.className = 'imp-msg ' + tp;
+      clearTimeout(window._mt);
+      window._mt = setTimeout(function(){ e.className = 'imp-msg'; }, 4500);
+    }
+
+    function saveImported(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(importedData));
+      }catch(e){}
+    }
+
+    function loadImported(){
+      try{
+        var raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return [];
+        var arr = JSON.parse(raw);
+        if(!Array.isArray(arr)) return [];
+        return arr;
+      }catch(e){
+        return [];
+      }
+    }
+
+    function rebuildAllData(){
+      allData = []
+        .concat(baseData || [])
+        .concat(importedData || []);
+    }
+
+    function importRows(rows){
+      var n = 0;
+      rows.forEach(function(r){
+        var p = parseRow(r);
+        if(p){
+          importedData.push(p);
+          n++;
+        }
+      });
+      saveImported();
+      rebuildAllData();
+      return n;
+    }
+
+    // Load shared data file if present
+    async function loadBaseData(){
+      try{
+        // Put your shared list here: /data/properties.json
+        // If you do not create it, baseData stays empty and only imports show (per user).
+        var r = await fetch('./data/properties.json', {cache:'no-store'});
+        if(!r.ok) throw new Error('no data');
+        var d = await r.json();
+        if(Array.isArray(d)) return d;
+        return [];
+      }catch(e){
+        return [];
+      }
+    }
+
+    // Export imported data so you can commit it to GitHub later
+    function exportImportedJson(){
+      var blob = new Blob([JSON.stringify(importedData, null, 2)], {type:'application/json'});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'properties-imported.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // Events wiring
+    function wireEvents(){
+      document.querySelectorAll('#chips-type .chip').forEach(function(chip){
+        chip.addEventListener('click', function(){
+          document.querySelectorAll('#chips-type .chip').forEach(function(c){ c.classList.remove('active'); });
+          chip.classList.add('active');
+          activeType = chip.dataset.val;
+          applyFilters();
+        });
+      });
+
+      ['filter-foia','sort-by','d-min','d-max'].forEach(function(id){
+        document.getElementById(id).addEventListener('change', applyFilters);
+      });
+
+      ['u-min','u-max','p-min','p-max','ppu-min','ppu-max'].forEach(function(id){
+        document.getElementById(id).addEventListener('input', function(){
+          clearTimeout(window._ft);
+          window._ft = setTimeout(applyFilters, 350);
+        });
+      });
+
+      document.getElementById('btn-reset').addEventListener('click', function(){
+        activeType = 'all';
+        document.querySelectorAll('#chips-type .chip').forEach(function(c){ c.classList.remove('active'); });
+        document.querySelector('#chips-type .chip[data-val="all"]').classList.add('active');
+        document.getElementById('filter-foia').value = '';
+        document.getElementById('sort-by').value = 'date-desc';
+        ['u-min','u-max','p-min','p-max','ppu-min','ppu-max','d-min','d-max'].forEach(function(id){
+          document.getElementById(id).value = '';
+        });
+        applyFilters();
+      });
+
+      document.getElementById('btn-archive').addEventListener('click', function(){
+        showingArchive = true;
+        this.classList.add('active');
+        document.getElementById('arc-banner').classList.add('on');
+        applyFilters();
+      });
+
+      document.getElementById('arc-close').addEventListener('click', function(){
+        showingArchive = false;
+        document.getElementById('btn-archive').classList.remove('active');
+        document.getElementById('arc-banner').classList.remove('on');
+        applyFilters();
+      });
+
+      document.getElementById('btn-timeline').addEventListener('click', function(){
+        document.getElementById('tl-modal').classList.add('open');
+      });
+      document.getElementById('tl-close').addEventListener('click', function(){
+        document.getElementById('tl-modal').classList.remove('open');
+      });
+      document.getElementById('tl-modal').addEventListener('click', function(e){
+        if(e.target === this) this.classList.remove('open');
+      });
+
+      document.getElementById('import-toggle').addEventListener('click', function(){
+        document.getElementById('import-panel').classList.toggle('open');
+      });
+
+      document.querySelectorAll('.imp-tab').forEach(function(tab){
+        tab.addEventListener('click', function(){
+          document.querySelectorAll('.imp-tab').forEach(function(t){ t.classList.remove('active'); });
+          document.querySelectorAll('.imp-content').forEach(function(c){ c.classList.remove('active'); });
+          tab.classList.add('active');
+          document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+        });
+      });
+
+      document.getElementById('btn-paste-imp').addEventListener('click', function(){
+        var t = document.getElementById('paste-input').value.trim();
+        if(!t){ showMsg('Paste some data first.', 'err'); return; }
+        var rows = t.split('\n').map(function(l){ return l.split('\t'); });
+        var start = isHdr(rows[0]) ? 1 : 0;
+        var n = importRows(rows.slice(start));
+        if(n > 0){
+          showMsg('Added ' + n + ' propert' + (n===1 ? 'y' : 'ies') + '.', 'ok');
+          document.getElementById('paste-input').value = '';
+          applyFilters();
+        } else {
+          showMsg('No valid rows found. Check column order.', 'err');
+        }
+      });
+
+      var csvInput = document.getElementById('csv-input');
+      var fileDrop = document.getElementById('file-drop');
+
+      fileDrop.addEventListener('click', function(){ csvInput.click(); });
+      fileDrop.addEventListener('dragover', function(e){ e.preventDefault(); fileDrop.classList.add('dov'); });
+      fileDrop.addEventListener('dragleave', function(){ fileDrop.classList.remove('dov'); });
+      fileDrop.addEventListener('drop', function(e){
+        e.preventDefault();
+        fileDrop.classList.remove('dov');
+        if(e.dataTransfer.files[0]){
+          try{
+            var dt = new DataTransfer();
+            dt.items.add(e.dataTransfer.files[0]);
+            csvInput.files = dt.files;
+          }catch(err){}
+          document.getElementById('drop-lbl').textContent = e.dataTransfer.files[0].name;
+        }
+      });
+      csvInput.addEventListener('change', function(){
+        if(csvInput.files[0]) document.getElementById('drop-lbl').textContent = csvInput.files[0].name;
+      });
+
+      document.getElementById('btn-csv-imp').addEventListener('click', function(){
+        var file = csvInput.files[0];
+        if(!file){ showMsg('Select a CSV file first.', 'err'); return; }
+        var reader = new FileReader();
+        reader.onload = function(e){
+          var rows = e.target.result.split('\n').map(function(line){
+            var res = [], cur = '', inQ = false;
+            for(var i=0;i<line.length;i++){
+              var ch = line[i];
+              if(ch === '"'){ inQ = !inQ; }
+              else if(ch === ',' && !inQ){ res.push(cur.trim()); cur = ''; }
+              else cur += ch;
+            }
+            res.push(cur.trim());
+            return res;
+          }).filter(function(r){ return r.some(function(c){ return c; }); });
+
+          var start = isHdr(rows[0]) ? 1 : 0;
+          var n = importRows(rows.slice(start));
+          if(n > 0){
+            showMsg('Added ' + n + ' from CSV.', 'ok');
+            document.getElementById('drop-lbl').textContent = 'Drop CSV here or click to browse';
+            applyFilters();
+          } else {
+            showMsg('No valid rows found.', 'err');
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      document.getElementById('btn-clr-all').addEventListener('click', function(){
+        if(!importedData.length){ showMsg('No imported data to clear.', 'err'); return; }
+        importedData = [];
+        saveImported();
+        rebuildAllData();
+        showMsg('Imported data cleared.', 'ok');
+        applyFilters();
+      });
+
+      document.getElementById('btn-exp-json').addEventListener('click', function(){
+        if(!importedData.length){ showMsg('No imported data to export.', 'err'); return; }
+        exportImportedJson();
+        showMsg('Exported imported JSON. Commit it to GitHub to share.', 'ok');
+      });
+    }
+
+    // Boot
+    document.addEventListener('DOMContentLoaded', async function(){
+      initMap();
+      wireEvents();
+
+      // Load shared base data (for everyone)
+      baseData = await loadBaseData();
+
+      // Load per-user imported data
+      importedData = loadImported();
+
+      rebuildAllData();
+      applyFilters();
+    });
+  </script>
+</body>
+</html>
