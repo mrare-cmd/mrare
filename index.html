@@ -1543,9 +1543,11 @@ async function renderCompMarkers(){
     var c = toShow[i];
     var coords = await geocode(c.address);
     if(!coords) continue;
+    var isMatched = (c.topaId !== null && c.topaId !== undefined);
+    var dotColor = (showingArchive || isMatched) ? '#d97706' : '#7c3aed';
     var icon = L.divIcon({
       className:'',
-      html:'<div style="width:14px;height:14px;border-radius:50%;background:#7c3aed;border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);cursor:pointer;"></div>',
+      html:'<div style="width:14px;height:14px;border-radius:50%;background:'+dotColor+';border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);cursor:pointer;"></div>',
       iconSize:[14,14], iconAnchor:[7,7], popupAnchor:[0,-8]
     });
     var html = buildCompPopupHtml(c);
