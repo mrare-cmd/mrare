@@ -1160,15 +1160,17 @@ async function focusProp(idx){
   var coords=await geocode(p.address);
   if(!coords) return;
   clearTimeout(window._popupTimer);
-  map.flyTo(coords,16,{animate:true,duration:0.8});
-  // Poll for the marker — renderMarkers geocodes async and may not be done yet
-  var attempts=0;
   clearInterval(window._markerPoll);
-  window._markerPoll=setInterval(function(){
-    attempts++;
-    if(p._marker){ clearInterval(window._markerPoll); p._marker.openPopup(); return; }
-    if(attempts>20){ clearInterval(window._markerPoll); }
-  },100);
+  map.flyTo(coords,16,{animate:true,duration:0.8});
+  // Wait for fly animation to finish (0.8s + buffer), then poll for marker
+  window._popupTimer=setTimeout(function(){
+    var attempts=0;
+    window._markerPoll=setInterval(function(){
+      attempts++;
+      if(p._marker){ clearInterval(window._markerPoll); p._marker.openPopup(); return; }
+      if(attempts>30){ clearInterval(window._markerPoll); } // give up after 3s
+    },100);
+  },950);
 }
 function hlItem(idx){
   document.querySelectorAll('.pi').forEach(function(e){e.classList.remove('hl');});
@@ -1527,27 +1529,17 @@ document.getElementById('match-modal').addEventListener('click', function(e){ if
 async function renderCompMarkers(){
   compMarkers.forEach(function(m){ map.removeLayer(m); });
   compMarkers = [];
-  // In archive view, only show comps that are matched to an archived TOPA property
-  // In active view, show all unmatched comps as purple markers
-  var toShow;
-  if(showingArchive){
-    toShow = compsData.filter(function(c){
-      if(c.topaId === null || c.topaId === undefined) return false;
-      var linked = allData[c.topaId];
-      return linked && isArc(linked);
-    });
-  } else {
-    toShow = compsData.filter(function(c){ return c.topaId === null || c.topaId === undefined; });
-  }
+  // In archive view, comp markers are never shown — comps appear only as sidebar sub-rows
+  // In active view, show unmatched comps as purple markers only
+  if(showingArchive) return;
+  var toShow = compsData.filter(function(c){ return c.topaId === null || c.topaId === undefined; });
   for(var i=0; i<toShow.length; i++){
     var c = toShow[i];
     var coords = await geocode(c.address);
     if(!coords) continue;
-    var isMatched = (c.topaId !== null && c.topaId !== undefined);
-    var dotColor = (showingArchive || isMatched) ? '#d97706' : '#7c3aed';
     var icon = L.divIcon({
       className:'',
-      html:'<div style="width:14px;height:14px;border-radius:50%;background:'+dotColor+';border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);cursor:pointer;"></div>',
+      html:'<div style="width:14px;height:14px;border-radius:50%;background:#7c3aed;border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);cursor:pointer;"></div>',
       iconSize:[14,14], iconAnchor:[7,7], popupAnchor:[0,-8]
     });
     var html = buildCompPopupHtml(c);
