@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1700000000000,
+    "name": "Example Deal Name",
+    "address": "1401 S Street NW",
+    "price": 67500000,
+    "date": "2024-06-15",
+    "units": 125,
+    "sf": 98000,
+    "ppu": 540000,
+    "ppsf": 688.78,
+    "affType": "Market Rate",
+    "vacancy": "5%",
+    "yearBuilt": 1965,
+    "pfCapRate": 5.2,
+    "capRate": 4.8,
+    "bldgClass": "B",
+    "buyer": "Example Buyer LLC",
+    "seller": "Example Seller Inc",
+    "broker": "Greysteel",
+    "notes": "Closed in Q2 2024. Financed with bridge loan.",
+    "topaId": null
+  }
+]
