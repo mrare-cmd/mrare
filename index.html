@@ -1008,7 +1008,10 @@ function renderList(){
     var markerColor=(arc&&hasComps)?'#d97706':(hasComps?'#d97706':'#059669');
     items.push({kind:'topa',p:p,i:i,color:markerColor,compsList:compsList});
     // Show matched comp rows beneath the TOPA property
+    // In archive view, only show comps whose linked TOPA is also archived
     compsList.forEach(function(c){
+      var linkedProp = allData[c.topaId];
+      if(showingArchive && linkedProp && !isArc(linkedProp)) return;
       items.push({kind:'comp',c:c,ci:compsData.indexOf(c),color:'#d97706'});
     });
   });
@@ -1526,9 +1529,20 @@ document.getElementById('match-modal').addEventListener('click', function(e){ if
 async function renderCompMarkers(){
   compMarkers.forEach(function(m){ map.removeLayer(m); });
   compMarkers = [];
-  var unmatched = compsData.filter(function(c){ return c.topaId === null || c.topaId === undefined; });
-  for(var i=0; i<unmatched.length; i++){
-    var c = unmatched[i];
+  // In archive view, only show comps that are matched to an archived TOPA property
+  // In active view, show all unmatched comps as purple markers
+  var toShow;
+  if(showingArchive){
+    toShow = compsData.filter(function(c){
+      if(c.topaId === null || c.topaId === undefined) return false;
+      var linked = allData[c.topaId];
+      return linked && isArc(linked);
+    });
+  } else {
+    toShow = compsData.filter(function(c){ return c.topaId === null || c.topaId === undefined; });
+  }
+  for(var i=0; i<toShow.length; i++){
+    var c = toShow[i];
     var coords = await geocode(c.address);
     if(!coords) continue;
     var icon = L.divIcon({
