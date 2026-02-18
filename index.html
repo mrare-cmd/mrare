@@ -581,7 +581,7 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
     <div id="map"></div>
     <div class="map-legend">
       <div class="leg-ttl">Legend</div>
-      <div class="leg-row"><div class="leg-dot" style="background:#1a3a6b"></div>TOPA (active)</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#059669"></div>TOPA (active)</div>
       <div class="leg-row"><div class="leg-dot" style="background:#d97706"></div>TOPA + Sale Comp</div>
       <div class="leg-row"><div class="leg-dot" style="background:#94a3b8"></div>Archived (420+ days)</div>
       <div class="leg-row"><div class="leg-dot" style="background:#7c3aed"></div>Sale Comp only</div>
@@ -1001,7 +1001,7 @@ function renderList(){
   var items=[];
   filteredData.forEach(function(p,i){
     var arc=isArc(p); var hasComps=getCompsForTopa(p._idx).length>0;
-    var markerColor=arc?'#94a3b8':(hasComps?'#d97706':'#1a3a6b');
+    var markerColor=arc?'#94a3b8':(hasComps?'#d97706':'#059669');
     items.push({kind:'topa',p:p,i:i,color:markerColor});
     // Inline matched comps directly below their TOPA property
     getCompsForTopa(p._idx).forEach(function(c,ci){
@@ -1644,7 +1644,7 @@ function buildCompsAccordionHtml(topaPropIdx, accordionId){
     '</div>';
   }).join('');
   return '<div class="pu-comp-accordion">'+
-    '<div class="pu-comp-accordion-hdr" onclick="toggleCompAccordion(\"' +accordionId+ '\")">'+
+    '<div class="pu-comp-accordion-hdr" data-acc="'+accordionId+'" onclick="toggleCompAccordion(this)">'+
       '<span class="pu-comp-accordion-lbl">'+
         '🏷 Sale Comps <span class="pu-comp-accordion-badge">'+cs.length+'</span>'+
       '</span>'+
@@ -1656,12 +1656,13 @@ function buildCompsAccordionHtml(topaPropIdx, accordionId){
   '</div>';
 }
 
-window.toggleCompAccordion = function(id){
+window.toggleCompAccordion = function(el){
+  var id = el.dataset ? el.dataset.acc : el.getAttribute('data-acc');
   var body = document.getElementById('body-'+id);
   var chev = document.getElementById('chev-'+id);
   if(!body) return;
   body.classList.toggle('open');
-  chev.classList.toggle('open');
+  if(chev) chev.classList.toggle('open');
 };
 
 // Patch renderMarkers: three color states + collapsible accordion popup
@@ -1680,7 +1681,7 @@ renderMarkers = async function(){
     var arc=isArc(p); var isC=p.type==='w/ Contract';
     var hasComps = getCompsForTopa(topaOrigIdx).length > 0;
     // Three color states: archived=gray, topa+comp=gold, topa-only=navy
-    var color = arc ? '#94a3b8' : (hasComps ? '#d97706' : '#1a3a6b');
+    var color = arc ? '#94a3b8' : (hasComps ? '#d97706' : '#059669');
     var days=daysIn(p.date); var ppuVal=getPPU(p);
     var segsThresh=[5,50,185,305,420];
     var segColors=['#16a34a','#22c55e','#d97706','#ea580c','#dc2626'];
@@ -1704,16 +1705,16 @@ renderMarkers = async function(){
       '</div>'+
       '<div class="pu-tags"><span class="pu-tag '+(arc?'arc':(isC?'c':'nc'))+'">'+p.type+'</span></div>'+
       '<div class="pu-topa-bar">'+
-      '<div class="pu-topa-lbl">TOPA Progress · <strong style="color:white">'+ms.label+'</strong></div>'+
+      '<div class="pu-topa-lbl">TOPA Progress · <strong style="color:white">'+(sold?'Sold':ms.label)+'</strong></div>'+
       '<div style="display:flex;gap:2px;margin:5px 0 4px">'+popSegHtml+'</div>'+
       '<div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.38)">'+
       '<span>Day 0</span><span>45</span><span>185</span><span>305</span><span>420</span>'+
       '</div>'+
-      '<div class="pu-topa-info" style="margin-top:5px"><strong>'+days+' days</strong><span>'+(arc?'Archived':Math.max(0,TOPA_LIMIT-days)+' days left')+'</span></div>'+
+      '<div class="pu-topa-info" style="margin-top:5px"><strong>'+(sold?daysAtSale:days)+' days</strong><span>'+(sold?'Sold · '+fmtDate(soldDate):(arc?'Archived':Math.max(0,TOPA_LIMIT-days)+' days left'))+'</span></div>'+
       '</div>'+
       '<div class="pu-milestones" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1)">'+
-      '<div style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px">Current Phase</div>'+
-      '<div style="font-size:0.75rem;font-weight:700;color:white">'+ms.label+'</div>'+
+      '<div style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px">'+(sold?'Outcome':'Current Phase')+'</div>'+
+      '<div style="font-size:0.75rem;font-weight:700;color:white">'+(sold?'✓ Sold — Process Complete':ms.label)+'</div>'+
       '</div>'+
       (hasComps ? buildCompsAccordionHtml(topaOrigIdx, accordionId) : '');
 
