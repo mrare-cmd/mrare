@@ -572,16 +572,6 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
     </div>
     <div class="res-count" id="res-count">— properties</div>
     <div class="prop-list" id="prop-list"></div>
-    <!-- COMPS SIDEBAR -->
-    <div style="border-top:2px solid var(--comp-bg);flex-shrink:0;">
-      <div style="padding:8px 14px 0;display:flex;align-items:center;justify-content:space-between;">
-        <div class="sec-lbl" style="margin-bottom:0;color:var(--comp);">Sales Comps <span class="comp-cnt-badge" id="comp-cnt-badge">0</span></div>
-        <button class="btn-comp-export" id="btn-export-comps" title="Export comps as JSON">↓ Export JSON</button>
-      </div>
-      <div id="comps-sidebar-list" style="padding:4px 14px 10px;max-height:200px;overflow-y:auto;">
-        <div id="comps-sidebar-empty" style="font-size:0.68rem;color:var(--muted);padding:6px 0 4px;">No sales comps loaded. Import below.</div>
-      </div>
-    </div>
   </div>
 
   <!-- MAP -->
@@ -792,6 +782,14 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
   <button class="btn-comp-outline" id="btn-run-matching" style="margin-top:6px;">🔗 Run Address Matching</button>
   <button class="btn-clr" id="btn-clr-comps" style="margin-top:4px;">Clear All Comps Data</button>
   <div class="comp-imp-msg" id="comp-imp-msg"></div>
+  <!-- Loaded comps list -->
+  <div id="comp-panel-list-wrap" style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px;display:none;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+      <span style="font-size:0.7rem;font-weight:700;color:var(--navy);">Loaded Comps <span class="comp-cnt-badge" id="comp-cnt-badge">0</span></span>
+      <button class="btn-comp-export" id="btn-export-comps" title="Export comps as JSON">↓ Export JSON</button>
+    </div>
+    <div id="comps-sidebar-list" style="max-height:240px;overflow-y:auto;"></div>
+  </div>
 </div>
 
 <!-- ════ COMP MATCH MODAL ════ -->
@@ -1357,17 +1355,29 @@ function autoMatchHighConfidence(){
 // ── MATCH QUEUE SYSTEM ────────────────────────────────────────────────────────
 function runMatching(){
   var autoMatched = autoMatchHighConfidence();
-  matchQueue = compsData.filter(function(c){ return !c.topaId; }).map(function(c){ return c; });
+  // Only queue comps that are unmatched AND have at least one candidate — skip ones with zero options
+  matchQueue = compsData.filter(function(c){
+    if(c.topaId !== null && c.topaId !== undefined) return false;
+    return findCandidates(c.address).length > 0;
+  });
+  var skipped = compsData.filter(function(c){
+    return (c.topaId === null || c.topaId === undefined) && findCandidates(c.address).length === 0;
+  }).length;
   matchQueueIdx = 0;
   if(!matchQueue.length){
-    var msg = autoMatched
-      ? 'Auto-matched '+autoMatched+' comp'+(autoMatched===1?'':'s')+' by address. No remaining comps need manual review.'
-      : 'All comps are already matched or there are no comps loaded.';
-    alert(msg);
+    var parts = [];
+    if(autoMatched) parts.push('Auto-matched '+autoMatched+' comp'+(autoMatched===1?'':'s')+' by address.');
+    if(skipped) parts.push(skipped+' comp'+(skipped===1?' has':'s have')+' no potential TOPA match and were skipped.');
+    if(!parts.length) parts.push('All comps are already matched or there are no comps loaded.');
+    alert(parts.join(' '));
     renderCompsSidebar(); renderCompMarkers(); applyFilters();
     return;
   }
-  var notice = autoMatched ? 'Auto-matched '+autoMatched+' comp'+(autoMatched===1?'':'s')+'. '+matchQueue.length+' need manual review.' : matchQueue.length+' comp'+(matchQueue.length===1?'':'s')+' need review.';
+  var noticeParts = [];
+  if(autoMatched) noticeParts.push('Auto-matched '+autoMatched+'.');
+  if(skipped) noticeParts.push(skipped+' skipped (no candidates).');
+  noticeParts.push(matchQueue.length+' need review.');
+  var notice = noticeParts.join(' ');
   document.getElementById('match-modal').classList.add('open');
   document.getElementById('match-progress-lbl').textContent = notice;
   setTimeout(showMatchStep, 800);
@@ -1498,24 +1508,26 @@ function buildCompPopupHtml(c){
 function renderCompsSidebar(){
   var el = document.getElementById('comps-sidebar-list');
   var badge = document.getElementById('comp-cnt-badge');
-  var empty = document.getElementById('comps-sidebar-empty');
+  var wrap = document.getElementById('comp-panel-list-wrap');
   badge.textContent = compsData.length;
   if(!compsData.length){
-    el.innerHTML = '<div id="comps-sidebar-empty" style="font-size:0.68rem;color:var(--muted);padding:6px 0 4px;">No sales comps loaded. Import below.</div>';
+    wrap.style.display = 'none';
+    el.innerHTML = '';
     return;
   }
+  wrap.style.display = 'block';
   el.innerHTML = compsData.map(function(c, ci){
     var ppu = (c.price && c.units) ? Math.round(c.price/c.units) : c.ppu;
     var matched = (c.topaId !== null && c.topaId !== undefined);
-    return '<div class="comp-list-item" onclick="focusComp('+ci+')" style="padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;">'+
+    return '<div class="comp-list-item" onclick="focusComp('+ci+')">'+
       '<div class="cli-addr">'+(c.name||c.address)+'</div>'+
       '<div class="cli-meta">'+
         (c.date ? '<span>'+fmtDate(c.date)+'</span>' : '')+
         (c.price ? '<span><strong>'+fmt$(c.price)+'</strong></span>' : '')+
         (ppu ? '<span>'+fmt$(ppu)+'/unit</span>' : '')+
       '</div>'+
-      '<div class="'+(matched?'cli-match':'cli-unmatched')+'">'+(matched?'✓ Matched to TOPA':'○ Unmatched')+
-        (matched&&allData[c.topaId] ? ' · '+allData[c.topaId].address.substring(0,30) : '')+
+      '<div class="'+(matched?'cli-match':'cli-unmatched')+'">'+(matched?'✓ Matched':' Unmatched')+
+        (matched&&allData[c.topaId] ? ' · '+allData[c.topaId].address.substring(0,28) : '')+
       '</div>'+
     '</div>';
   }).join('');
