@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOPA Pipeline Dashboard</title>
+<!-- Proxima Nova via Adobe Fonts fallback chain; system fallback to Nunito which is close -->
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+/* ── Proxima Nova stack: load via @font-face if available, else Nunito ── */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: local('Proxima Nova'), local('ProximaNova-Regular');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  src: local('Proxima Nova Semibold'), local('ProximaNova-Semibold');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  src: local('Proxima Nova Bold'), local('ProximaNova-Bold');
+  font-weight: 700;
+}
+@font-face {
+  font-family: 'Proxima Nova';
+  src: local('Proxima Nova Extrabold'), local('ProximaNova-Extrabold');
+  font-weight: 800;
+}
+
+:root {
+  --navy: #081937;
+  --navy-mid: #0d2548;
+  --navy-light: #1a3a6b;
+  --navy-border: rgba(255,255,255,0.1);
+  --white: #ffffff;
+  --off-white: #f4f6f9;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --gray: #94a3b8;
+  --gray-bg: #f1f5f9;
+  --accent: #2563eb;
+  --gold: #d97706;
+  --font: 'Proxima Nova', 'Nunito', sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body { font-family: var(--font); background: var(--off-white); color: var(--navy); display: flex; flex-direction: column; font-size: 13px; }
+
+/* ════════════════ HEADER ════════════════ */
+header {
+  background: var(--navy);
+  color: var(--white);
+  height: 58px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: 1px solid var(--navy-light);
+  flex-shrink: 0;
+}
+.hdr-brand {
+  display: flex; flex-direction: column; justify-content: center;
+  border-right: 1px solid var(--navy-border);
+  padding-right: 20px; margin-right: 20px; height: 100%;
+}
+.hdr-brand h1 { font-size: 1.15rem; font-weight: 800; color: var(--white); letter-spacing: 0.01em; line-height: 1; }
+.hdr-brand .sub { font-size: 0.6rem; color: rgba(255,255,255,0.4); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 3px; }
+
+.hdr-asof { display: flex; flex-direction: column; justify-content: center; }
+.hdr-asof .asof-lbl { font-size: 0.58rem; color: rgba(255,255,255,0.38); letter-spacing: 0.12em; text-transform: uppercase; }
+.hdr-asof .asof-val { font-size: 1.05rem; font-weight: 700; color: var(--white); margin-top: 1px; }
+
+.hdr-stats { display: flex; gap: 0; margin-left: auto; height: 100%; }
+.stat-blk {
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-end;
+  padding: 0 18px; border-left: 1px solid var(--navy-border);
+}
+.stat-blk .v { font-size: 1.05rem; font-weight: 700; color: var(--white); line-height: 1; }
+.stat-blk .l { font-size: 0.57rem; color: rgba(255,255,255,0.38); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 3px; }
+
+.hdr-btns { display: flex; gap: 8px; margin-left: 16px; align-items: center; }
+.hdr-btn {
+  padding: 6px 13px; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.65);
+  background: transparent; font-family: var(--font); font-size: 0.68rem; font-weight: 600;
+  cursor: pointer; border-radius: 5px; transition: all 0.14s; white-space: nowrap;
+  display: flex; align-items: center; gap: 5px;
+}
+.hdr-btn:hover, .hdr-btn.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.45); color: var(--white); }
+.badge-cnt { background: var(--gold); color: var(--white); border-radius: 9px; padding: 1px 6px; font-size: 0.6rem; font-weight: 700; }
+
+/* ════════════════ LAYOUT ════════════════ */
+.layout { display: grid; grid-template-columns: 278px 1fr; flex: 1; overflow: hidden; }
+
+/* ════════════════ SIDEBAR ════════════════ */
+.sidebar { background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+
+.sidebar-filters { padding: 13px 14px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.sec-lbl { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted); margin-bottom: 9px; }
+.fg { margin-bottom: 7px; }
+.fg label { font-size: 0.62rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 3px; }
+.rr { display: flex; gap: 4px; align-items: center; }
+.rr input { flex: 1; min-width: 0; padding: 5px 6px; border: 1px solid var(--border); background: var(--off-white); font-family: var(--font); font-size: 0.7rem; color: var(--navy); border-radius: 4px; outline: none; transition: border-color 0.12s; }
+.rr input:focus { border-color: var(--accent); background: var(--white); }
+.rr span { font-size: 0.65rem; color: var(--muted); flex-shrink: 0; }
+select.full { width: 100%; padding: 5px 7px; border: 1px solid var(--border); background: var(--off-white); font-family: var(--font); font-size: 0.73rem; color: var(--navy); border-radius: 4px; outline: none; transition: border-color 0.12s; }
+select.full:focus { border-color: var(--accent); background: var(--white); }
+.chips { display: flex; gap: 4px; flex-wrap: wrap; }
+.chip { padding: 3px 9px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.63rem; font-weight: 600; cursor: pointer; background: var(--off-white); color: var(--muted); transition: all 0.12s; user-select: none; }
+.chip.active { background: var(--navy); color: var(--white); border-color: var(--navy); }
+.chip:hover:not(.active) { border-color: var(--navy); color: var(--navy); background: var(--white); }
+.btn-reset { width: 100%; padding: 5px; background: transparent; border: 1px solid var(--border); color: var(--muted); font-family: var(--font); font-size: 0.63rem; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.12s; margin-top: 5px; }
+.btn-reset:hover { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+.res-count { padding: 6px 14px; font-size: 0.63rem; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); background: var(--off-white); flex-shrink: 0; }
+
+/* ════════════════ PROPERTY LIST ════════════════ */
+.prop-list { flex: 1; overflow-y: auto; }
+.prop-list::-webkit-scrollbar { width: 3px; }
+.prop-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.pi { padding: 9px 14px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+.pi:hover { background: var(--off-white); }
+.pi.hl { background: #eff6ff; border-left: 3px solid var(--accent); padding-left: 11px; }
+.pi.arc { opacity: 0.65; }
+.pi-addr { font-size: 0.77rem; font-weight: 700; line-height: 1.3; color: var(--navy); }
+.pi-name { font-size: 0.65rem; color: var(--muted); margin-bottom: 4px; }
+.pi-meta { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.bdg { font-size: 0.58rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+.bdg-g { background: var(--green-bg); color: var(--green); }
+.bdg-r { background: var(--red-bg); color: var(--red); }
+.bdg-n { background: rgba(8,25,55,0.07); color: var(--navy); }
+.bdg-gr { background: var(--gray-bg); color: var(--gray); border: 1px solid var(--border); }
+.bdg-arc { background: #fef3c7; color: #92400e; }
+.pi-price { font-size: 0.7rem; font-weight: 700; color: var(--navy); margin-left: auto; }
+.pi-days { font-size: 0.6rem; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+.pi-days strong { font-weight: 700; color: var(--navy); }
+.days-bar { display: inline-flex; gap: 1px; width: 80px; height: 4px; vertical-align: middle; }
+.days-seg { flex: 1; border-radius: 1px; background: var(--border); transition: background 0.2s; }
+.days-seg.filled-1 { background: #16a34a; }
+.days-seg.filled-2 { background: #22c55e; }
+.days-seg.filled-3 { background: var(--gold); }
+.days-seg.filled-4 { background: #ea580c; }
+.days-seg.filled-5 { background: var(--red); }
+.pi-phase { font-size: 0.6rem; font-weight: 600; color: var(--accent); margin-top: 2px; letter-spacing: 0.01em; }
+.no-res { padding: 24px 14px; text-align: center; color: var(--muted); font-size: 0.75rem; line-height: 1.5; }
+
+/* ════════════════ ARCHIVE BANNER ════════════════ */
+.arc-banner { display: none; background: #fffbeb; border-bottom: 1px solid #fde68a; padding: 5px 14px; font-size: 0.67rem; color: #92400e; font-weight: 600; flex-shrink: 0; align-items: center; gap: 8px; }
+.arc-banner.on { display: flex; }
+.arc-close { margin-left: auto; cursor: pointer; font-weight: 700; background: none; border: none; color: #b45309; font-size: 0.75rem; padding: 0 2px; font-family: var(--font); }
+
+/* ════════════════ MAP ════════════════ */
+#map-container { position: relative; }
+#map { width: 100%; height: 100%; }
+.map-legend { position: absolute; bottom: 26px; left: 12px; z-index: 500; background: rgba(255,255,255,0.97); border: 1px solid var(--border); border-radius: 7px; padding: 10px 13px; font-size: 0.65rem; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+.leg-ttl { font-size: 0.56rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.leg-row { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; color: var(--navy); font-weight: 600; }
+.leg-row:last-child { margin-bottom: 0; }
+.leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; border: 2px solid white; box-shadow: 0 0 0 1px rgba(0,0,0,0.12); }
+
+/* ════════════════ TIMELINE MODAL ════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(8,25,55,0.55); z-index: 2000;
+  display: none; align-items: center; justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--white); border-radius: 12px; width: 90vw; max-width: 960px;
+  max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(8,25,55,0.35);
+  display: flex; flex-direction: column;
+}
+.modal::-webkit-scrollbar { width: 4px; }
+.modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.modal-hdr {
+  background: var(--navy); color: var(--white); padding: 20px 28px 18px;
+  border-radius: 12px 12px 0 0; flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between;
+}
+.modal-hdr h2 { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; }
+.modal-hdr p { font-size: 0.73rem; color: rgba(255,255,255,0.55); margin-top: 4px; max-width: 640px; line-height: 1.5; }
+.modal-close { background: rgba(255,255,255,0.12); border: none; color: var(--white); width: 30px; height: 30px; border-radius: 50%; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: 16px; margin-top: 2px; transition: background 0.12s; font-family: var(--font); }
+.modal-close:hover { background: rgba(255,255,255,0.25); }
+.modal-body { padding: 28px; }
+
+/* Timeline */
+.tl-wrap { position: relative; }
+.tl-track {
+  display: flex; align-items: stretch;
+  border-radius: 8px; overflow: hidden;
+  box-shadow: 0 2px 8px rgba(8,25,55,0.1);
+  margin-bottom: 24px;
+}
+.tl-seg {
+  flex: 1; padding: 12px 10px 10px; background: var(--off-white);
+  border-right: 2px solid var(--white); position: relative; min-width: 0;
+  transition: background 0.15s;
+}
+.tl-seg:last-child { border-right: none; }
+.tl-seg:hover { background: #e8edf5; }
+.tl-seg.seg-start { flex: 0 0 72px; background: var(--navy); }
+.tl-seg-days { font-size: 0.8rem; font-weight: 800; color: var(--navy); line-height: 1; }
+.tl-seg.seg-start .tl-seg-days { color: var(--white); font-size: 0.72rem; }
+.tl-seg-unit { font-size: 0.56rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 1px; }
+.tl-seg.seg-start .tl-seg-unit { color: rgba(255,255,255,0.5); }
+.tl-seg-lbl { font-size: 0.67rem; font-weight: 700; color: var(--navy); margin-top: 6px; line-height: 1.3; }
+.tl-seg.seg-start .tl-seg-lbl { color: rgba(255,255,255,0.85); font-size: 0.62rem; }
+
+.tl-events-row { display: flex; margin-bottom: 20px; }
+.tl-event-spacer { flex: 0 0 72px; }
+.tl-events { flex: 1; display: flex; gap: 0; }
+.tl-event-col { flex: 1; padding: 0 6px; display: flex; flex-direction: column; gap: 6px; }
+
+.tl-event {
+  border-radius: 6px; padding: 8px 10px; font-size: 0.67rem; line-height: 1.4;
+  border-left: 3px solid transparent; position: relative;
+}
+.tl-event-if { background: #e8f0fb; border-left-color: var(--accent); color: #1e3a6e; }
+.tl-event-good { background: var(--green-bg); border-left-color: var(--green); color: #14532d; }
+.tl-event-bad { background: var(--red-bg); border-left-color: var(--red); color: #7f1d1d; }
+.tl-event-arrow { position: absolute; top: 50%; right: -14px; transform: translateY(-50%); font-size: 0.75rem; color: var(--muted); z-index: 1; }
+.tl-event strong { font-weight: 700; display: block; margin-bottom: 2px; }
+.tl-event .tag { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 0.58rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+.tag-if { background: var(--accent); color: white; }
+.tag-then { background: var(--green); color: white; }
+.tag-close { background: var(--red); color: white; }
+
+.tl-total { text-align: center; padding: 10px 16px; background: var(--navy); border-radius: 7px; color: var(--white); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; }
+.tl-total span { color: rgba(255,255,255,0.55); font-weight: 400; }
+
+/* ════════════════ IMPORT ════════════════ */
+.import-toggle { position: fixed; bottom: 18px; right: 18px; z-index: 1000; background: var(--navy); color: var(--white); border: none; padding: 9px 15px; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 7px; box-shadow: 0 4px 16px rgba(8,25,55,0.3); transition: all 0.14s; }
+.import-toggle:hover { background: var(--navy-light); transform: translateY(-1px); }
+.import-panel { position: fixed; bottom: 58px; right: 18px; z-index: 1000; background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 17px; width: 385px; box-shadow: 0 8px 32px rgba(8,25,55,0.15); display: none; }
+.import-panel.open { display: block; }
+.import-panel h3 { font-size: 0.95rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; }
+.import-panel > p { font-size: 0.7rem; color: var(--muted); margin-bottom: 9px; line-height: 1.5; }
+.col-hint { font-size: 0.6rem; color: var(--muted); margin-bottom: 11px; padding: 7px 9px; background: var(--off-white); border-radius: 4px; line-height: 1.8; border: 1px solid var(--border); }
+.imp-tabs { display: flex; margin-bottom: 11px; background: var(--off-white); border-radius: 5px; padding: 3px; gap: 2px; }
+.imp-tab { flex: 1; padding: 5px; text-align: center; font-family: var(--font); font-size: 0.63rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; border-radius: 3px; background: transparent; color: var(--muted); border: none; transition: all 0.12s; }
+.imp-tab.active { background: var(--white); color: var(--navy); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.imp-content { display: none; }
+.imp-content.active { display: block; }
+textarea { width: 100%; height: 88px; padding: 8px; border: 1px solid var(--border); background: var(--off-white); font-family: monospace; font-size: 0.67rem; color: var(--navy); resize: vertical; border-radius: 4px; outline: none; margin-bottom: 7px; transition: border-color 0.12s; }
+textarea:focus { border-color: var(--accent); background: var(--white); }
+.btn-imp { width: 100%; padding: 7px; background: var(--navy); color: white; border: none; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 4px; transition: background 0.12s; margin-bottom: 5px; }
+.btn-imp:hover { background: var(--navy-light); }
+.btn-clr { width: 100%; padding: 5px; background: transparent; color: var(--red); border: 1px solid #fca5a5; font-family: var(--font); font-size: 0.63rem; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.12s; }
+.btn-clr:hover { background: var(--red-bg); }
+.file-drop { border: 2px dashed var(--border); border-radius: 5px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.12s; margin-bottom: 7px; }
+.file-drop:hover, .file-drop.dov { border-color: var(--accent); background: #eff6ff; }
+.file-drop p { font-size: 0.7rem; color: var(--muted); }
+.file-drop input { display: none; }
+.imp-msg { font-size: 0.65rem; font-weight: 600; padding: 6px 9px; border-radius: 4px; margin-top: 6px; display: none; }
+.imp-msg.ok { background: var(--green-bg); color: var(--green); display: block; }
+.imp-msg.err { background: var(--red-bg); color: var(--red); display: block; }
+
+/* ════════════════ COMPS ════════════════ */
+:root { --comp: #7c3aed; --comp-bg: #ede9fe; --comp-light: #a78bfa; }
+.comp-toggle { position: fixed; bottom: 18px; right: 215px; z-index: 1000; background: var(--comp); color: var(--white); border: none; padding: 9px 13px; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 7px; box-shadow: 0 4px 16px rgba(124,58,237,0.35); transition: all 0.14s; white-space: nowrap; }
+.comp-toggle:hover { background: #6d28d9; transform: translateY(-1px); }
+.comp-panel { position: fixed; bottom: 58px; right: 215px; z-index: 1000; background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 17px; width: 420px; box-shadow: 0 8px 32px rgba(8,25,55,0.15); display: none; max-height: 80vh; overflow-y: auto; }
+.comp-panel.open { display: block; }
+.comp-panel::-webkit-scrollbar { width: 3px; }
+.comp-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.comp-panel h3 { font-size: 0.95rem; font-weight: 800; color: var(--navy); margin-bottom: 3px; display: flex; align-items: center; gap: 7px; }
+.comp-panel > p { font-size: 0.7rem; color: var(--muted); margin-bottom: 11px; line-height: 1.5; }
+.comp-section-hdr { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--comp); margin: 12px 0 7px; border-top: 1px solid var(--border); padding-top: 10px; }
+.comp-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 8px; margin-bottom: 8px; }
+.comp-form-grid .fg { margin-bottom: 0; }
+.comp-form-grid .fg.wide { grid-column: 1/-1; }
+.comp-form-grid label { font-size: 0.6rem; font-weight: 600; color: var(--muted); display: block; margin-bottom: 2px; }
+.comp-form-grid input, .comp-form-grid textarea { width: 100%; padding: 5px 6px; border: 1px solid var(--border); background: var(--off-white); font-family: var(--font); font-size: 0.7rem; color: var(--navy); border-radius: 4px; outline: none; transition: border-color 0.12s; }
+.comp-form-grid input:focus, .comp-form-grid textarea:focus { border-color: var(--comp); background: white; }
+.comp-form-grid textarea { height: 48px; resize: vertical; }
+.comp-col-hint { font-size: 0.58rem; color: var(--muted); padding: 6px 8px; background: var(--off-white); border-radius: 4px; border: 1px solid var(--border); line-height: 1.8; margin-bottom: 9px; }
+.btn-comp { width: 100%; padding: 7px; background: var(--comp); color: white; border: none; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 4px; transition: background 0.12s; margin-bottom: 5px; }
+.btn-comp:hover { background: #6d28d9; }
+.btn-comp-outline { width: 100%; padding: 6px; background: transparent; color: var(--comp); border: 1px solid var(--comp-light); font-family: var(--font); font-size: 0.63rem; font-weight: 600; cursor: pointer; border-radius: 4px; transition: all 0.12s; margin-bottom: 5px; }
+.btn-comp-outline:hover { background: var(--comp-bg); }
+.comp-imp-msg { font-size: 0.65rem; font-weight: 600; padding: 6px 9px; border-radius: 4px; margin-top: 5px; display: none; }
+.comp-imp-msg.ok { background: var(--green-bg); color: var(--green); display: block; }
+.comp-imp-msg.err { background: var(--red-bg); color: var(--red); display: block; }
+
+/* Comps sidebar section */
+.comps-sidebar { padding: 10px 14px; border-top: 2px solid var(--comp-bg); flex-shrink: 0; max-height: 220px; overflow-y: auto; }
+.comps-sidebar::-webkit-scrollbar { width: 3px; }
+.comps-sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.comp-list-item { padding: 7px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
+.comp-list-item:last-child { border-bottom: none; }
+.comp-list-item:hover { opacity: 0.8; }
+.cli-addr { font-size: 0.7rem; font-weight: 700; color: var(--comp); line-height: 1.3; }
+.cli-meta { font-size: 0.62rem; color: var(--muted); margin-top: 2px; display: flex; gap: 6px; }
+.cli-meta strong { color: var(--navy); }
+.cli-match { font-size: 0.58rem; color: var(--green); font-weight: 600; margin-top: 1px; }
+.cli-unmatched { font-size: 0.58rem; color: var(--comp); font-weight: 600; margin-top: 1px; }
+
+/* Match modal */
+.match-modal { position: fixed; inset: 0; background: rgba(8,25,55,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+.match-modal.open { display: flex; }
+.match-box { background: var(--white); border-radius: 12px; width: 90vw; max-width: 780px; max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(8,25,55,0.3); }
+.match-box::-webkit-scrollbar { width: 4px; }
+.match-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.match-hdr { background: var(--comp); color: white; padding: 18px 24px 16px; border-radius: 12px 12px 0 0; display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; }
+.match-hdr h2 { font-size: 1.1rem; font-weight: 800; }
+.match-hdr p { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 3px; }
+.match-body { padding: 20px 24px; }
+.match-comp-card { background: var(--comp-bg); border: 1px solid var(--comp-light); border-radius: 8px; padding: 12px 14px; margin-bottom: 14px; }
+.match-comp-card h4 { font-size: 0.78rem; font-weight: 800; color: var(--comp); margin-bottom: 3px; }
+.match-comp-card .mc-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.68rem; color: var(--navy); }
+.match-comp-card .mc-meta span { font-weight: 600; }
+.match-section-lbl { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 12px 0 7px; }
+.match-candidate { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border: 2px solid var(--border); border-radius: 7px; margin-bottom: 7px; cursor: pointer; transition: all 0.12s; }
+.match-candidate:hover { border-color: var(--comp-light); background: var(--comp-bg); }
+.match-candidate.selected { border-color: var(--comp); background: var(--comp-bg); }
+.mc-radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; margin-top: 2px; transition: all 0.12s; }
+.match-candidate.selected .mc-radio { border-color: var(--comp); background: var(--comp); }
+.mc-info h5 { font-size: 0.73rem; font-weight: 700; color: var(--navy); }
+.mc-info p { font-size: 0.63rem; color: var(--muted); margin-top: 1px; }
+.mc-score { font-size: 0.58rem; font-weight: 700; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+.mc-score-hi { background: var(--green-bg); color: var(--green); }
+.mc-score-med { background: #fef3c7; color: #92400e; }
+.match-btn-row { display: flex; gap: 7px; margin-top: 12px; }
+.match-btn-accept { flex: 1; padding: 8px; background: var(--comp); color: white; border: none; font-family: var(--font); font-size: 0.7rem; font-weight: 700; cursor: pointer; border-radius: 5px; transition: background 0.12s; }
+.match-btn-accept:hover { background: #6d28d9; }
+.match-btn-skip { flex: 1; padding: 8px; background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: var(--font); font-size: 0.7rem; font-weight: 600; cursor: pointer; border-radius: 5px; transition: all 0.12s; }
+.match-btn-skip:hover { background: var(--off-white); }
+.match-no-candidates { padding: 14px; background: var(--off-white); border-radius: 7px; text-align: center; font-size: 0.7rem; color: var(--muted); }
+.match-progress { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
+
+/* Comp popup tab system */
+.pu-tabs { display: flex; gap: 0; margin: 8px -1px 0; border-top: 1px solid rgba(255,255,255,0.12); }
+.pu-tab { flex: 1; padding: 6px 4px; text-align: center; font-family: var(--font); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; cursor: pointer; background: transparent; color: rgba(255,255,255,0.45); border: none; border-bottom: 2px solid transparent; transition: all 0.12s; }
+.pu-tab.active { color: var(--white); border-bottom-color: var(--comp-light); }
+.pu-tab-content { display: none; padding-top: 10px; }
+.pu-tab-content.active { display: block; }
+.pu-comp-card { background: rgba(124,58,237,0.18); border: 1px solid rgba(167,139,250,0.3); border-radius: 6px; padding: 9px 11px; margin-bottom: 7px; }
+.pu-comp-card:last-child { margin-bottom: 0; }
+.pu-comp-addr { font-size: 0.68rem; font-weight: 700; color: #c4b5fd; line-height: 1.3; margin-bottom: 5px; }
+.pu-comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+.pu-comp-f label { font-size: 0.52rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: rgba(255,255,255,0.35); display: block; margin-bottom: 1px; }
+.pu-comp-f span { font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.9); }
+.pu-comp-f.wide { grid-column: 1/-1; }
+.pu-comp-notes { font-size: 0.62rem; color: rgba(255,255,255,0.55); margin-top: 5px; font-style: italic; line-height: 1.4; }
+.no-comps-msg { font-size: 0.68rem; color: rgba(255,255,255,0.4); text-align: center; padding: 12px 0; }
+
+/* Comps sidebar */
+.comps-sidebar-hdr { padding: 9px 14px 0; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.comps-sidebar-hdr .sec-lbl { margin-bottom: 0; color: var(--comp); }
+.comp-cnt-badge { font-size: 0.6rem; font-weight: 700; background: var(--comp-bg); color: var(--comp); padding: 1px 6px; border-radius: 9px; }
+.btn-comp-export { font-size: 0.58rem; font-weight: 700; padding: 2px 7px; background: transparent; border: 1px solid var(--comp-light); color: var(--comp); border-radius: 3px; cursor: pointer; font-family: var(--font); transition: all 0.12s; }
+.btn-comp-export:hover { background: var(--comp-bg); }
+
+/* Unmatched comp marker color in legend */
+.leg-dot-comp { background: #7c3aed; }
+
+/* JSON export panel */
+.comp-export-section { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+/* ════════════════ LEAFLET POPUP ════════════════ */
+.leaflet-popup-content-wrapper { background: var(--navy); color: var(--white); border-radius: 8px; border: none; box-shadow: 0 8px 24px rgba(8,25,55,0.4); }
+.leaflet-popup-tip { background: var(--navy); }
+.leaflet-popup-content { margin: 13px 15px; font-family: var(--font); min-width: 215px; }
+.leaflet-popup-close-button { color: rgba(255,255,255,0.35) !important; font-size: 17px !important; }
+.pu-addr { font-size: 0.83rem; font-weight: 700; margin-bottom: 1px; line-height: 1.3; }
+.pu-name { font-size: 0.67rem; color: rgba(255,255,255,0.45); margin-bottom: 9px; }
+.pu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 14px; margin-bottom: 9px; }
+.pu-f label { font-size: 0.54rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.38); display: block; margin-bottom: 1px; }
+.pu-f span { font-size: 0.77rem; font-weight: 500; }
+.pu-f.wide { grid-column: 1 / -1; }
+.pu-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.pu-tag { padding: 2px 7px; border-radius: 3px; font-size: 0.6rem; font-weight: 700; }
+.pu-tag.c { background: var(--green); color: white; }
+.pu-tag.nc { background: var(--red); color: white; }
+.pu-tag.arc { background: var(--gray); color: white; }
+.pu-topa-bar { margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); }
+.pu-topa-lbl { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.38); margin-bottom: 4px; }
+.pu-topa-track { width: 100%; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; margin-bottom: 4px; }
+.pu-topa-fill { height: 100%; border-radius: 2px; }
+.pu-topa-info { display: flex; justify-content: space-between; font-size: 0.67rem; }
+.pu-topa-info strong { color: var(--white); font-weight: 700; }
+.pu-topa-info span { color: rgba(255,255,255,0.45); }
+
+/* TOPA Milestone progress bar in popup */
+.pu-milestones { margin-top: 6px; }
+.pu-ms-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+.pu-ms-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pu-ms-dot.past { background: var(--green); }
+.pu-ms-dot.current { background: var(--gold); border: 2px solid white; }
+.pu-ms-dot.future { background: rgba(255,255,255,0.2); }
+.pu-ms-lbl { font-size: 0.62rem; color: rgba(255,255,255,0.6); }
+.pu-ms-lbl.current { color: var(--white); font-weight: 600; }
+.pu-ms-days { font-size: 0.58rem; color: rgba(255,255,255,0.38); margin-left: auto; }
+</style>
+</head>
+<body>
+
+<!-- ════ HEADER ════ -->
+<header>
+  <div class="hdr-brand">
+    <h1>TOPA Pipeline</h1>
+    <div class="sub">DC Multifamily · Offer of Sale Tracker</div>
+  </div>
+  <div class="hdr-asof">
+    <div class="asof-lbl">As of</div>
+    <div class="asof-val" id="asof-date">—</div>
+  </div>
+  <div class="hdr-stats">
+    <div class="stat-blk"><span class="v" id="stat-props">—</span><span class="l">Active</span></div>
+    <div class="stat-blk"><span class="v" id="stat-units">—</span><span class="l">Units</span></div>
+    <div class="stat-blk"><span class="v" id="stat-vol">—</span><span class="l">Volume</span></div>
+    <div class="stat-blk"><span class="v" id="stat-ppu">—</span><span class="l">Avg $/Unit</span></div>
+  </div>
+  <div class="hdr-btns">
+    <button class="hdr-btn" id="btn-timeline">📋 TOPA Timeline</button>
+    <button class="hdr-btn" id="btn-archive">🗂 Archived <span class="badge-cnt" id="arc-cnt">0</span></button>
+  </div>
+</header>
+
+<!-- ════ ARCHIVE BANNER ════ -->
+<div class="arc-banner" id="arc-banner">
+  Showing archived properties — TOPA date is more than 420 days ago. These have likely completed or expired the process.
+  <button class="arc-close" id="arc-close">✕ Back to Active</button>
+</div>
+
+<!-- ════ MAIN LAYOUT ════ -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-filters">
+      <div class="sec-lbl">Filters</div>
+      <div class="fg">
+        <label>Type of Offering</label>
+        <div class="chips" id="chips-type">
+          <div class="chip active" data-val="all">All</div>
+          <div class="chip" data-val="w/ Contract">w/ Contract</div>
+          <div class="chip" data-val="w/o Contract">w/o Contract</div>
+        </div>
+      </div>
+      <div class="fg">
+        <label>FOIA Source</label>
+        <select class="full" id="filter-foia">
+          <option value="">All Sources</option>
+          <option value="FOIA">FOIA</option>
+          <option value="Greysteel">Greysteel</option>
+          <option value="Requested">Requested</option>
+          <option value="Submitted">Submitted</option>
+          <option value="-">None / Unknown</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Units</label>
+        <div class="rr"><input type="number" id="u-min" placeholder="Min" min="0"><span>–</span><input type="number" id="u-max" placeholder="Max" min="0"></div>
+      </div>
+      <div class="fg">
+        <label>Price ($)</label>
+        <div class="rr"><input type="number" id="p-min" placeholder="Min" min="0" step="100000"><span>–</span><input type="number" id="p-max" placeholder="Max" min="0" step="100000"></div>
+      </div>
+      <div class="fg">
+        <label>Price / Unit ($)</label>
+        <div class="rr"><input type="number" id="ppu-min" placeholder="Min" min="0" step="5000"><span>–</span><input type="number" id="ppu-max" placeholder="Max" min="0" step="5000"></div>
+      </div>
+      <div class="fg">
+        <label>TOPA Date Range</label>
+        <div class="rr"><input type="date" id="d-min"><span>–</span><input type="date" id="d-max"></div>
+      </div>
+      <div class="fg">
+        <label>Days in TOPA</label>
+        <div class="rr"><input type="number" id="days-min" placeholder="Min" min="0" max="420"><span>–</span><input type="number" id="days-max" placeholder="Max" min="0" max="420"></div>
+      </div>
+      <div class="fg">
+        <label>Sort By</label>
+        <select class="full" id="sort-by">
+          <option value="date-desc">TOPA Date (Newest)</option>
+          <option value="date-asc">TOPA Date (Oldest)</option>
+          <option value="days-asc">Days in TOPA (Fewest)</option>
+          <option value="days-desc">Days in TOPA (Most)</option>
+          <option value="price-desc">Price (High → Low)</option>
+          <option value="price-asc">Price (Low → High)</option>
+          <option value="units-desc">Units (High → Low)</option>
+          <option value="units-asc">Units (Low → High)</option>
+          <option value="ppu-desc">Price/Unit (High → Low)</option>
+          <option value="ppu-asc">Price/Unit (Low → High)</option>
+        </select>
+      </div>
+      <button class="btn-reset" id="btn-reset">↺  Reset All Filters</button>
+    </div>
+    <div class="res-count" id="res-count">— properties</div>
+    <div class="prop-list" id="prop-list"></div>
+    <!-- COMPS SIDEBAR -->
+    <div style="border-top:2px solid var(--comp-bg);flex-shrink:0;">
+      <div style="padding:8px 14px 0;display:flex;align-items:center;justify-content:space-between;">
+        <div class="sec-lbl" style="margin-bottom:0;color:var(--comp);">Sales Comps <span class="comp-cnt-badge" id="comp-cnt-badge">0</span></div>
+        <button class="btn-comp-export" id="btn-export-comps" title="Export comps as JSON">↓ Export JSON</button>
+      </div>
+      <div id="comps-sidebar-list" style="padding:4px 14px 10px;max-height:200px;overflow-y:auto;">
+        <div id="comps-sidebar-empty" style="font-size:0.68rem;color:var(--muted);padding:6px 0 4px;">No sales comps loaded. Import below.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div id="map-container">
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="leg-ttl">Legend</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#16a34a"></div>w/ Contract</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#dc2626"></div>w/o Contract</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#94a3b8"></div>Archived (420+ days)</div>
+      <div class="leg-row"><div class="leg-dot" style="background:#7c3aed"></div>Sale Comp (no TOPA)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ TOPA TIMELINE MODAL ════ -->
+<div class="modal-overlay" id="tl-modal">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div>
+        <h2>TOPA Timeline</h2>
+        <p>The Tenant Opportunity to Purchase Act (TOPA) offers residents renting in the District of Columbia the opportunity to purchase their housing accommodation when an owner plans to sell. Below is a detailed flow-chart of TOPA timelines and requirements after contract execution.</p>
+      </div>
+      <button class="modal-close" id="tl-close">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- PHASE TRACK -->
+      <div class="tl-track">
+        <div class="tl-seg seg-start">
+          <div class="tl-seg-days">Day 0</div>
+          <div class="tl-seg-unit">Start</div>
+          <div class="tl-seg-lbl">Tenants Notified</div>
+        </div>
+        <div class="tl-seg">
+          <div class="tl-seg-days">5</div>
+          <div class="tl-seg-unit">days</div>
+          <div class="tl-seg-lbl" style="color:var(--muted);font-size:0.6rem">Offer posted</div>
+        </div>
+        <div class="tl-seg" style="background:#dbeafe">
+          <div class="tl-seg-days" style="color:var(--accent)">45</div>
+          <div class="tl-seg-unit">days</div>
+          <div class="tl-seg-lbl">TA Formation Window</div>
+        </div>
+        <div class="tl-seg" style="background:#dbeafe">
+          <div class="tl-seg-days" style="color:var(--accent)">135</div>
+          <div class="tl-seg-unit">days</div>
+          <div class="tl-seg-lbl">TA Contract &amp; Deposit</div>
+        </div>
+        <div class="tl-seg" style="background:#dbeafe">
+          <div class="tl-seg-days" style="color:var(--accent)">120</div>
+          <div class="tl-seg-unit">days</div>
+          <div class="tl-seg-lbl">TA Secure Financing</div>
+        </div>
+        <div class="tl-seg" style="background:#dbeafe">
+          <div class="tl-seg-days" style="color:var(--accent)">120</div>
+          <div class="tl-seg-unit">days</div>
+          <div class="tl-seg-lbl">TA Financing Extension</div>
+        </div>
+        <div class="tl-seg" style="background:#dcfce7">
+          <div class="tl-seg-days" style="color:var(--green)">Closing</div>
+          <div class="tl-seg-unit">period</div>
+          <div class="tl-seg-lbl">Tenants Go to Closing</div>
+        </div>
+      </div>
+
+      <!-- EVENTS ROW -->
+      <div class="tl-events-row">
+        <div class="tl-event-spacer"></div>
+        <div class="tl-events">
+          <!-- Col 1: 5 days -->
+          <div class="tl-event-col">
+            <div class="tl-event tl-event-if">
+              <span class="tag tag-if">IF</span>
+              <strong>TA Exists</strong>
+              Tenants have 30 days to respond &amp; form association. Clock begins.
+            </div>
+          </div>
+          <!-- Col 2: 45 days -->
+          <div class="tl-event-col">
+            <div class="tl-event tl-event-good">
+              <span class="tag tag-then">✓</span>
+              <strong>TA Forms &amp; Responds</strong>
+              Association established within 45 days.
+            </div>
+            <div class="tl-event tl-event-bad">
+              <span class="tag tag-close">→ CLOSE</span>
+              <strong>No Formation / Response</strong>
+              Move directly to Closing Period.
+            </div>
+          </div>
+          <!-- Col 3: 135 days -->
+          <div class="tl-event-col">
+            <div class="tl-event tl-event-if">
+              <span class="tag tag-if">REQ</span>
+              <strong>TA Max Deposit</strong>
+              TA must match contract &amp; post 5% of purchase price as deposit.
+            </div>
+            <div class="tl-event tl-event-bad">
+              <span class="tag tag-close">→ CLOSE</span>
+              <strong>TA Does Not Match</strong>
+              Fails to post deposit → Closing Period.
+            </div>
+          </div>
+          <!-- Col 4: 120 days financing -->
+          <div class="tl-event-col">
+            <div class="tl-event tl-event-if">
+              <span class="tag tag-if">REQ</span>
+              <strong>TA Must Secure Financing</strong>
+              TA must demonstrate financing ability within 240 days total.
+            </div>
+            <div class="tl-event tl-event-bad">
+              <span class="tag tag-close">→ CLOSE</span>
+              <strong>Cannot Secure Financing</strong>
+              TA lacks ability to close in 240-day period → Closing Period.
+            </div>
+          </div>
+          <!-- Col 5: 120 days extension -->
+          <div class="tl-event-col">
+            <div class="tl-event tl-event-if">
+              <span class="tag tag-if">OPT</span>
+              <strong>TA Financing Extension</strong>
+              TA may request extension if pursuing financing with lender letter.
+            </div>
+            <div class="tl-event tl-event-bad">
+              <span class="tag tag-close">→ CLOSE</span>
+              <strong>No Lender Letter</strong>
+              TA cannot provide letter of financing pursuit → Closing Period.
+            </div>
+          </div>
+          <!-- Col 6: closing -->
+          <div class="tl-event-col">
+            <div class="tl-event tl-event-good">
+              <span class="tag tag-then">🏠</span>
+              <strong>Tenants Go to Closing</strong>
+              TA successfully completes all requirements and closes on the property.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-total">420 DAYS MAX TIMELINE FOR TOPA PROCESS <span>· Progress bars on each property track all 420 days · Properties archived after 420 days · Phases may collapse earlier if TA exits</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ IMPORT ════ -->
+<button class="import-toggle" id="import-toggle">+ Import TOPA Data</button>
+
+<!-- ════ COMPS IMPORT ════ -->
+<button class="comp-toggle" id="comp-toggle">+ Import Sale Comps</button>
+<div class="comp-panel" id="comp-panel">
+  <h3 style="color:var(--comp);">🏷 Sales Comps</h3>
+  <p>Import closed sales to compare against active TOPA pipeline. Comps can be matched to TOPA properties or stand alone on the map.</p>
+  <div class="comp-col-hint">Expected columns (in order):<br>Property Name · Property Address · Sale Price · Sale Date · Units · Price/Unit · Building SF · Price/SF · Affordable Type · Vacancy · Year Built · PF Cap Rate · Actual Cap Rate · Building Class · Buyer · Seller · Listing Broker · Transaction Notes · Age</div>
+  <div class="imp-tabs">
+    <button class="imp-tab active" data-ctab="cpaste">Paste from Excel</button>
+    <button class="imp-tab" data-ctab="ccsv">Upload CSV</button>
+    <button class="imp-tab" data-ctab="cmanual">Manual Entry</button>
+    <button class="imp-tab" data-ctab="cjson">Load JSON</button>
+  </div>
+  <div class="imp-content active" id="ctab-cpaste">
+    <textarea id="comp-paste-input" placeholder="Paste tab-separated rows from Excel. Header row is auto-detected."></textarea>
+    <button class="btn-comp" id="btn-comp-paste-imp">Import Pasted Comps</button>
+  </div>
+  <div class="imp-content" id="ctab-ccsv">
+    <div class="file-drop" id="comp-file-drop"><p id="comp-drop-lbl">Drop CSV here or click to browse</p><input type="file" id="comp-csv-input" accept=".csv,.txt"></div>
+    <button class="btn-comp" id="btn-comp-csv-imp">Import CSV</button>
+  </div>
+  <div class="imp-content" id="ctab-cmanual">
+    <div class="comp-form-grid">
+      <div class="fg wide"><label>Property Address *</label><input type="text" id="cm-address" placeholder="e.g. 1401 S Street NW"></div>
+      <div class="fg wide"><label>Property Name</label><input type="text" id="cm-name" placeholder="Optional deal name"></div>
+      <div class="fg"><label>Sale Price ($)</label><input type="number" id="cm-price" placeholder="e.g. 5200000" min="0"></div>
+      <div class="fg"><label>Sale Date</label><input type="date" id="cm-date"></div>
+      <div class="fg"><label>Units</label><input type="number" id="cm-units" placeholder="# of units" min="0"></div>
+      <div class="fg"><label>Building SF</label><input type="number" id="cm-sf" placeholder="Gross SF" min="0"></div>
+      <div class="fg"><label>Year Built</label><input type="number" id="cm-year" placeholder="e.g. 1965" min="1800" max="2030"></div>
+      <div class="fg"><label>Building Class</label><input type="text" id="cm-class" placeholder="A, B, C..."></div>
+      <div class="fg"><label>Actual Cap Rate (%)</label><input type="number" id="cm-cap" placeholder="e.g. 5.2" step="0.01"></div>
+      <div class="fg"><label>PF Cap Rate (%)</label><input type="number" id="cm-pfcap" placeholder="e.g. 6.0" step="0.01"></div>
+      <div class="fg wide"><label>Buyer</label><input type="text" id="cm-buyer" placeholder="Buying entity"></div>
+      <div class="fg wide"><label>Seller</label><input type="text" id="cm-seller" placeholder="Selling entity"></div>
+      <div class="fg wide"><label>Listing Broker</label><input type="text" id="cm-broker" placeholder="Listing broker company"></div>
+      <div class="fg wide"><label>Affordable Type</label><input type="text" id="cm-aff" placeholder="LIHTC, Market Rate, etc."></div>
+      <div class="fg wide"><label>Transaction Notes</label><textarea id="cm-notes" placeholder="Any relevant notes about the transaction..." style="height:56px;"></textarea></div>
+    </div>
+    <button class="btn-comp" id="btn-comp-manual-add">Add Comp</button>
+  </div>
+  <div class="imp-content" id="ctab-cjson">
+    <p style="font-size:0.68rem;color:var(--muted);margin-bottom:8px;line-height:1.5;">Load a <strong>sales_comps.json</strong> file exported from this dashboard or placed in your GitHub data/ folder. Merges with existing comps — duplicates skipped by address+date.</p>
+    <div class="file-drop" id="comp-json-drop"><p id="comp-json-lbl">Drop sales_comps.json here or click to browse</p><input type="file" id="comp-json-input" accept=".json"></div>
+    <button class="btn-comp" id="btn-comp-json-imp">Load JSON</button>
+  </div>
+  <button class="btn-comp-outline" id="btn-run-matching" style="margin-top:6px;">🔗 Run Address Matching</button>
+  <button class="btn-clr" id="btn-clr-comps" style="margin-top:4px;">Clear All Comps Data</button>
+  <div class="comp-imp-msg" id="comp-imp-msg"></div>
+</div>
+
+<!-- ════ COMP MATCH MODAL ════ -->
+<div class="match-modal" id="match-modal">
+  <div class="match-box">
+    <div class="match-hdr">
+      <div>
+        <h2>Address Matching</h2>
+        <p class="match-progress" id="match-progress-lbl">Review possible matches between sale comps and TOPA properties.</p>
+      </div>
+      <button class="modal-close" id="match-close" style="background:rgba(255,255,255,0.15);">✕</button>
+    </div>
+    <div class="match-body" id="match-body">
+      <!-- Populated by JS -->
+    </div>
+    <div style="padding:0 24px 20px;display:flex;gap:10px;">
+      <button class="match-btn-accept" id="match-btn-accept" style="background:#16a34a;">✓ Accept This Match</button>
+      <button class="match-btn-skip" id="match-btn-skip">Skip (No Match)</button>
+      <button class="match-btn-skip" id="match-btn-done" style="display:none;background:var(--comp);color:white;border-color:var(--comp);">Done</button>
+    </div>
+  </div>
+</div>
+
+
+<div class="import-panel" id="import-panel">
+  <h3>Import Properties</h3>
+  <p>Append new properties via CSV or paste from Excel. Existing data is always preserved.</p>
+  <div class="col-hint">Expected columns (in order):<br>TOPA Date · Address · Deal Name · Type · Units · Price · Price/Unit · FOIA · Buyer · Owner</div>
+  <div class="imp-tabs">
+    <button class="imp-tab active" data-tab="paste">Paste from Excel</button>
+    <button class="imp-tab" data-tab="csv">Upload CSV</button>
+  </div>
+  <div class="imp-content active" id="tab-paste">
+    <textarea id="paste-input" placeholder="Paste tab-separated rows from Excel. Header row is auto-detected."></textarea>
+    <button class="btn-imp" id="btn-paste-imp">Import Pasted Data</button>
+  </div>
+  <div class="imp-content" id="tab-csv">
+    <div class="file-drop" id="file-drop"><p id="drop-lbl">Drop CSV here or click to browse</p><input type="file" id="csv-input" accept=".csv,.txt"></div>
+    <button class="btn-imp" id="btn-csv-imp">Import CSV</button>
+  </div>
+  <button class="btn-clr" id="btn-clr-all">Clear All Imported Data</button>
+  <div class="imp-msg" id="imp-msg"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+var GEO = {}; // coordinates cached in localStorage
+
+// TOPA milestone thresholds (cumulative days)
+var MILESTONES = [
+  {day:5,   label:"Tenants Notified"},
+  {day:50,  label:"TA Formation Window (45d)"},
+  {day:185, label:"TA Contract & Deposit (135d)"},
+  {day:305, label:"TA Secure Financing (120d)"},
+  {day:420, label:"TA Financing Extension (120d)"},
+];
+
+var BASE_DATA = [{"date":"2024-01-09","address":"77 H Street NW","name":"77 H","type":"w/ Contract","units":303,"price":89000000.0,"foia":"FOIA","buyer":"Georgetown","owner":"Clarion Partners"},{"date":"2024-01-09","address":"2023 4th Street NE","name":"","type":"w/ Contract","units":10,"price":2600000.0,"foia":"Submitted","buyer":"","owner":"VNV Development"},{"date":"2024-01-12","address":"22 & 44 Banner Lane NW, 1105 21st Street NW","name":"Banner Lane","type":"w/ Contract","units":561,"price":231500000.0,"foia":"FOIA","buyer":"The Vistria Group","owner":"Toll Brothers, Inc"},{"date":"2024-01-23","address":"4010-4014 3rd Street SE","name":"","type":"w/ Contract","units":26,"price":4000000.0,"foia":"FOIA","buyer":"2-534(a)(2)","owner":""},{"date":"2024-01-24","address":"4474 & 4478 Macarthur Boulevard NW","name":"","type":"w/o Contract","units":12,"price":3400000.0,"foia":"FOIA","buyer":"No Contract","owner":"Dumbarton Investments"},{"date":"2024-01-25","address":"1307-1309 Holbrook Street NE","name":"","type":"w/ Contract","units":6,"price":1450000.0,"foia":"FOIA","buyer":"Richard Cunningham","owner":""},{"date":"2024-01-29","address":"1401 S Street NW","name":"District","type":"w/ Contract","units":125,"price":67500000.0,"foia":"FOIA","buyer":"SEMREF","owner":"JPMC"},{"date":"2024-01-30","address":"1840 Minnesota Avenue SE","name":"Minnesota Flats","type":"w/ Contract","units":16,"price":1800000.0,"foia":"Submitted","buyer":"","owner":"Vine Investments"},{"date":"2024-01-30","address":"3333 10th Place SE","name":"Riverstone","type":"w/ Contract","units":8,"price":1400000.0,"foia":"Submitted","buyer":"","owner":"Vine Investments"},{"date":"2024-02-06","address":"1525 19th Street SE","name":"","type":"w/ Contract","units":16,"price":1775000.0,"foia":"FOIA","buyer":"Richard Cunningham","owner":""},{"date":"2024-02-07","address":"653 East Capitol Street SE","name":"Saratoga Apartments","type":"w/ Contract","units":30,"price":5200000.0,"foia":"FOIA","buyer":"Velocity Development LLC - William Mohler","owner":"Adams Investment Group"},{"date":"2024-02-08","address":"1920 S Street NW","name":"Chateau Thierry","type":"w/o Contract","units":47,"price":399900.0,"foia":"FOIA","buyer":"Condo Sale - Likely Mistake","owner":""},{"date":"2024-02-08","address":"3427 13th Street NW","name":"","type":"w/o Contract","units":16,"price":460000.0,"foia":"FOIA","buyer":"","owner":"Dumbarton Investments"},{"date":"2024-02-09","address":"1525 19th Street SE","name":"","type":"w/ Contract","units":16,"price":1775000.0,"foia":"Submitted","buyer":"","owner":""},{"date":"2024-02-09","address":"4016 Livingston Road SE","name":"","type":"w/ Contract","units":6,"price":700000.0,"foia":"FOIA","buyer":"Kevin Rowley","owner":"Wallis Trust"},{"date":"2024-02-13","address":"3538 6th Street NW","name":"Parkworth Flats","type":"w/ Contract","units":5,"price":1800000.0,"foia":"FOIA","buyer":"Caleb Jackson","owner":""},{"date":"2024-02-16","address":"2601 Virginia Avenue NW","name":"Boathouse","type":"w/ Contract","units":234,"price":68750000.0,"foia":"FOIA","buyer":"UpCampus","owner":"UIP"},{"date":"2024-02-21","address":"2101 Champlain Street NW","name":"Reed Row","type":"w/ Contract","units":132,"price":40835000.0,"foia":"FOIA","buyer":"Pacific Life","owner":"Kettler"},{"date":"2024-02-27","address":"4520 Georgia Avenue Northwest","name":"","type":"w/ Contract","units":12,"price":3000000.0,"foia":"FOIA","buyer":"Louis Jacobe","owner":"MuniTrust Capital"},{"date":"2024-03-12","address":"1416 Chapin Street NW","name":"Malcom Place","type":"w/o Contract","units":11,"price":4500000.0,"foia":"Submitted","buyer":"","owner":""},{"date":"2024-03-18","address":"146 & 150 36th Street NE","name":"","type":"w/o Contract","units":6,"price":675000.0,"foia":"FOIA","buyer":"","owner":"Robert S Ward"},{"date":"2024-03-26","address":"1711 T Street NW","name":"","type":"w/ Contract","units":11,"price":2950000.0,"foia":"FOIA","buyer":"Ilissa Blech","owner":"Dave Gorman"},{"date":"2024-03-27","address":"2222 Q Street NW","name":"","type":"w/ Contract","units":20,"price":6250000.0,"foia":"","buyer":"Ross Vann","owner":"Tribby Properties"},{"date":"2024-04-04","address":"3016 Dumbarton Street","name":"","type":"w/ Contract","units":14,"price":10500000.0,"foia":"FOIA","buyer":"2-534(a)(2)","owner":""},{"date":"2024-04-04","address":"2222 Q Street NW","name":"","type":"w/ Contract","units":20,"price":6250000.0,"foia":"","buyer":"","owner":""},{"date":"2024-04-02","address":"1307-1309 Holbrook Street NE","name":"","type":"w/ Contract","units":6,"price":1650000.0,"foia":"FOIA","buyer":"","owner":""},{"date":"2024-04-09","address":"309 Maryland Avenue NE","name":"","type":"w/o Contract","units":7,"price":1950000.0,"foia":"","buyer":"","owner":""},{"date":"2024-04-12","address":"4936 Nash Street NE","name":"","type":"w/o Contract","units":12,"price":1200000.0,"foia":"","buyer":"","owner":""},{"date":"2024-04-10","address":"3506 Georgia Avenue NW","name":"The Avenue","type":"w/ Contract","units":83,"price":1500000.0,"foia":"FOIA","buyer":"Preservation of Affordable Housing Inc","owner":"Landex Corporation - Peter Siegel"},{"date":"2024-04-10","address":"1861 Mintwood Place NW","name":"","type":"w/ Contract","units":6,"price":1600000.0,"foia":"FOIA","buyer":"Diep Ngoc Duong & Nga Thi Hang Nguyen","owner":"Anthony Barilla"},{"date":"2024-04-29","address":"4273 Edson Place NE","name":"","type":"w/ Contract","units":6,"price":525000.0,"foia":"","buyer":"","owner":""},{"date":"2024-04-30","address":"1101 P Street NW","name":"","type":"w/ Contract","units":6,"price":2300000.0,"foia":"FOIA","buyer":"Eldersburg Property LLC, Hamidreza? HG","owner":"Norman Piccioni"},{"date":"2024-04-30","address":"1516 Oates Street NE","name":"","type":"w/ Contract","units":14,"price":1200000.0,"foia":"FOIA","buyer":"Kevin Link","owner":"Applestein Family Partnership"},{"date":"2024-04-30","address":"807 A Street NE","name":"","type":"w/ Contract","units":6,"price":1500000.0,"foia":"FOIA","buyer":"Pablo H Costas Aguilera & Tatiana I Velasco Bruno","owner":"Helen Kane"},{"date":"2024-05-02","address":"4273 Edson Place NE","name":"","type":"w/ Contract","units":6,"price":525000.0,"foia":"","buyer":"","owner":""},{"date":"2024-05-07","address":"514-516 44th Street NE","name":"","type":"w/o Contract","units":6,"price":1100000.0,"foia":"","buyer":"","owner":"Charleta Duckett"},{"date":"2024-05-17","address":"2300 19th Street NW","name":"","type":"w/o Contract","units":7,"price":1950000.0,"foia":"","buyer":"","owner":"Lanae Holbrook"},{"date":"2024-05-20","address":"1701 E Street NE","name":"","type":"w/o Contract","units":6,"price":3525000.0,"foia":"","buyer":"","owner":"Richard Cunningham"},{"date":"2024-06-05","address":"1210-1212 Maple View Place SE","name":"","type":"w/ Contract","units":27,"price":2350000.0,"foia":"FOIA","buyer":"Jamaal Claggion","owner":"David & William Applestein"},{"date":"2024-06-06","address":"5205 Bass Place SE","name":"","type":"w/o Contract","units":9,"price":990000.0,"foia":"","buyer":"","owner":"Lawrence W Buck"},{"date":"2024-06-13","address":"5036 Astor Place SE","name":"","type":"w/o Contract","units":9,"price":1200000.0,"foia":"","buyer":"","owner":"ACB 5036 Astor PL LLC"},{"date":"2024-06-14","address":"3319 17th Street NW","name":"","type":"w/o Contract","units":5,"price":1425000.0,"foia":"","buyer":"","owner":""},{"date":"2024-06-20","address":"5225 Connecticut Avenue NW","name":"The Huntington","type":"w/ Contract","units":127,"price":16380000.0,"foia":"FOIA","buyer":"American Housing","owner":"Lustine Realty Company"},{"date":"2024-06-26","address":"4017, 4021, and 4025 8th Street NE","name":"","type":"w/ Contract","units":13,"price":2600000.0,"foia":"","buyer":"","owner":"8th Street NE Partners, LLC"},{"date":"2024-06-28","address":"1749-1759 W Street SE","name":"","type":"w/ Contract","units":15,"price":2075000.0,"foia":"FOIA","buyer":"Seyi Ademiluyi","owner":""},{"date":"2024-06-26","address":"5100 B Street SE","name":"","type":"w/o Contract","units":12,"price":1800000.0,"foia":"","buyer":"","owner":"Swierdsiol B"},{"date":"2024-07-01","address":"1410-1412 Young Street SE","name":"","type":"w/ Contract","units":18,"price":1620000.0,"foia":"","buyer":"","owner":""},{"date":"2024-07-02","address":"4017, 4021, & 4025 8th Street NE","name":"","type":"w/ Contract","units":13,"price":2600000.0,"foia":"","buyer":"","owner":""},{"date":"2024-07-02","address":"2727 29th Street NW","name":"Cleveland House","type":"w/ Contract","units":214,"price":70000000.0,"foia":"FOIA","buyer":"Akelius","owner":"Archstone Communities"},{"date":"2024-07-12","address":"1410-1412 Young Street SE","name":"","type":"w/ Contract","units":18,"price":1620000.0,"foia":"","buyer":"","owner":""},{"date":"2024-07-26","address":"610 Eastern Avenue NE","name":"","type":"w/ Contract","units":6,"price":900000.0,"foia":"FOIA","buyer":"Redacted","owner":"Redacted"},{"date":"2024-07-26","address":"1845 Summit Place NW","name":"Park East Apartments","type":"w/ Contract","units":88,"price":17250000.0,"foia":"FOIA","buyer":"Ernst Equities","owner":"CIM Group LP"},{"date":"2024-07-26","address":"1829 Summit Place NW","name":"Harvard Village","type":"w/ Contract","units":85,"price":18000000.0,"foia":"FOIA","buyer":"Ernst Equities","owner":"CIM Group LP"},{"date":"2024-07-30","address":"330 5th Street SE","name":"","type":"w/o Contract","units":6,"price":1850000.0,"foia":"","buyer":"","owner":"James J. Lee"},{"date":"2024-07-31","address":"4009 4th Street SE","name":"","type":"w/o Contract","units":12,"price":975000.0,"foia":"","buyer":"","owner":"Thomas Bookard"},{"date":"2024-08-14","address":"201, 203, 205, 207, 209, 211 & 213 16th Street NE & 1600-1606 Constitution Ave NE","name":"","type":"w/ Contract","units":44,"price":8750000.0,"foia":"FOIA","buyer":"Uchechi Theodore Opaigbeogu","owner":""},{"date":"2024-08-15","address":"2513-2515 22nd Street NE","name":"","type":"w/ Contract","units":5,"price":1300000.0,"foia":"FOIA","buyer":"Redacted","owner":"Redacted"},{"date":"2024-08-21","address":"2112 8th Street NW","name":"Atlantic Plumbing","type":"w/ Contract","units":310,"price":106000000.0,"foia":"FOIA","buyer":"Redacted","owner":"JBG SMITH Properties"},{"date":"2024-08-23","address":"324 61st Street NE","name":"","type":"w/ Contract","units":7,"price":750000.0,"foia":"FOIA","buyer":"AMT Development","owner":"324 61st St NE LLC, \"Jeff Richards\""},{"date":"2024-08-27","address":"30 Ridge Square NW","name":"City Ridge","type":"w/ Contract","units":690,"price":193705714.0,"foia":"FOIA","buyer":"SHR Ride Square Partners I and SHR RSP II, LLC","owner":"Lauren Aiello - NASH-Roadside 3900 Wisconsin, LLC"},{"date":"2024-08-27","address":"965 Florida Avenue NW","name":"The Wren","type":"w/ Contract","units":433,"price":129000000.0,"foia":"FOIA","buyer":"","owner":"JBG SMITH Properties"},{"date":"2024-08-29","address":"601 Park Road NW","name":"","type":"w/ Contract","units":22,"price":3500000.0,"foia":"FOIA","buyer":"601 Park Road LLC","owner":"Hartford E Bealer LLC"},{"date":"2024-08-29","address":"6228 North Dakota Ave and 6211 3rd St NW","name":"","type":"w/ Contract","units":31,"price":5415000.0,"foia":"FOIA","buyer":"6228 North Dakota Ave LLC/Felipe Ernst/Cameron Webb","owner":"Hartford E Bealer LLC"},{"date":"2024-08-29","address":"1449 Oak Street NW","name":"","type":"w/ Contract","units":9,"price":1586000.0,"foia":"FOIA","buyer":"1449 Oak St LLC/Ernst Equities","owner":"Hartford E Bealer LLC"},{"date":"2024-08-29","address":"5 Ridge Square NW","name":"City Ridge","type":"w/ Contract","units":690,"price":85294286.0,"foia":"FOIA","buyer":"SHR Ride Square Partners I and SHR RSP II, LLC","owner":"Lauren Aiello - NASH-Roadside 3900 Wisconsin, LLC"},{"date":"2024-09-05","address":"1900 16th Street SE","name":"","type":"w/ Contract","units":15,"price":1920000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2024-09-09","address":"401 Chaplin Street SE","name":"","type":"w/ Contract","units":43,"price":4500000.0,"foia":"-","buyer":"","owner":""},{"date":"2024-09-12","address":"4214 & 4216 Benning Road NE and 4213 Brooks Street NE","name":"","type":"w/ Contract","units":36,"price":4003500.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2024-09-12","address":"3339 Mount Pleasant Street NW","name":"Park Pleasant","type":"w/ Contract","units":126,"price":6500000.0,"foia":"FOIA","buyer":"Community Realty Co/ 51st PP LLC","owner":"Rams Investment Company, LLC"},{"date":"2024-09-12","address":"1900 16th Street SE","name":"","type":"w/ Contract","units":15,"price":1920000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2024-09-12","address":"4801 3rd Street NW","name":"","type":"w/o Contract","units":5,"price":1800000.0,"foia":"-","buyer":"","owner":""},{"date":"2024-09-20","address":"5036 Astor Place SE","name":"","type":"w/ Contract","units":9,"price":916000.0,"foia":"FOIA","buyer":"John Hanna","owner":"ACB 5036 Astor PL LLC"},{"date":"2024-10-03","address":"1340 21st Street NW","name":"","type":"w/ Contract","units":10,"price":3800000.0,"foia":"FOIA","buyer":"Redacted","owner":"O Street Corporation"},{"date":"2024-10-21","address":"1919 19th Street NW","name":"","type":"w/ Contract","units":14,"price":4150000.0,"foia":"FOIA","buyer":"Redacted","owner":"Redacted"},{"date":"2024-10-24","address":"1715 V Street SE","name":"","type":"w/ Contract","units":8,"price":1300000.0,"foia":"FOIA","buyer":"Collaborative Solutions for Communities","owner":"Bethany, Inc."},{"date":"2024-11-08","address":"4465 Macarthur Boulevard NW","name":"Foxhall Terrace","type":"w/ Contract","units":36,"price":6796175.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2024-11-15","address":"1725-1727 Capitol Avenue NE","name":"","type":"w/ Contract","units":6,"price":975000.0,"foia":"FOIA","buyer":"DMV Realty Partners","owner":"Peggie Powers"},{"date":"2024-11-21","address":"3405-3423 15th Street, 1444-1454 Savannah Street, 1443-1449 Smith Place SE","name":"","type":"w/ Contract","units":62,"price":5750000.0,"foia":"FOIA","buyer":"Preservation of Urban Green, LLC","owner":"Savannah Park Housing Limited Partnership"},{"date":"2024-11-27","address":"4069-4075 Minnesota Avenue SE and 4077-4089 Minnesota Avenue SE","name":"","type":"w/o Contract","units":83,"price":15500000.0,"foia":"-","buyer":"","owner":""},{"date":"2024-12-13","address":"1957 19th Place SE","name":"","type":"w/ Contract","units":15,"price":1820000.0,"foia":"Greysteel","buyer":"Brooks Staley - Black Tern Investments LLC","owner":"Lisa N Allen - LNA Enterprises"},{"date":"2024-12-17","address":"747 10th St SE","name":"","type":"w/ Contract","units":9,"price":2300000.0,"foia":"FOIA","buyer":"747 Tenth LLC c/o Aman Singh","owner":"Redacted"},{"date":"2024-12-26","address":"1823 Kalorama Road NW","name":"","type":"w/o Contract","units":5,"price":4300000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-01-03","address":"912 Gallatin St NW","name":"","type":"w/ Contract","units":14,"price":2550000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-01-08","address":"3754 Martin Luther King Jr Avenue SE","name":"","type":"w/o Contract","units":11,"price":900000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-01-10","address":"272 56th Street NE","name":"","type":"w/ Contract","units":6,"price":666600.0,"foia":"FOIA","buyer":"Redacted","owner":"Synthia A. Wilson"},{"date":"2025-01-14","address":"3709 New Hampshire Avenue NW","name":"Modo Apartments","type":"w/ Contract","units":17,"price":5300000.0,"foia":"FOIA","buyer":"AG Capital Partners, LLC; Gauhar Naseem","owner":"RP 3701 NW, LLC - Michael Rooney"},{"date":"2025-01-14","address":"4647 Hillside Road SE,1620 21st Place SE, 2608 Bowen Road SE","name":"","type":"w/ Contract","units":12,"price":2100000.0,"foia":"FOIA","buyer":"PROPHECY INVESTMENTS LLC","owner":"2608 BOWEN RD SE DE LLC"},{"date":"2025-01-21","address":"2712 Wisconsin Avenue NW","name":"Wisconsin House","type":"w/ Contract","units":108,"price":20000000.0,"foia":"FOIA","buyer":"listed as 20,000 - Keener Squire","owner":""},{"date":"2025-01-22","address":"3501 13th Street NW","name":"Monroe Tower","type":"w/ Contract","units":42,"price":7075000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-01-22","address":"240 34th Street SE","name":"","type":"w/ Contract","units":6,"price":800000.0,"foia":"FOIA","buyer":"Sara Tessa - Radical Faith properties","owner":"Charles Murphy - Meridian Gate Company LLC"},{"date":"2025-01-27","address":"4649 Hillside Road SE","name":"","type":"w/o Contract","units":5,"price":730000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-01-27","address":"2712 Wisconsin Avenue NW","name":"Wisconsin House","type":"w/ Contract","units":108,"price":20000000.0,"foia":"FOIA","buyer":"Keener Squire - KSP Development LLC","owner":"TRUSTEE OF THE MARITAL TRUST UNDER FRED W. SMITH LIVING TRUST"},{"date":"2025-01-30","address":"1300 Constitution Avenue NE","name":"","type":"w/ Contract","units":14,"price":2150000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-02-04","address":"4024 Calvert Street NW","name":"","type":"w/ Contract","units":6,"price":1600000.0,"foia":"FOIA","buyer":"Blackmail Properties LLC c/o Scott Simpson","owner":""},{"date":"2025-02-06","address":"1300 Constitution Avenue NE","name":"The Constitution","type":"w/ Contract","units":14,"price":2150000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-02-07","address":"272 56th Street NE","name":"","type":"w/ Contract","units":6,"price":660600.0,"foia":"FOIA","buyer":"Redacted","owner":"Synthia A. Wilson"},{"date":"2025-02-14","address":"1115 M Street NW","name":"","type":"w/ Contract","units":5,"price":2450000.0,"foia":"FOIA","buyer":"BWG Investment Holdings, Barrett Gold (?)","owner":"Matthew Carcone, Blue Water Capitol LLC"},{"date":"2025-02-18","address":"1160 First Street NE","name":"","type":"w/ Contract","units":469,"price":181750000.0,"foia":"FOIA","buyer":"Foulger-Pratt Development, LLC","owner":"AvalonBay Communities"},{"date":"2025-02-18","address":"318 I Street NE","name":"AVA H Street","type":"w/ Contract","units":138,"price":36000000.0,"foia":"FOIA","buyer":"Foulger-Pratt Development, LLC","owner":"AvalonBay Communities"},{"date":"2025-02-19","address":"3848 South Capitol Street SE","name":"","type":"w/ Contract","units":11,"price":1749000.0,"foia":"FOIA","buyer":"Flats at South Capitol LLC, successor-in-int by as to Kaye Stern Properties LLC","owner":"Jason Stern"},{"date":"2025-02-19","address":"3836-3840 South Capitol Street SE","name":"","type":"w/ Contract","units":19,"price":3021000.0,"foia":"FOIA","buyer":"Flats at South Capitol LLC, successor-in-int by as to Kaye Stern Properties LLC","owner":"Jason Stern"},{"date":"2025-02-19","address":"1648 Park Road NW","name":"","type":"w/ Contract","units":6,"price":850000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-02-19","address":"55 M Street NE","name":"AVA NoMa","type":"w/ Contract","units":438,"price":142480000.0,"foia":"FOIA","buyer":"Foulger-Pratt Development, LLC","owner":"AvalonBay Communities"},{"date":"2025-02-19","address":"770 5th Street NW","name":"Avalon at Gallery Place","type":"w/ Contract","units":203,"price":87100000.0,"foia":"FOIA","buyer":"Foulger-Pratt Development, LLC","owner":"AvalonBay Communities"},{"date":"2025-02-21","address":"1821 T Street NW","name":"","type":"w/ Contract","units":9,"price":4000000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-02-24","address":"318 I Street NE","name":"AVA H Street","type":"w/ Contract","units":138,"price":36000000.0,"foia":"FOIA","buyer":"Foulger-Pratt Development, LLC","owner":"AvalonBay Communities"},{"date":"2025-02-24","address":"1115 M Street NW","name":"","type":"w/ Contract","units":5,"price":2245000.0,"foia":"FOIA","buyer":"BWG Investment Holdings, Barrett Gold (?)","owner":"Matthew Carcone, Blue Water Capitol LLC"},{"date":"2025-02-25","address":"4501 Connecticut Avenue NW","name":"Avalon the Albemarle","type":"w/ Contract","units":234,"price":70000000.0,"foia":"FOIA","buyer":"APAH Acquisitions, LLC (Arlington Partnership for Affordable Housing","owner":"Smith Property Holdings Five (D.C.), L.P. c/o AvalonBay Communities"},{"date":"2025-02-28","address":"2359 Ontario Road NW","name":"Meridian Hill Apartments","type":"w/ Contract","units":29,"price":500000.0,"foia":"FOIA","buyer":"WE 2359 Ontario Road LLC","owner":"Adam Lobene - American Housing"},{"date":"2025-02-28","address":"3654 New Hampshire Avenue NW","name":"","type":"w/ Contract","units":29,"price":1200000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-02-28","address":"2401 Ontario Road NW","name":"Meridian Hill Apartments","type":"w/ Contract","units":25,"price":500000.0,"foia":"FOIA","buyer":"WE 2359 Ontario Road LLC","owner":"Adam Lobene - American Housing"},{"date":"2025-03-06","address":"1229 Madison Street NW","name":"","type":"w/ Contract","units":8,"price":3368421.0,"foia":"FOIA","buyer":"ARCTRUST - Project DC Holdings LLC","owner":"Adam Lobene - American Housing"},{"date":"2025-03-06","address":"1446 Fairmont Street NW","name":"","type":"w/ Contract","units":7,"price":3519210.0,"foia":"FOIA","buyer":"ARCTRUST - Project DC Holdings LLC","owner":"Adam Lobene - American Housing"},{"date":"2025-03-07","address":"1616 27th Street SE","name":"","type":"w/o Contract","units":11,"price":1600000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-03-10","address":"1435 Newton Street NW","name":"Newton Towers","type":"w/ Contract","units":56,"price":17270444.0,"foia":"FOIA","buyer":"ARCTRUST - Project DC Holdings LLC","owner":"Adam Lobene - American Housing"},{"date":"2025-03-11","address":"2401 Ontario Road NW","name":"Meridian Hill Apartments","type":"w/ Contract","units":25,"price":500000.0,"foia":"FOIA","buyer":"WE 2401 Ontario Road LLC","owner":"Adam Lobene - American Housing"},{"date":"2025-03-11","address":"3848 South Capitol Street SE","name":"","type":"w/ Contract","units":11,"price":1749000.0,"foia":"FOIA","buyer":"Flats at South Capitol LLC, successor-in-int by as to Kaye Stern Properties LLC","owner":"Jason Stern"},{"date":"2025-03-13","address":"1255 25th Street NW","name":"WestEnd25","type":"w/ Contract","units":283,"price":200000000.0,"foia":"FOIA","buyer":"No actual contract.","owner":"JBG Smith"},{"date":"2025-03-14","address":"1616 27th Street SE","name":"","type":"w/o Contract","units":11,"price":1500000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-03-18","address":"1160 First Street NE","name":"Avalon First and M","type":"w/ Contract","units":469,"price":181750000.0,"foia":"FOIA","buyer":"Foulger-Pratt Development, LLC","owner":"AvalonBay Communities"},{"date":"2025-03-19","address":"1270 4th Street NE","name":"The Batley","type":"w/ Contract","units":432,"price":180000000.0,"foia":"FOIA","buyer":"No actual contract.","owner":"JBG Smith"},{"date":"2025-03-19","address":"1717 S Street SE","name":"","type":"w/ Contract","units":36,"price":5200000.0,"foia":"FOIA","buyer":"Mike Taylor - AMT Development LLC","owner":"Steve Snider"},{"date":"2025-03-20","address":"20 Ridge Square NW","name":"City Ridge","type":"w/ Contract","units":340,"price":299000000.0,"foia":"FOIA","buyer":"","owner":"Shalom Barnes Associates"},{"date":"2025-03-21","address":"4107 Connecticut Avenue NW","name":"","type":"w/ Contract","units":37,"price":4675000.0,"foia":"FOIA","buyer":"Cameron Webb - Webb Ventures","owner":"Sirius LLC"},{"date":"2025-03-28","address":"20 Ridge Square NW","name":"City Ridge","type":"w/ Contract","units":340,"price":299000000.0,"foia":"FOIA","buyer":"SHR Ride Square Partners I and SHR RSP II, LLC (Sekisui House Asset Management)","owner":"Nash Roadside"},{"date":"2025-04-01","address":"1435 Newton Street NW","name":"Newton Towers","type":"w/ Contract","units":56,"price":17270444.0,"foia":"FOIA","buyer":"Project DC Holdings LLC - ARCTRUST","owner":"American Housing - Adam Lobene"},{"date":"2025-04-01","address":"1072 Thomas Jefferson Street NW","name":"Adams-Mason House","type":"w/o Contract","units":8,"price":5600000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-04-07","address":"2515 P Street NW","name":"","type":"w/ Contract","units":13,"price":3400000.0,"foia":"FOIA","buyer":"MNM Investments 2021 LLC","owner":"2515 P LLC"},{"date":"2025-04-08","address":"526 59th Street NE","name":"Grant Park Apartments","type":"w/ Contract","units":12,"price":1525000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-04-09","address":"1444 Rock Creek Ford Road NW","name":"Rockford Apartments","type":"w/ Contract","units":68,"price":10504350.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-04-09","address":"2201 Wisconsin Avenue NW","name":"The Meridian","type":"w/ Contract","units":50,"price":12626263.0,"foia":"FOIA","buyer":"The Lenkin Company","owner":"Monument Realty LLC"},{"date":"2025-04-11","address":"526 59th Street NE","name":"Grant Park Apartments","type":"w/ Contract","units":12,"price":1525000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-04-15","address":"1444 Rock Creek Ford Road NW","name":"Rockford Apartments","type":"w/ Contract","units":68,"price":10504350.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-04-21","address":"431 54th Street SE","name":"","type":"w/o Contract","units":8,"price":520000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-04-21","address":"101 Galveston Place SW","name":"","type":"w/o Contract","units":5,"price":800000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-04-24","address":"4725 Minnesota Avenue NE","name":"","type":"w/o Contract","units":12,"price":1350000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-04-25","address":"1301 Belmont Street NW","name":"","type":"w/o Contract","units":20,"price":2300000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-05-01","address":"1416 Chapin Street NW","name":"Malcom Place","type":"w/ Contract","units":16,"price":2900000.0,"foia":"FOIA","buyer":"Mila Realty Group LLC - Michael McGregor","owner":"Saied Jamshidi - Amir Afshar"},{"date":"2025-05-02","address":"4725 Minnesota Avenue NE","name":"","type":"w/o Contract","units":12,"price":1350000.0,"foia":"-","buyer":"","owner":"Ali \"Sam\" Razjooyan"},{"date":"2025-05-08","address":"4337\u20134347 Martin Luther King Jr Avenue, 4353\u20134363 Martin Luther King Jr Avenue & 200\u2013211 Elmira Street SW","name":"Martin's View","type":"w/ Contract","units":156,"price":39500000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-05-12","address":"1600\u20131608 28th Place SE","name":"","type":"w/ Contract","units":22,"price":2000000.0,"foia":"FOIA","buyer":"Omer and Yasemin Zirekoglu","owner":"Randle Highlands LLC"},{"date":"2025-05-22","address":"1821 T Street NW","name":"","type":"w/ Contract","units":9,"price":3750000.0,"foia":"FOIA","buyer":"Redacted","owner":"Khalid Alizzi"},{"date":"2025-05-22","address":"4000 Livingston Road SE","name":"","type":"w/ Contract","units":14,"price":1300000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-05-29","address":"1821 T Street NW","name":"","type":"w/ Contract","units":9,"price":3750000.0,"foia":"FOIA","buyer":"Redacted","owner":"Khalid Alizzi"},{"date":"2025-05-30","address":"4021 Benton Street NW","name":"","type":"w/ Contract","units":21,"price":3375000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-06-02","address":"1823\u20131825 East Capitol Street SE","name":"","type":"w/ Contract","units":12,"price":2400000.0,"foia":"FOIA","buyer":"Michael Taylor","owner":"Robert McCulloch"},{"date":"2025-06-03","address":"1660 Park Road NW","name":"","type":"w/ Contract","units":8,"price":2100000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-06-03","address":"111\u2013115 Kennedy Street NW","name":"","type":"w/ Contract","units":12,"price":1100000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-06-03","address":"249 Oglethorpe Street NW","name":"","type":"w/ Contract","units":5,"price":850000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-06-03","address":"6600 Luzon Avenue NW and 6505 14th Street NW","name":"Luzon and Van Buren","type":"w/ Contract","units":118,"price":20350000.0,"foia":"FOIA","buyer":"Capitol Rock Partners, LLC - Felipe Ernst","owner":"Borger Residential"},{"date":"2025-06-03","address":"700 Quincy Street NE","name":"","type":"w/o Contract","units":7,"price":2829000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-06-09","address":"4725 Minnesota Avenue NE","name":"","type":"w/o Contract","units":12,"price":1350000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-06-12","address":"1923 Benning Road NE","name":"","type":"w/ Contract","units":9,"price":3179824.0,"foia":"FOIA","buyer":"Project DC Holdings LLC - ARCTRUST - Gary S Baumann","owner":"Musa Utku Aslanturk"},{"date":"2025-06-16","address":"1810 I Street NE","name":"","type":"w/ Contract","units":14,"price":3895000.0,"foia":"FOIA","buyer":"Redacted","owner":"Milano Dezign - Abraham Ors"},{"date":"2025-06-20","address":"2622 University Place NW","name":"","type":"w/ Contract","units":19,"price":7372160.0,"foia":"FOIA","buyer":"Project DC Holdings LLC - ARCTRUST - Gary S Baumann","owner":"Sanjay Bajaj"},{"date":"2025-06-20","address":"1901 I Street NE","name":"","type":"w/ Contract","units":13,"price":4173750.0,"foia":"FOIA","buyer":"Project DC Holdings LLC - ARCTRUST - Gary S Baumann","owner":"Adam Lobene - American Housing"},{"date":"2025-06-24","address":"3601 14th Street NW","name":"","type":"w/ Contract","units":10,"price":3050000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-06-25","address":"1310 L Street SE","name":"","type":"w/ Contract","units":15,"price":5000000.0,"foia":"FOIA","buyer":"Project DC Holdings LLC - ARCTRUST - Gary S Baumann","owner":"Sanjay Bajaj"},{"date":"2025-07-07","address":"1821 T Street NW","name":"","type":"w/ Contract","units":9,"price":3750000.0,"foia":"FOIA","buyer":"","owner":""},{"date":"2025-07-17","address":"1205, 1300, 1302, 1304, 1306, 1308, 1310, 1312 6th Street NW and 1201, 1203, 1205, 1207, 1209, 1211 7th Street NW","name":"The Center at Washington Apartments","type":"w/ Contract","units":200,"price":52000000.0,"foia":"FOIA","buyer":"FPA Multifamily","owner":"MidCity Financial Corporation"},{"date":"2025-07-24","address":"2920 P Street SE","name":"","type":"w/ Contract","units":5,"price":515000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-07-22","address":"1072 Thomas Jefferson Street NW","name":"","type":"w/o Contract","units":8,"price":5600000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-07-29","address":"5401-5407 Connecticut Avenue NW & 3719-3723 Military Road NW","name":"Flats at Chevy Chase","type":"w/ Contract","units":14,"price":6100000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-07-30","address":"1807 Newton Street NW","name":"","type":"w/ Contract","units":7,"price":1050000.0,"foia":"FOIA","buyer":"Stax Development LLC / YES Equity / Mike Azimi","owner":"Conservator for xxxx, Kendra Rose, Esq."},{"date":"2025-07-30","address":"1433 Columbia Road NW","name":"","type":"w/ Contract","units":37,"price":3400000.0,"foia":"FOIA","buyer":"Stax Development LLC / YES Equity / Mike Azimi","owner":"Conservator for xxxx, Kendra Rose, Esq."},{"date":"2025-08-12","address":"2723 Jasper Street SE","name":"","type":"w/ Contract","units":5,"price":600000.0,"foia":"FOIA","buyer":"Redacted","owner":"Redacted"},{"date":"2025-08-25","address":"1499 Massachusetts Avenue NW","name":"MAA Massachusetts Ave","type":"w/ Contract","units":269,"price":163000000.0,"foia":"Greysteel","buyer":"","owner":"Mid-America Apartment Communities, Inc."},{"date":"2025-09-04","address":"954 Southern Avenue SE","name":"","type":"w/ Contract","units":11,"price":1610000.0,"foia":"Greysteel","buyer":"Michael Taylor","owner":"Dean Smothers"},{"date":"2025-09-09","address":"1416 Chapin Street NW","name":"Malcom Place","type":"w/ Contract","units":16,"price":2900000.0,"foia":"FOIA","buyer":"Mila Realty Group LLC - Michael McGregor","owner":"Saied Jamshidi - Amir Afshar"},{"date":"2025-09-11","address":"954 Southern Avenue SE","name":"","type":"w/ Contract","units":11,"price":1610000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-09-12","address":"1483 Newton Street NW","name":"The Isabella","type":"w/ Contract","units":39,"price":7700000.0,"foia":"FOIA","buyer":"Community Realty Co., Inc.","owner":"Steve Schwat - UIP"},{"date":"2025-09-18","address":"1236 31st Street NW","name":"","type":"w/ Contract","units":5,"price":3000000.0,"foia":"FOIA","buyer":"J. M. & A. H. - out of Denver","owner":"Ezra Glass, Adam Bernstein, David Duber"},{"date":"2025-09-22","address":"201 57th Street NE","name":"","type":"w/ Contract","units":6,"price":655000.0,"foia":"FOIA","buyer":"Carnoustie Holdings - Redacted","owner":"201 57th Investment LLC - Jim Strasbourger"},{"date":"2025-09-24","address":"3130 Buena Vista Terrace SE","name":"","type":"w/ Contract","units":6,"price":950000.0,"foia":"FOIA","buyer":"RJ Realty Partners - Ronald Vasquez and Jose Huerta","owner":"D. N."},{"date":"2025-09-24","address":"4420 B Street SE","name":"","type":"w/ Contract","units":9,"price":750000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-09-29","address":"418 Missouri Avenue NW","name":"","type":"w/ Contract","units":12,"price":1955000.0,"foia":"FOIA","buyer":"Al Davis - 418 Missouri Avenue Development LLC","owner":"Aaron McCarley/Deborah Tate"},{"date":"2025-09-29","address":"3130 Buena Vista Terrace SE","name":"","type":"w/ Contract","units":6,"price":950000.0,"foia":"FOIA","buyer":"RJ Realty Partners - Ronald Vasquez and Jose Huerta","owner":"D. N."},{"date":"2025-10-06","address":"1401 Bangor Street SE","name":"","type":"w/ Contract","units":5,"price":675000.0,"foia":"FOIA","buyer":"TAMM Investments LLC - Akeem Dyson?","owner":"SI Investors 5 LLC - hidden, same as below"},{"date":"2025-10-07","address":"3465 Minnesota Avenue SE","name":"","type":"w/ Contract","units":6,"price":800000.0,"foia":"FOIA","buyer":"TAMM Investments LLC - Akeem Dyson?","owner":"3465 Minnesota LLC - hidden"},{"date":"2025-10-10","address":"3654 New Hampshire Avenue NW","name":"","type":"w/o Contract","units":24,"price":750000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-10-16","address":"1280 Union Street NE","name":"Margarite","type":"w/ Contract","units":260,"price":127000000.0,"foia":"FOIA","buyer":"Redacted","owner":"Grosvenor"},{"date":"2025-10-16","address":"2700 Texas Avenue SE","name":"","type":"w/ Contract","units":8,"price":879500.0,"foia":"FOIA","buyer":"Moors Holding LLC - Greg West","owner":"Mimi Gulelat"},{"date":"2025-10-27","address":"4325 Kansas Avenue NW","name":"","type":"w/ Contract","units":17,"price":1550000.0,"foia":"FOIA","buyer":"UC - Redacted","owner":"JB - Redacted"},{"date":"2025-10-27","address":"1701\u20131713 Benning Road NE","name":"Benning Courts","type":"w/ Contract","units":97,"price":14200000.0,"foia":"FOIA","buyer":"Tryko Partners - Uri Kahanow","owner":"Horning"},{"date":"2025-10-29","address":"1101\u20131113 19th Street NE","name":"","type":"w/o Contract","units":24,"price":3150000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-10-31","address":"5611, 5615, 5616 7th Street NW","name":"","type":"w/o Contract","units":10,"price":1615000.0,"foia":"-","buyer":"","owner":""},{"date":"2025-11-05","address":"6024 8th Street NW","name":"","type":"w/ Contract","units":20,"price":3700000.0,"foia":"FOIA","buyer":"LB - Redacted","owner":"Alvin Gross"},{"date":"2025-11-06","address":"5615 Nannie Helen Burroughs Avenue NE","name":"","type":"w/ Contract","units":14,"price":1820000.0,"foia":"FOIA","buyer":"5615 TG Real Estate Investments LLC - Negest Dawit - TG Cigar Lounge","owner":"Solid Properties - Madison Investments"},{"date":"2025-11-26","address":"5524 8th Street NW","name":"Longfellow Apartments","type":"w/ Contract","units":23,"price":3175000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-11-26","address":"1235 Randolph Street NW","name":"Randolph Apartments","type":"w/ Contract","units":26,"price":3120000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-11-26","address":"220 Allison Street NW","name":"Allison Apartments","type":"w/ Contract","units":27,"price":3375000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-12-02","address":"1725 Capitol Avenue NE","name":"","type":"w/ Contract","units":6,"price":905000.0,"foia":"FOIA","buyer":"Paul Fon and Joshua Douglas","owner":"Redacted"},{"date":"2025-12-03","address":"129 Yuma Street SE","name":"","type":"w/ Contract","units":12,"price":1246300.0,"foia":"FOIA","buyer":"Kris Sankar","owner":"James Suh"},{"date":"2025-12-03","address":"770\u2013782 Kenilworth Terrace NE, 3721\u20133741 Jay Street NE, 3819\u20133821 Jay Street NE, 3724\u20133784 Hayes Street and 3800\u20133820 Hayes Street NE","name":"Mayfair Mansions - LIHTC","type":"w/ Contract","units":410,"price":27000000.0,"foia":"FOIA","buyer":"Radiant Property Management","owner":"Enterprise Community Development"},{"date":"2025-12-03","address":"1201, 1209, 1217, 1225, 1233, 1241 Valley Avenue SE and 3901 13th Street SE","name":"Wheeler Terrace - LIHTC","type":"w/ Contract","units":116,"price":7500000.0,"foia":"FOIA","buyer":"Radiant Property Management","owner":"Enterprise Community Development"},{"date":"2025-12-10","address":"1818 Q Street SE","name":"","type":"w/ Contract","units":13,"price":1250000.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2025-12-15","address":"1224 Missouri Avenue NW","name":"","type":"w/o Contract","units":6,"price":null,"foia":"-","buyer":"","owner":""},{"date":"2025-12-17","address":"1745 T Street NW","name":"","type":"w/ Contract","units":6,"price":715000.0,"foia":"FOIA","buyer":"KB, Marcus Stringer","owner":"SH"},{"date":"2025-12-29","address":"2801 15th Street NW","name":"Meridian Heights","type":"w/ Contract","units":62,"price":9000000.0,"foia":"FOIA","buyer":"Mikhail Phillips","owner":"UIP"},{"date":"2025-12-31","address":"1430 W Street NW","name":"1430W","type":"w/ Contract","units":38,"price":8968750.0,"foia":"Greysteel","buyer":"","owner":""},{"date":"2026-01-06","address":"2400\u20132406 Minnesota Avenue SE","name":"","type":"w/ Contract","units":5,"price":1100000.0,"foia":"Requested","buyer":"","owner":""},{"date":"2026-01-15","address":"401 Chaplin Street SE","name":"Bethune House","type":"w/ Contract","units":43,"price":3700000.0,"foia":"Requested","buyer":"","owner":""},{"date":"2026-01-30","address":"1351 Wisconsin Avenue NW","name":"","type":"w/ Contract","units":7,"price":10200000.0,"foia":"Requested","buyer":"","owner":""}];
+
+var TODAY = new Date(); TODAY.setHours(0,0,0,0);
+var TOPA_LIMIT = 420;
+var allData = BASE_DATA.map(function(p){ return Object.assign({},p); });
+var importedData = [];
+var filteredData = [];
+var activeType = 'all';
+var showingArchive = false;
+var markers = [];
+var dcLayer = null;
+var map;
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+function daysIn(dateStr){ if(!dateStr) return 0; var d=new Date(dateStr); d.setHours(0,0,0,0); return Math.floor((TODAY-d)/86400000); }
+function isArc(p){ return daysIn(p.date)>TOPA_LIMIT; }
+function fmt$(n){ if(n==null||isNaN(n)) return '—'; if(n>=1e9) return '$'+(n/1e9).toFixed(2)+'B'; if(n>=1e6) return '$'+(n/1e6).toFixed(n%1e6===0?0:1)+'M'; if(n>=1000) return '$'+Math.round(n/1000)+'K'; return '$'+n.toLocaleString(); }
+function fmtFull$(n){ return (n==null||isNaN(n))?'—':'$'+n.toLocaleString(); }
+function getPPU(p){ return (p.price&&p.units)?Math.round(p.price/p.units):null; }
+function fmtDate(s){ if(!s) return '—'; var pt=s.split('-'); var mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return mo[parseInt(pt[1])-1]+' '+parseInt(pt[2])+', '+pt[0]; }
+
+function getMilestonePhase(days){
+  if(days<=5) return {phase:0,label:"Tenants Notified"};
+  if(days<=50) return {phase:1,label:"TA Formation Window"};
+  if(days<=185) return {phase:2,label:"TA Contract & Deposit"};
+  if(days<=305) return {phase:3,label:"TA Securing Financing"};
+  if(days<=420) return {phase:4,label:"TA Financing Extension"};
+  return {phase:5,label:"Process Concluded"};
+}
+
+function getActiveMostRecent(){
+  var active=allData.filter(function(p){return !isArc(p);});
+  if(!active.length) return allData.reduce(function(a,b){return a.date>b.date?a:b;}).date;
+  return active.reduce(function(a,b){return a.date>b.date?a:b;}).date;
+}
+
+// ── MAP ──────────────────────────────────────────────────────────────────────
+function initMap(){
+  map=L.map('map',{center:[38.9072,-77.0369],zoom:12});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap © CARTO',maxZoom:19}).addTo(map);
+  // DC boundary via GeoJSON
+  fetch('https://raw.githubusercontent.com/unitedstates/districts/gh-pages/states/DC/shape.geojson')
+    .then(function(r){return r.json();})
+    .then(function(data){
+      dcLayer=L.geoJSON(data,{
+        style:{color:'#081937',weight:3.5,fillOpacity:0,opacity:0.9}
+      }).addTo(map);
+    }).catch(function(){});
+}
+
+// ── GEOCODE ──────────────────────────────────────────────────────────────────
+// Load any previously cached coords from localStorage
+(function(){
+  try{var s=localStorage.getItem('topa_geo');if(s){var c=JSON.parse(s);Object.assign(GEO,c);}}catch(e){}
+})();
+
+function saveGeoCache(){
+  try{localStorage.setItem('topa_geo',JSON.stringify(GEO));}catch(e){}
+}
+
+async function geocode(addr){
+  if(GEO[addr]) return GEO[addr];
+  try{
+    var r=await fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(addr+', Washington DC')+'&limit=1');
+    var d=await r.json();
+    if(d&&d[0]){
+      var c=[parseFloat(d[0].lat),parseFloat(d[0].lon)];
+      GEO[addr]=c;
+      saveGeoCache();
+      return c;
+    }
+  }catch(e){}
+  return null;
+}
+
+// ── MARKERS ──────────────────────────────────────────────────────────────────
+async function renderMarkers(){
+  markers.forEach(function(m){map.removeLayer(m);});
+  markers=[];
+  for(var i=0;i<filteredData.length;i++){
+    var p=filteredData[i];
+    var coords=await geocode(p.address);
+    if(!coords) continue;
+    var arc=isArc(p); var isC=p.type==='w/ Contract';
+    var color=arc?'#94a3b8':(isC?'#16a34a':'#dc2626');
+    var days=daysIn(p.date); var ppuVal=getPPU(p);
+    var pct=Math.min(100,Math.round(days/TOPA_LIMIT*100));
+    // Segmented bar for popup
+    var segsThresh=[5,50,185,305,420];
+    var segColors=['#16a34a','#22c55e','#d97706','#ea580c','#dc2626'];
+    var popSegHtml=segsThresh.map(function(t,si){
+      var filled=days>=t; 
+      return '<div style="flex:1;height:4px;border-radius:1px;background:'+(filled?segColors[si]:'rgba(255,255,255,0.15)')+'"></div>';
+    }).join('');
+    var ms=getMilestonePhase(days);
+
+    var msHtml='';
+    MILESTONES.forEach(function(m,mi){
+      var cls=days>m.day?'past':(days>=(mi>0?MILESTONES[mi-1].day:0)&&days<=m.day?'current':'future');
+      msHtml+='<div class="pu-ms-row"><div class="pu-ms-dot '+cls+'"></div><span class="pu-ms-lbl'+(cls==='current'?' current':'')+'">'+m.label+'</span><span class="pu-ms-days">Day '+m.day+'</span></div>';
+    });
+
+    var html='<div class="pu-addr">'+p.address+'</div>'
+      +(p.name?'<div class="pu-name">'+p.name+'</div>':'')
+      +'<div class="pu-grid">'
+      +'<div class="pu-f"><label>TOPA Date</label><span>'+fmtDate(p.date)+'</span></div>'
+      +'<div class="pu-f"><label>Units</label><span>'+p.units+'</span></div>'
+      +'<div class="pu-f"><label>Price</label><span>'+fmtFull$(p.price)+'</span></div>'
+      +'<div class="pu-f"><label>Price / Unit</label><span>'+(ppuVal?'$'+ppuVal.toLocaleString():'—')+'</span></div>'
+      +(p.buyer?'<div class="pu-f wide"><label>Buyer</label><span>'+p.buyer+'</span></div>':'')
+      +(p.owner?'<div class="pu-f wide"><label>Owner / Seller</label><span>'+p.owner+'</span></div>':'')
+      +'<div class="pu-f"><label>FOIA</label><span>'+(p.foia||'—')+'</span></div>'
+      +'</div>'
+      +'<div class="pu-tags"><span class="pu-tag '+(arc?'arc':(isC?'c':'nc'))+'">'+p.type+'</span></div>'
+      +'<div class="pu-topa-bar">'
+      +'<div class="pu-topa-lbl">TOPA Progress · <strong style="color:white">'+ms.label+'</strong></div>'
+      +'<div style="display:flex;gap:2px;margin:5px 0 4px">'+ popSegHtml +'</div>'
+      +'<div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.38)">'
+      +'<span>Day 0</span><span>45</span><span>185</span><span>305</span><span>420</span>'
+      +'</div>'
+      +'<div class="pu-topa-info" style="margin-top:5px"><strong>'+days+' days</strong><span>'+(arc?'Archived':Math.max(0,TOPA_LIMIT-days)+' days left')+'</span></div>'
+      +'</div>'
+      +'<div class="pu-milestones" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1)">'
+      +'<div style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px">Current Phase</div>'
+      +'<div style="font-size:0.75rem;font-weight:700;color:white">'+ms.label+'</div>'
+      +'</div>';
+
+    (function(idx){
+      var opacity=arc?'0.5':'1';
+      var icon=L.divIcon({
+        className:'',
+        html:'<div style="width:16px;height:16px;border-radius:50%;background:'+color+';border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);opacity:'+opacity+';cursor:pointer;"></div>',
+        iconSize:[16,16],iconAnchor:[8,8],popupAnchor:[0,-10]
+      });
+      var mk=L.marker(coords,{icon:icon}).bindPopup(html,{maxWidth:310});
+      mk.on('click',function(){hlItem(idx);});
+      mk.addTo(map);
+      markers.push(mk);
+    })(i);
+  }
+}
+
+// ── LIST ─────────────────────────────────────────────────────────────────────
+function renderList(){
+  var el=document.getElementById('prop-list');
+  var cnt=document.getElementById('res-count');
+  var lbl=showingArchive?'archived ':'';
+  cnt.textContent=filteredData.length+' '+lbl+'propert'+(filteredData.length===1?'y':'ies');
+  if(!filteredData.length){
+    el.innerHTML='<div class="no-res">'+(showingArchive?'No archived properties yet. These will appear once a TOPA date is more than 420 days ago.':'No properties match the current filters.')+'</div>';
+    return;
+  }
+  el.innerHTML=filteredData.map(function(p,i){
+    var ppuVal=getPPU(p); var isC=p.type==='w/ Contract'; var arc=isArc(p);
+    var days=daysIn(p.date);
+    // Build 5-segment milestone bar: [5, 45, 135, 120, 120] = 420 total
+    var segs=[5,50,185,305,420];
+    var segHtml=segs.map(function(threshold,si){
+      var cls=days>=threshold?'filled-'+(si+1):'';
+      return '<div class="days-seg '+cls+'"></div>';
+    }).join('');
+    var ms=getMilestonePhase(days);
+    return '<div class="pi'+(arc?' arc':'')+'" data-idx="'+i+'" onclick="focusProp('+i+')">'
+      +'<div class="pi-addr">'+p.address+'</div>'
+      +(p.name?'<div class="pi-name">'+p.name+'</div>':'')
+      +'<div class="pi-meta">'
+      +'<span class="bdg '+(isC?'bdg-g':'bdg-r')+'">'+p.type+'</span>'
+      +'<span class="bdg bdg-n">'+p.units+' units</span>'
+      +(ppuVal?'<span class="bdg bdg-gr">'+fmt$(ppuVal)+'/unit</span>':'')
+      +'<span class="pi-price">'+fmt$(p.price)+'</span>'
+      +'</div>'
+      +'<div class="pi-days"><strong>'+days+'d</strong> in TOPA'
+      +'<span class="days-bar">'+segHtml+'</span>'
+      +(arc?'<span class="bdg bdg-arc">Archived</span>':'<span>'+Math.max(0,TOPA_LIMIT-days)+'d left</span>')
+      +'</div>'
+      +'<div class="pi-phase">'+ms.label+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+function updateStats(){
+  var active=allData.filter(function(p){return !isArc(p);});
+  var u=active.reduce(function(s,p){return s+(p.units||0);},0);
+  var v=active.reduce(function(s,p){return s+(p.price||0);},0);
+  var pa=active.filter(function(p){return p.price&&p.units;}).map(function(p){return p.price/p.units;});
+  var avgPpu=pa.length?pa.reduce(function(a,b){return a+b;},0)/pa.length:null;
+  document.getElementById('stat-props').textContent=active.length;
+  document.getElementById('stat-units').textContent=u.toLocaleString();
+  document.getElementById('stat-vol').textContent=fmt$(v);
+  document.getElementById('stat-ppu').textContent=avgPpu?'$'+Math.round(avgPpu).toLocaleString():'—';
+  document.getElementById('arc-cnt').textContent=allData.filter(function(p){return isArc(p);}).length;
+  document.getElementById('asof-date').textContent=fmtDate(getActiveMostRecent());
+}
+
+// ── FILTER + SORT ─────────────────────────────────────────────────────────────
+function applyFilters(){
+  var foia=document.getElementById('filter-foia').value;
+  var sort=document.getElementById('sort-by').value;
+  var uMin=parseFloat(document.getElementById('u-min').value)||null;
+  var uMax=parseFloat(document.getElementById('u-max').value)||null;
+  var pMin=parseFloat(document.getElementById('p-min').value)||null;
+  var pMax=parseFloat(document.getElementById('p-max').value)||null;
+  var ppuMin=parseFloat(document.getElementById('ppu-min').value)||null;
+  var ppuMax=parseFloat(document.getElementById('ppu-max').value)||null;
+  var dMin=document.getElementById('d-min').value||null;
+  var dMax=document.getElementById('d-max').value||null;
+  var daysMinV=document.getElementById('days-min').value;
+  var daysMaxV=document.getElementById('days-max').value;
+  var pool=allData.filter(function(p){return showingArchive?isArc(p):!isArc(p);});
+  filteredData=pool.filter(function(p){
+    if(activeType!=='all'&&p.type!==activeType) return false;
+    if(foia&&p.foia!==foia) return false;
+    if(uMin!=null&&p.units<uMin) return false;
+    if(uMax!=null&&p.units>uMax) return false;
+    if(pMin!=null&&(p.price==null||p.price<pMin)) return false;
+    if(pMax!=null&&(p.price==null||p.price>pMax)) return false;
+    var pp=getPPU(p);
+    if(ppuMin!=null&&(pp==null||pp<ppuMin)) return false;
+    if(ppuMax!=null&&(pp==null||pp>ppuMax)) return false;
+    if(dMin&&p.date<dMin) return false;
+    if(daysMinV&&daysIn(p.date)<parseInt(daysMinV)) return false;
+    if(daysMaxV&&daysIn(p.date)>parseInt(daysMaxV)) return false;
+    if(dMax&&p.date>dMax) return false;
+    return true;
+  });
+  filteredData.sort(function(a,b){
+    switch(sort){
+      case 'date-desc': return b.date.localeCompare(a.date);
+      case 'date-asc': return a.date.localeCompare(b.date);
+      case 'days-desc': return daysIn(b.date)-daysIn(a.date);
+      case 'days-asc': return daysIn(a.date)-daysIn(b.date);
+      case 'price-desc': return (b.price||0)-(a.price||0);
+      case 'price-asc': return (a.price||0)-(b.price||0);
+      case 'units-desc': return (b.units||0)-(a.units||0);
+      case 'units-asc': return (a.units||0)-(b.units||0);
+      case 'ppu-desc': return (getPPU(b)||0)-(getPPU(a)||0);
+      case 'ppu-asc': return (getPPU(a)||0)-(getPPU(b)||0);
+      default: return 0;
+    }
+  });
+  updateStats(); renderList(); renderMarkers();
+}
+
+// ── FOCUS ─────────────────────────────────────────────────────────────────────
+async function focusProp(idx){
+  document.querySelectorAll('.pi').forEach(function(e){e.classList.remove('hl');});
+  var el=document.querySelector('.pi[data-idx="'+idx+'"]');
+  if(el) el.classList.add('hl');
+  var p=filteredData[idx]; var coords=await geocode(p.address);
+  if(coords){ map.flyTo(coords,16,{animate:true,duration:0.8}); setTimeout(function(){if(markers[idx])markers[idx].openPopup();},900); }
+}
+function hlItem(idx){
+  document.querySelectorAll('.pi').forEach(function(e){e.classList.remove('hl');});
+  var el=document.querySelector('.pi[data-idx="'+idx+'"]');
+  if(el){el.classList.add('hl');el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+}
+
+// ── EVENTS ────────────────────────────────────────────────────────────────────
+document.querySelectorAll('#chips-type .chip').forEach(function(chip){
+  chip.addEventListener('click',function(){
+    document.querySelectorAll('#chips-type .chip').forEach(function(c){c.classList.remove('active');});
+    chip.classList.add('active'); activeType=chip.dataset.val; applyFilters();
+  });
+});
+['filter-foia','sort-by','d-min','d-max'].forEach(function(id){document.getElementById(id).addEventListener('change',applyFilters);});
+['u-min','u-max','p-min','p-max','ppu-min','ppu-max','days-min','days-max'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',function(){clearTimeout(window._ft);window._ft=setTimeout(applyFilters,350);});
+});
+document.getElementById('btn-reset').addEventListener('click',function(){
+  activeType='all';
+  document.querySelectorAll('#chips-type .chip').forEach(function(c){c.classList.remove('active');});
+  document.querySelector('#chips-type .chip[data-val="all"]').classList.add('active');
+  document.getElementById('filter-foia').value='';
+  document.getElementById('sort-by').value='date-desc';
+  ['u-min','u-max','p-min','p-max','ppu-min','ppu-max','d-min','d-max','days-min','days-max'].forEach(function(id){document.getElementById(id).value='';});
+  applyFilters();
+});
+
+// Archive
+document.getElementById('btn-archive').addEventListener('click',function(){
+  showingArchive=true; this.classList.add('active');
+  document.getElementById('arc-banner').classList.add('on'); applyFilters();
+});
+document.getElementById('arc-close').addEventListener('click',function(){
+  showingArchive=false; document.getElementById('btn-archive').classList.remove('active');
+  document.getElementById('arc-banner').classList.remove('on'); applyFilters();
+});
+
+// Timeline modal
+document.getElementById('btn-timeline').addEventListener('click',function(){document.getElementById('tl-modal').classList.add('open');});
+document.getElementById('tl-close').addEventListener('click',function(){document.getElementById('tl-modal').classList.remove('open');});
+document.getElementById('tl-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+
+// Import
+document.getElementById('import-toggle').addEventListener('click',function(){document.getElementById('import-panel').classList.toggle('open');document.getElementById('comp-panel').classList.remove('open');});
+document.querySelectorAll('.imp-tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    document.querySelectorAll('.imp-tab').forEach(function(t){t.classList.remove('active');});
+    document.querySelectorAll('.imp-content').forEach(function(c){c.classList.remove('active');});
+    tab.classList.add('active'); document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+function parseRow(cells){
+  if(!cells[1]||!cells[1].trim()) return null;
+  var dr=cells[0]?cells[0].trim():''; var dv='';
+  if(dr){var d=new Date(dr);if(!isNaN(d))dv=d.toISOString().split('T')[0];}
+  var pr=cells[5]?String(cells[5]).replace(/[$,\s]/g,''):'';
+  return{date:dv,address:cells[1].trim(),name:cells[2]?cells[2].trim():'',type:cells[3]?cells[3].trim():'',units:parseInt(cells[4])||0,price:parseFloat(pr)||null,foia:cells[7]?cells[7].trim():'',buyer:cells[8]?cells[8].trim():'',owner:cells[9]?cells[9].trim():''};
+}
+function importRows(rows){var n=0;rows.forEach(function(r){var p=parseRow(r);if(p){importedData.push(p);allData.push(p);n++;}});return n;}
+function showMsg(t,tp){var e=document.getElementById('imp-msg');e.textContent=t;e.className='imp-msg '+tp;clearTimeout(window._mt);window._mt=setTimeout(function(){e.className='imp-msg';},4500);}
+function isHdr(cells){var f=(cells[0]||'').toLowerCase();return f.includes('date')||f.includes('topa');}
+document.getElementById('btn-paste-imp').addEventListener('click',function(){
+  var t=document.getElementById('paste-input').value.trim();
+  if(!t){showMsg('Paste some data first.','err');return;}
+  var rows=t.split('\n').map(function(l){return l.split('\t');});
+  var s=isHdr(rows[0])?1:0; var n=importRows(rows.slice(s));
+  if(n>0){showMsg('✓ Added '+n+' propert'+(n===1?'y':'ies')+'.','ok');document.getElementById('paste-input').value='';applyFilters();}
+  else showMsg('No valid rows found — check column order.','err');
+});
+var csvInput=document.getElementById('csv-input'); var fileDrop=document.getElementById('file-drop');
+fileDrop.addEventListener('click',function(){csvInput.click();});
+fileDrop.addEventListener('dragover',function(e){e.preventDefault();fileDrop.classList.add('dov');});
+fileDrop.addEventListener('dragleave',function(){fileDrop.classList.remove('dov');});
+fileDrop.addEventListener('drop',function(e){
+  e.preventDefault();fileDrop.classList.remove('dov');
+  if(e.dataTransfer.files[0]){try{var dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);csvInput.files=dt.files;}catch(err){}
+  document.getElementById('drop-lbl').textContent=e.dataTransfer.files[0].name;}
+});
+csvInput.addEventListener('change',function(){if(csvInput.files[0])document.getElementById('drop-lbl').textContent=csvInput.files[0].name;});
+document.getElementById('btn-csv-imp').addEventListener('click',function(){
+  var file=csvInput.files[0]; if(!file){showMsg('Select a CSV file first.','err');return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var rows=e.target.result.split('\n').map(function(line){
+      var res=[],cur='',inQ=false;
+      for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){res.push(cur.trim());cur='';}else cur+=ch;}
+      res.push(cur.trim());return res;
+    }).filter(function(r){return r.some(function(c){return c;});});
+    var s=isHdr(rows[0])?1:0; var n=importRows(rows.slice(s));
+    if(n>0){showMsg('✓ Added '+n+' from CSV.','ok');document.getElementById('drop-lbl').textContent='Drop CSV here or click to browse';applyFilters();}
+    else showMsg('No valid rows found.','err');
+  };
+  reader.readAsText(file);
+});
+document.getElementById('btn-clr-all').addEventListener('click',function(){
+  if(!importedData.length){showMsg('No imported data to clear.','err');return;}
+  importedData=[];allData=BASE_DATA.map(function(p){return Object.assign({},p);});
+  showMsg('Imported data cleared.','ok');applyFilters();
+});
+
+// ── COMPS DATA ────────────────────────────────────────────────────────────────
+var compsData = []; // all loaded comps: {id, address, name, price, date, units, sf, ppu, ppsf, yearBuilt, class, capRate, pfCapRate, buyer, seller, broker, affType, notes, topaId:null|idx}
+var compMarkers = [];
+var matchQueue = []; // pending matching sessions
+var matchQueueIdx = 0;
+var matchSelectedCandidate = null;
+
+// Attempt to load from data/sales_comps.json (GitHub hosted)
+(function loadRemoteComps(){
+  fetch('data/sales_comps.json')
+    .then(function(r){ if(!r.ok) throw new Error('no file'); return r.json(); })
+    .then(function(d){
+      if(Array.isArray(d) && d.length){
+        d.forEach(function(c){ if(!compsDupe(c)) compsData.push(c); });
+        renderCompsSidebar();
+        renderCompMarkers();
+        showCompMsg('✓ Loaded '+d.length+' comps from data/sales_comps.json','ok');
+      }
+    })
+    .catch(function(){ /* no remote file — that's fine */ });
+})();
+
+function compsDupe(c){
+  return compsData.some(function(x){ return x.address===c.address && x.date===c.date; });
+}
+
+function parseCompRow(cells){
+  // Columns: Name · Address · Sale Price · Sale Date · Units · Price/Unit · Building SF · Price/SF · Affordable Type · Vacancy · Year Built · PF Cap Rate · Actual Cap Rate · Building Class · Buyer · Seller · Listing Broker · Transaction Notes · Age
+  var addr = (cells[1]||'').trim(); if(!addr) return null;
+  var pr = parseFloat(String(cells[2]||'').replace(/[$,\s]/g,''))||null;
+  var rawDate = (cells[3]||'').trim(); var dv='';
+  if(rawDate){ var dd=new Date(rawDate); if(!isNaN(dd)) dv=dd.toISOString().split('T')[0]; }
+  return {
+    id: Date.now()+Math.random(),
+    name: (cells[0]||'').trim(),
+    address: addr,
+    price: pr,
+    date: dv,
+    units: parseInt(cells[4])||null,
+    ppu: parseFloat(String(cells[5]||'').replace(/[$,\s]/g,''))||null,
+    sf: parseFloat(String(cells[6]||'').replace(/[,\s]/g,''))||null,
+    ppsf: parseFloat(String(cells[7]||'').replace(/[$,\s]/g,''))||null,
+    affType: (cells[8]||'').trim(),
+    vacancy: (cells[9]||'').trim(),
+    yearBuilt: parseInt(cells[10])||null,
+    pfCapRate: parseFloat(cells[11])||null,
+    capRate: parseFloat(cells[12])||null,
+    bldgClass: (cells[13]||'').trim(),
+    buyer: (cells[14]||'').trim(),
+    seller: (cells[15]||'').trim(),
+    broker: (cells[16]||'').trim(),
+    notes: (cells[17]||'').trim(),
+    topaId: null
+  };
+}
+
+function isCompHdr(cells){ var f=(cells[0]||'').toLowerCase(); return f.includes('name')||f.includes('property'); }
+
+function importComps(rows){
+  var added=0;
+  rows.forEach(function(r){
+    var c=parseCompRow(r);
+    if(c && !compsDupe(c)){ compsData.push(c); added++; }
+  });
+  return added;
+}
+
+function showCompMsg(t,tp){
+  var e=document.getElementById('comp-imp-msg');
+  e.textContent=t; e.className='comp-imp-msg '+tp;
+  clearTimeout(window._cmt); window._cmt=setTimeout(function(){e.className='comp-imp-msg';},5000);
+}
+
+// ── FUZZY MATCHING ────────────────────────────────────────────────────────────
+function normalizeAddr(s){
+  return (s||'').toLowerCase()
+    .replace(/\./g,'').replace(/,/g,' ')
+    .replace(/[-–—]/g,' ')
+    // Expand full words to canonical short form FIRST (so both sides become identical)
+    .replace(/\bstreet\b/g,'st')
+    .replace(/\bavenue\b/g,'ave')
+    .replace(/\bboulevard\b/g,'blvd')
+    .replace(/\bplace\b/g,'pl')
+    .replace(/\broad\b/g,'rd')
+    .replace(/\bdrive\b/g,'dr')
+    .replace(/\bcourt\b/g,'ct')
+    .replace(/\blane\b/g,'ln')
+    .replace(/\bterrace\b/g,'ter')
+    .replace(/\bcircle\b/g,'cir')
+    .replace(/\bsquare\b/g,'sq')
+    .replace(/\bway\b/g,'wy')
+    .replace(/\bhighway\b/g,'hwy')
+    .replace(/\bparkway\b/g,'pkwy')
+    .replace(/\bnorthwest\b/g,'nw')
+    .replace(/\bnortheast\b/g,'ne')
+    .replace(/\bsouthwest\b/g,'sw')
+    .replace(/\bsoutheast\b/g,'se')
+    .replace(/\bnorth\b/g,'n')
+    .replace(/\bsouth\b/g,'s')
+    .replace(/\beast\b/g,'e')
+    .replace(/\bwest\b/g,'w')
+    .replace(/\s+/g,' ').trim();
+}
+
+function addrSimilarity(a, b){
+  var na = normalizeAddr(a), nb = normalizeAddr(b);
+  if(na === nb) return 1.0;
+  // Extract first number token
+  var numA = (na.match(/^\d+/) || [''])[0];
+  var numB = (nb.match(/^\d+/) || [''])[0];
+  if(numA && numB && numA !== numB) return 0; // different street numbers = not a match
+  // Jaccard on word tokens
+  var wa = new Set(na.split(' ').filter(Boolean));
+  var wb = new Set(nb.split(' ').filter(Boolean));
+  var inter = 0; wa.forEach(function(w){ if(wb.has(w)) inter++; });
+  var union = new Set([...wa,...wb]).size;
+  return union ? inter/union : 0;
+}
+
+function findCandidates(compAddr){
+  var results = [];
+  allData.forEach(function(p, idx){
+    var score = addrSimilarity(compAddr, p.address);
+    if(score > 0.3) results.push({idx:idx, prop:p, score:score});
+  });
+  results.sort(function(a,b){ return b.score - a.score; });
+  return results.slice(0,4);
+}
+
+// Auto-match comps where score is >= 0.85 (essentially same address, different abbreviation)
+function autoMatchHighConfidence(){
+  var autoMatched = 0;
+  compsData.forEach(function(c){
+    if(c.topaId !== null && c.topaId !== undefined) return;
+    var candidates = findCandidates(c.address);
+    if(candidates.length && candidates[0].score >= 0.85){
+      c.topaId = candidates[0].idx;
+      autoMatched++;
+    }
+  });
+  return autoMatched;
+}
+
+// ── MATCH QUEUE SYSTEM ────────────────────────────────────────────────────────
+function runMatching(){
+  var autoMatched = autoMatchHighConfidence();
+  matchQueue = compsData.filter(function(c){ return !c.topaId; }).map(function(c){ return c; });
+  matchQueueIdx = 0;
+  if(!matchQueue.length){
+    var msg = autoMatched
+      ? 'Auto-matched '+autoMatched+' comp'+(autoMatched===1?'':'s')+' by address. No remaining comps need manual review.'
+      : 'All comps are already matched or there are no comps loaded.';
+    alert(msg);
+    renderCompsSidebar(); renderCompMarkers(); applyFilters();
+    return;
+  }
+  var notice = autoMatched ? 'Auto-matched '+autoMatched+' comp'+(autoMatched===1?'':'s')+'. '+matchQueue.length+' need manual review.' : matchQueue.length+' comp'+(matchQueue.length===1?'':'s')+' need review.';
+  document.getElementById('match-modal').classList.add('open');
+  document.getElementById('match-progress-lbl').textContent = notice;
+  setTimeout(showMatchStep, 800);
+}
+
+function showMatchStep(){
+  var total = matchQueue.length;
+  var progressLbl = document.getElementById('match-progress-lbl');
+  var body = document.getElementById('match-body');
+  var btnAccept = document.getElementById('match-btn-accept');
+  var btnSkip = document.getElementById('match-btn-skip');
+  var btnDone = document.getElementById('match-btn-done');
+
+  if(matchQueueIdx >= total){
+    progressLbl.textContent = 'Matching complete!';
+    body.innerHTML = '<div style="text-align:center;padding:24px 0;"><div style="font-size:2rem;margin-bottom:8px;">✅</div><div style="font-size:0.9rem;font-weight:700;color:var(--navy);">All comps reviewed.</div><div style="font-size:0.73rem;color:var(--muted);margin-top:6px;">Matched comps will appear in their TOPA property popup and sidebar. Unmatched comps appear on the map in purple.</div></div>';
+    btnAccept.style.display='none'; btnSkip.style.display='none'; btnDone.style.display='block';
+    renderCompsSidebar(); renderCompMarkers(); return;
+  }
+
+  matchSelectedCandidate = null;
+  var comp = matchQueue[matchQueueIdx];
+  var candidates = findCandidates(comp.address);
+  progressLbl.textContent = 'Comp '+(matchQueueIdx+1)+' of '+total+' — review and approve or skip';
+  btnAccept.style.display='block'; btnSkip.style.display='block'; btnDone.style.display='none';
+
+  var compMeta = [
+    comp.price ? fmt$(comp.price) : null,
+    comp.date ? fmtDate(comp.date) : null,
+    comp.units ? comp.units+' units' : null,
+    comp.sf ? comp.sf.toLocaleString()+' SF' : null
+  ].filter(Boolean).join(' · ');
+
+  var candidateHtml = candidates.length
+    ? candidates.map(function(c, ci){
+        var scoreClass = c.score > 0.7 ? 'mc-score-hi' : 'mc-score-med';
+        var pct = Math.round(c.score*100);
+        return '<div class="match-candidate" data-ci="'+ci+'" onclick="selectCandidate('+ci+',this)">'+
+          '<div class="mc-radio"></div>'+
+          '<div class="mc-info" style="flex:1;">'+
+            '<h5>'+c.prop.address+'</h5>'+
+            '<p>'+(c.prop.name||'No deal name')+' · '+c.prop.units+' units · '+fmt$(c.prop.price)+'</p>'+
+          '</div>'+
+          '<span class="mc-score '+scoreClass+'">'+pct+'% match</span>'+
+        '</div>';
+      }).join('')
+    : '<div class="match-no-candidates">No similar TOPA addresses found. This comp will remain unmatched on the map.</div>';
+
+  body.innerHTML =
+    '<div class="match-comp-card">'+
+      '<h4>'+(comp.name||comp.address)+'</h4>'+
+      '<div style="font-size:0.7rem;color:var(--navy);margin-bottom:4px;">'+comp.address+'</div>'+
+      '<div class="mc-meta"><span>'+compMeta+'</span>'+(comp.buyer?'<span>Buyer: '+comp.buyer+'</span>':'')+(comp.seller?'<span>Seller: '+comp.seller+'</span>':'')+'</div>'+
+    '</div>'+
+    '<div class="match-section-lbl">Possible TOPA Matches — select one, then click Accept</div>'+
+    candidateHtml;
+
+  window._matchCandidates = candidates;
+}
+
+window.selectCandidate = function(ci, el){
+  document.querySelectorAll('.match-candidate').forEach(function(x){ x.classList.remove('selected'); });
+  el.classList.add('selected'); matchSelectedCandidate = ci;
+};
+
+document.getElementById('match-btn-accept').addEventListener('click', function(){
+  var comp = matchQueue[matchQueueIdx];
+  if(matchSelectedCandidate !== null && window._matchCandidates && window._matchCandidates[matchSelectedCandidate]){
+    comp.topaId = window._matchCandidates[matchSelectedCandidate].idx;
+  }
+  matchQueueIdx++; showMatchStep();
+});
+document.getElementById('match-btn-skip').addEventListener('click', function(){
+  matchQueueIdx++; showMatchStep();
+});
+document.getElementById('match-btn-done').addEventListener('click', function(){
+  document.getElementById('match-modal').classList.remove('open');
+});
+document.getElementById('match-close').addEventListener('click', function(){
+  document.getElementById('match-modal').classList.remove('open');
+});
+document.getElementById('match-modal').addEventListener('click', function(e){ if(e.target===this) this.classList.remove('open'); });
+
+// ── COMP MARKERS ──────────────────────────────────────────────────────────────
+async function renderCompMarkers(){
+  compMarkers.forEach(function(m){ map.removeLayer(m); });
+  compMarkers = [];
+  var unmatched = compsData.filter(function(c){ return c.topaId === null || c.topaId === undefined; });
+  for(var i=0; i<unmatched.length; i++){
+    var c = unmatched[i];
+    var coords = await geocode(c.address);
+    if(!coords) continue;
+    var icon = L.divIcon({
+      className:'',
+      html:'<div style="width:14px;height:14px;border-radius:50%;background:#7c3aed;border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);cursor:pointer;"></div>',
+      iconSize:[14,14], iconAnchor:[7,7], popupAnchor:[0,-8]
+    });
+    var html = buildCompPopupHtml(c);
+    var mk = L.marker(coords, {icon:icon}).bindPopup(html, {maxWidth:290});
+    mk.addTo(map);
+    compMarkers.push(mk);
+  }
+}
+
+function buildCompPopupHtml(c){
+  var ppu = (c.price && c.units) ? Math.round(c.price/c.units) : (c.ppu || null);
+  var ppsf = c.ppsf || (c.price && c.sf ? Math.round(c.price/c.sf*100)/100 : null);
+  return '<div style="font-size:0.7rem;font-weight:700;color:#c4b5fd;margin-bottom:2px;">SALE COMP</div>'+
+    '<div class="pu-addr">'+(c.name||c.address)+'</div>'+
+    (c.name ? '<div class="pu-name">'+c.address+'</div>' : '')+
+    '<div class="pu-grid">'+
+    (c.date ? '<div class="pu-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
+    (c.units ? '<div class="pu-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
+    (c.price ? '<div class="pu-f"><label>Sale Price</label><span>'+fmtFull$(c.price)+'</span></div>' : '')+
+    (ppu ? '<div class="pu-f"><label>Price / Unit</label><span>$'+ppu.toLocaleString()+'</span></div>' : '')+
+    (c.sf ? '<div class="pu-f"><label>Building SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
+    (ppsf ? '<div class="pu-f"><label>Price / SF</label><span>$'+ppsf+'</span></div>' : '')+
+    (c.yearBuilt ? '<div class="pu-f"><label>Year Built</label><span>'+c.yearBuilt+'</span></div>' : '')+
+    (c.capRate ? '<div class="pu-f"><label>Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
+    (c.buyer ? '<div class="pu-f wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
+    (c.seller ? '<div class="pu-f wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
+    '</div>'+
+    (c.notes ? '<div style="font-size:0.62rem;color:rgba(255,255,255,0.5);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1);font-style:italic;">'+c.notes+'</div>' : '')+
+    '<div style="margin-top:8px;padding:4px 7px;background:rgba(124,58,237,0.25);border-radius:4px;font-size:0.6rem;color:#c4b5fd;font-weight:600;">No TOPA match — standalone comp</div>';
+}
+
+// ── COMP SIDEBAR ──────────────────────────────────────────────────────────────
+function renderCompsSidebar(){
+  var el = document.getElementById('comps-sidebar-list');
+  var badge = document.getElementById('comp-cnt-badge');
+  var empty = document.getElementById('comps-sidebar-empty');
+  badge.textContent = compsData.length;
+  if(!compsData.length){
+    el.innerHTML = '<div id="comps-sidebar-empty" style="font-size:0.68rem;color:var(--muted);padding:6px 0 4px;">No sales comps loaded. Import below.</div>';
+    return;
+  }
+  el.innerHTML = compsData.map(function(c, ci){
+    var ppu = (c.price && c.units) ? Math.round(c.price/c.units) : c.ppu;
+    var matched = (c.topaId !== null && c.topaId !== undefined);
+    return '<div class="comp-list-item" onclick="focusComp('+ci+')" style="padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;">'+
+      '<div class="cli-addr">'+(c.name||c.address)+'</div>'+
+      '<div class="cli-meta">'+
+        (c.date ? '<span>'+fmtDate(c.date)+'</span>' : '')+
+        (c.price ? '<span><strong>'+fmt$(c.price)+'</strong></span>' : '')+
+        (ppu ? '<span>'+fmt$(ppu)+'/unit</span>' : '')+
+      '</div>'+
+      '<div class="'+(matched?'cli-match':'cli-unmatched')+'">'+(matched?'✓ Matched to TOPA':'○ Unmatched')+
+        (matched&&allData[c.topaId] ? ' · '+allData[c.topaId].address.substring(0,30) : '')+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+window.focusComp = async function(ci){
+  var c = compsData[ci];
+  var coords = await geocode(c.address);
+  if(coords) map.flyTo(coords, 16, {animate:true, duration:0.8});
+};
+
+// ── COMP POPUP TABS in TOPA popup ─────────────────────────────────────────────
+function getCompsForTopa(topaPropIdx){
+  return compsData.filter(function(c){ return c.topaId === topaPropIdx; });
+}
+
+function buildCompsTabHtml(topaPropIdx){
+  var cs = getCompsForTopa(topaPropIdx);
+  if(!cs.length) return '<div class="no-comps-msg">No sale comps linked to this property. Import comps and run address matching.</div>';
+  return cs.map(function(c){
+    var ppu = (c.price && c.units) ? Math.round(c.price/c.units) : c.ppu;
+    var ppsf = c.ppsf || (c.price && c.sf ? Math.round(c.price/c.sf*100)/100 : null);
+    return '<div class="pu-comp-card">'+
+      '<div class="pu-comp-addr">'+(c.name ? c.name+' — ' : '')+c.address+'</div>'+
+      '<div class="pu-comp-grid">'+
+      (c.date ? '<div class="pu-comp-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
+      (c.price ? '<div class="pu-comp-f"><label>Sale Price</label><span>'+fmtFull$(c.price)+'</span></div>' : '')+
+      (c.units ? '<div class="pu-comp-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
+      (ppu ? '<div class="pu-comp-f"><label>Price / Unit</label><span>$'+ppu.toLocaleString()+'</span></div>' : '')+
+      (c.sf ? '<div class="pu-comp-f"><label>Bldg SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
+      (ppsf ? '<div class="pu-comp-f"><label>Price / SF</label><span>$'+ppsf+'</span></div>' : '')+
+      (c.yearBuilt ? '<div class="pu-comp-f"><label>Year Built</label><span>'+c.yearBuilt+'</span></div>' : '')+
+      (c.capRate ? '<div class="pu-comp-f"><label>Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
+      (c.pfCapRate ? '<div class="pu-comp-f"><label>PF Cap Rate</label><span>'+c.pfCapRate+'%</span></div>' : '')+
+      (c.buyer ? '<div class="pu-comp-f wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
+      (c.seller ? '<div class="pu-comp-f wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
+      (c.broker ? '<div class="pu-comp-f wide"><label>Listing Broker</label><span>'+c.broker+'</span></div>' : '')+
+      '</div>'+
+      (c.notes ? '<div class="pu-comp-notes">'+c.notes+'</div>' : '')+
+    '</div>';
+  }).join('');
+}
+
+// Patch renderMarkers to add comp tabs to popups
+// (Override inline popup HTML builder to include tabs when comps exist)
+var _origRenderMarkers = renderMarkers;
+renderMarkers = async function(){
+  markers.forEach(function(m){map.removeLayer(m);});
+  markers=[];
+  for(var i=0;i<filteredData.length;i++){
+    var p=filteredData[i];
+    // Find the original index in allData for comp lookup
+    var topaOrigIdx = allData.indexOf(p);
+    var coords=await geocode(p.address);
+    if(!coords) continue;
+    var arc=isArc(p); var isC=p.type==='w/ Contract';
+    var color=arc?'#94a3b8':(isC?'#16a34a':'#dc2626');
+    var days=daysIn(p.date); var ppuVal=getPPU(p);
+    var segsThresh=[5,50,185,305,420];
+    var segColors=['#16a34a','#22c55e','#d97706','#ea580c','#dc2626'];
+    var popSegHtml=segsThresh.map(function(t,si){
+      var filled=days>=t;
+      return '<div style="flex:1;height:4px;border-radius:1px;background:'+(filled?segColors[si]:'rgba(255,255,255,0.15)')+'\"></div>';
+    }).join('');
+    var ms=getMilestonePhase(days);
+    var hasComps = getCompsForTopa(topaOrigIdx).length > 0;
+
+    var topaTabHtml = '<div class="pu-addr">'+p.address+'</div>'+
+      (p.name?'<div class="pu-name">'+p.name+'</div>':'')+
+      '<div class="pu-grid">'+
+      '<div class="pu-f"><label>TOPA Date</label><span>'+fmtDate(p.date)+'</span></div>'+
+      '<div class="pu-f"><label>Units</label><span>'+p.units+'</span></div>'+
+      '<div class="pu-f"><label>Price</label><span>'+fmtFull$(p.price)+'</span></div>'+
+      '<div class="pu-f"><label>Price / Unit</label><span>'+(ppuVal?'$'+ppuVal.toLocaleString():'—')+'</span></div>'+
+      (p.buyer?'<div class="pu-f wide"><label>Buyer</label><span>'+p.buyer+'</span></div>':'')+
+      (p.owner?'<div class="pu-f wide"><label>Owner / Seller</label><span>'+p.owner+'</span></div>':'')+
+      '<div class="pu-f"><label>FOIA</label><span>'+(p.foia||'—')+'</span></div>'+
+      '</div>'+
+      '<div class="pu-tags"><span class="pu-tag '+(arc?'arc':(isC?'c':'nc'))+'">'+p.type+'</span></div>'+
+      '<div class="pu-topa-bar">'+
+      '<div class="pu-topa-lbl">TOPA Progress · <strong style="color:white">'+ms.label+'</strong></div>'+
+      '<div style="display:flex;gap:2px;margin:5px 0 4px">'+popSegHtml+'</div>'+
+      '<div style="display:flex;justify-content:space-between;font-size:0.6rem;color:rgba(255,255,255,0.38)">'+
+      '<span>Day 0</span><span>45</span><span>185</span><span>305</span><span>420</span>'+
+      '</div>'+
+      '<div class="pu-topa-info" style="margin-top:5px"><strong>'+days+' days</strong><span>'+(arc?'Archived':Math.max(0,TOPA_LIMIT-days)+' days left')+'</span></div>'+
+      '</div>'+
+      '<div class="pu-milestones" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1)">'+
+      '<div style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px">Current Phase</div>'+
+      '<div style="font-size:0.75rem;font-weight:700;color:white">'+ms.label+'</div>'+
+      '</div>';
+
+    var popupId = 'popup-topa-'+i;
+    var html;
+    if(hasComps){
+      html = '<div id="'+popupId+'">'+
+        '<div class="pu-tabs">'+
+          '<button class="pu-tab active" onclick="switchPuTab(\''+popupId+'\',0,this)">TOPA Info</button>'+
+          '<button class="pu-tab" onclick="switchPuTab(\''+popupId+'\',1,this)">Sale Comps <span style=\"background:#7c3aed;color:white;border-radius:8px;padding:0 5px;font-size:0.55rem;\">'+getCompsForTopa(topaOrigIdx).length+'</span></button>'+
+        '</div>'+
+        '<div class="pu-tab-content active" data-tab-panel="0">'+topaTabHtml+'</div>'+
+        '<div class="pu-tab-content" data-tab-panel="1">'+buildCompsTabHtml(topaOrigIdx)+'</div>'+
+      '</div>';
+    } else {
+      html = topaTabHtml;
+    }
+
+    (function(idx){
+      var opacity=arc?'0.5':'1';
+      var icon=L.divIcon({
+        className:'',
+        html:'<div style="width:16px;height:16px;border-radius:50%;background:'+color+';border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);opacity:'+opacity+';cursor:pointer;"></div>',
+        iconSize:[16,16],iconAnchor:[8,8],popupAnchor:[0,-10]
+      });
+      var mk=L.marker(coords,{icon:icon}).bindPopup(html,{maxWidth:330});
+      mk.on('click',function(){hlItem(idx);});
+      mk.addTo(map);
+      markers.push(mk);
+    })(i);
+  }
+  // Also render comp markers
+  renderCompMarkers();
+};
+
+window.switchPuTab = function(popupId, tabIdx, btn){
+  var container = document.getElementById(popupId);
+  if(!container) return;
+  container.querySelectorAll('.pu-tab').forEach(function(t){ t.classList.remove('active'); });
+  container.querySelectorAll('.pu-tab-content').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  var panel = container.querySelector('[data-tab-panel="'+tabIdx+'"]');
+  if(panel) panel.classList.add('active');
+};
+
+// ── JSON EXPORT ───────────────────────────────────────────────────────────────
+document.getElementById('btn-export-comps').addEventListener('click', function(){
+  if(!compsData.length){ alert('No comps to export.'); return; }
+  var json = JSON.stringify(compsData, null, 2);
+  var blob = new Blob([json], {type:'application/json'});
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'sales_comps.json'; a.click(); URL.revokeObjectURL(a.href);
+});
+
+// ── COMPS IMPORT EVENTS ───────────────────────────────────────────────────────
+// Comp panel toggle
+document.getElementById('comp-toggle').addEventListener('click', function(){
+  document.getElementById('comp-panel').classList.toggle('open');
+  document.getElementById('import-panel').classList.remove('open');
+});
+
+// Comp tabs
+document.querySelectorAll('[data-ctab]').forEach(function(tab){
+  tab.addEventListener('click', function(){
+    document.querySelectorAll('[data-ctab]').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('[id^="ctab-"]').forEach(function(c){ c.classList.remove('active'); });
+    tab.classList.add('active');
+    document.getElementById('ctab-'+tab.dataset.ctab).classList.add('active');
+  });
+});
+
+// Paste import
+document.getElementById('btn-comp-paste-imp').addEventListener('click', function(){
+  var t = document.getElementById('comp-paste-input').value.trim();
+  if(!t){ showCompMsg('Paste some data first.','err'); return; }
+  var rows = t.split('\n').map(function(l){ return l.split('\t'); });
+  var s = isCompHdr(rows[0]) ? 1 : 0;
+  var n = importComps(rows.slice(s));
+  if(n>0){ showCompMsg('✓ Added '+n+' comp'+(n===1?'':'s')+'. Run Address Matching to link them.','ok'); document.getElementById('comp-paste-input').value=''; renderCompsSidebar(); renderCompMarkers(); }
+  else showCompMsg('No valid rows found. Check column order.','err');
+});
+
+// CSV import
+var compCsvInput = document.getElementById('comp-csv-input');
+var compFileDrop = document.getElementById('comp-file-drop');
+compFileDrop.addEventListener('click', function(){ compCsvInput.click(); });
+compFileDrop.addEventListener('dragover', function(e){ e.preventDefault(); compFileDrop.classList.add('dov'); });
+compFileDrop.addEventListener('dragleave', function(){ compFileDrop.classList.remove('dov'); });
+compFileDrop.addEventListener('drop', function(e){
+  e.preventDefault(); compFileDrop.classList.remove('dov');
+  if(e.dataTransfer.files[0]){ try{ var dt=new DataTransfer(); dt.items.add(e.dataTransfer.files[0]); compCsvInput.files=dt.files; }catch(err){}
+  document.getElementById('comp-drop-lbl').textContent=e.dataTransfer.files[0].name; }
+});
+compCsvInput.addEventListener('change', function(){ if(compCsvInput.files[0]) document.getElementById('comp-drop-lbl').textContent=compCsvInput.files[0].name; });
+document.getElementById('btn-comp-csv-imp').addEventListener('click', function(){
+  var file = compCsvInput.files[0]; if(!file){ showCompMsg('Select a CSV file first.','err'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var rows = e.target.result.split('\n').map(function(line){
+      var res=[],cur='',inQ=false;
+      for(var i=0;i<line.length;i++){var ch=line[i];if(ch==='"'){inQ=!inQ;}else if(ch===','&&!inQ){res.push(cur.trim());cur='';}else cur+=ch;}
+      res.push(cur.trim()); return res;
+    }).filter(function(r){ return r.some(function(c){ return c; }); });
+    var s = isCompHdr(rows[0]) ? 1 : 0;
+    var n = importComps(rows.slice(s));
+    if(n>0){ showCompMsg('✓ Added '+n+' comps from CSV.','ok'); document.getElementById('comp-drop-lbl').textContent='Drop CSV here or click to browse'; renderCompsSidebar(); renderCompMarkers(); }
+    else showCompMsg('No valid rows found.','err');
+  };
+  reader.readAsText(file);
+});
+
+// Manual entry
+document.getElementById('btn-comp-manual-add').addEventListener('click', function(){
+  var addr = document.getElementById('cm-address').value.trim();
+  if(!addr){ showCompMsg('Address is required.','err'); return; }
+  var rawDate = document.getElementById('cm-date').value;
+  var c = {
+    id: Date.now()+Math.random(),
+    name: document.getElementById('cm-name').value.trim(),
+    address: addr,
+    price: parseFloat(document.getElementById('cm-price').value)||null,
+    date: rawDate||'',
+    units: parseInt(document.getElementById('cm-units').value)||null,
+    sf: parseFloat(document.getElementById('cm-sf').value)||null,
+    yearBuilt: parseInt(document.getElementById('cm-year').value)||null,
+    bldgClass: document.getElementById('cm-class').value.trim(),
+    capRate: parseFloat(document.getElementById('cm-cap').value)||null,
+    pfCapRate: parseFloat(document.getElementById('cm-pfcap').value)||null,
+    buyer: document.getElementById('cm-buyer').value.trim(),
+    seller: document.getElementById('cm-seller').value.trim(),
+    broker: document.getElementById('cm-broker').value.trim(),
+    affType: document.getElementById('cm-aff').value.trim(),
+    notes: document.getElementById('cm-notes').value.trim(),
+    ppu: null, ppsf: null, vacancy:'',
+    topaId: null
+  };
+  if(compsDupe(c)){ showCompMsg('Duplicate address + date already exists.','err'); return; }
+  compsData.push(c);
+  showCompMsg('✓ Comp added. Run Address Matching to link it.','ok');
+  // Clear form
+  ['cm-address','cm-name','cm-price','cm-units','cm-sf','cm-year','cm-class','cm-cap','cm-pfcap','cm-buyer','cm-seller','cm-broker','cm-aff','cm-notes'].forEach(function(id){ document.getElementById(id).value=''; });
+  document.getElementById('cm-date').value='';
+  renderCompsSidebar(); renderCompMarkers();
+});
+
+// JSON load
+var compJsonInput = document.getElementById('comp-json-input');
+var compJsonDrop = document.getElementById('comp-json-drop');
+compJsonDrop.addEventListener('click', function(){ compJsonInput.click(); });
+compJsonDrop.addEventListener('dragover', function(e){ e.preventDefault(); compJsonDrop.classList.add('dov'); });
+compJsonDrop.addEventListener('dragleave', function(){ compJsonDrop.classList.remove('dov'); });
+compJsonDrop.addEventListener('drop', function(e){
+  e.preventDefault(); compJsonDrop.classList.remove('dov');
+  if(e.dataTransfer.files[0]){ try{var dt=new DataTransfer();dt.items.add(e.dataTransfer.files[0]);compJsonInput.files=dt.files;}catch(err){} document.getElementById('comp-json-lbl').textContent=e.dataTransfer.files[0].name; }
+});
+compJsonInput.addEventListener('change', function(){ if(compJsonInput.files[0]) document.getElementById('comp-json-lbl').textContent=compJsonInput.files[0].name; });
+document.getElementById('btn-comp-json-imp').addEventListener('click', function(){
+  var file = compJsonInput.files[0]; if(!file){ showCompMsg('Select a JSON file first.','err'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var data = JSON.parse(e.target.result);
+      if(!Array.isArray(data)) throw new Error('not array');
+      var n = 0;
+      data.forEach(function(c){ if(c.address && !compsDupe(c)){ compsData.push(c); n++; } });
+      showCompMsg('✓ Loaded '+n+' comps from JSON ('+(data.length-n)+' dupes skipped).','ok');
+      document.getElementById('comp-json-lbl').textContent='Drop sales_comps.json here or click to browse';
+      renderCompsSidebar(); renderCompMarkers();
+    }catch(err){ showCompMsg('Invalid JSON file.','err'); }
+  };
+  reader.readAsText(file);
+});
+
+// Run matching button
+document.getElementById('btn-run-matching').addEventListener('click', runMatching);
+
+// Clear comps
+document.getElementById('btn-clr-comps').addEventListener('click', function(){
+  if(!compsData.length){ showCompMsg('No comps to clear.','err'); return; }
+  if(!confirm('Clear all '+compsData.length+' sales comps? This cannot be undone.')) return;
+  compsData = []; renderCompsSidebar(); renderCompMarkers(); applyFilters();
+  showCompMsg('All comps cleared.','ok');
+});
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  initMap();
+  applyFilters();
+});
+</script>
+</body>
+</html>
