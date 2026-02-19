@@ -1433,7 +1433,7 @@ function renderList(){
         +rightLabel
         +'</div>'
         +'<div class="pi-phase">'+phaseLabel+'</div>'
-        +(hasComps?compPanels:'')
+        +(compsList.length>0?compPanels:'')
         +'</div>';
     } else {
       var c=item.c; var ci=item.ci;
