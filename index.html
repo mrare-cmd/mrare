@@ -2138,6 +2138,13 @@ document.getElementById('btn-clr-props').addEventListener('click', function(){
     btn.textContent = '↑ Saving…';
 
     try {
+      // Geocode any properties not yet in GEO cache before saving so coords are baked in
+      btn.innerHTML = '<span class="gh-sync-dot configured"></span> ↑ Geocoding…';
+      var ungeocoded = allData.filter(function(p){ return !GEO[p.address]; });
+      for(var gi=0; gi<ungeocoded.length; gi++){
+        await geocode(ungeocoded[gi].address);
+      }
+      btn.innerHTML = '<span class="gh-sync-dot configured"></span> ↑ Saving…';
       var r1 = await pushFile(c, 'data/properties.json', buildPropsJson());
       if(!r1.ok){ showSyncToast('Error: ' + r1.msg, false); dot.className='gh-sync-dot error'; btn.classList.remove('syncing'); btn.innerHTML='<span class="gh-sync-dot configured"></span> ↑ Save to GitHub'; return; }
       var r2 = await pushFile(c, 'data/sales_comps.json', buildCompsJson());
@@ -2193,8 +2200,12 @@ document.getElementById('btn-clr-props').addEventListener('click', function(){
   }
 
   function buildPropsJson(){
+    // Bake any cached coords into each property so they load instantly without Nominatim calls
     var clean = allData.map(function(p){
-      var o=Object.assign({},p); delete o._idx; delete o._marker; return o;
+      var o=Object.assign({},p);
+      delete o._idx; delete o._marker;
+      if(!o._coords && GEO[p.address]) o._coords = GEO[p.address];
+      return o;
     });
     return JSON.stringify(clean, null, 2);
   }
@@ -2231,6 +2242,10 @@ document.addEventListener('DOMContentLoaded', function(){
     .then(function(d){
       if(Array.isArray(d) && d.length){
         allData = d.map(function(p,i){ var o=Object.assign({},p); o._idx=i; return o; });
+        // Pre-populate GEO cache from baked coords so Nominatim isn't called for known properties
+        allData.forEach(function(p){
+          if(p._coords && !GEO[p.address]) GEO[p.address] = p._coords;
+        });
       }
     })
     .catch(function(){ /* no properties file — start empty */ })
