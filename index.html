@@ -976,16 +976,29 @@ function saveGeoCache(){
 
 async function geocode(addr){
   if(GEO[addr]) return GEO[addr];
-  try{
-    var r=await fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(addr+', Washington DC')+'&limit=1');
-    var d=await r.json();
-    if(d&&d[0]){
-      var c=[parseFloat(d[0].lat),parseFloat(d[0].lon)];
-      GEO[addr]=c;
-      saveGeoCache();
-      return c;
-    }
-  }catch(e){}
+  // Try progressively simplified versions of the address
+  var attempts = [
+    addr + ', Washington DC',
+    addr + ', Washington, DC',
+    addr.replace(/\s*&\s*/g, ' and ') + ', Washington DC',
+    // Strip everything after the first comma (drop suite/unit info)
+    addr.split(',')[0].trim() + ', Washington DC',
+    // For multi-address strings like "123 & 125 Main St NW", just use the first number
+    addr.replace(/^(\d+[\w-]*)\s*[,&\/].*?((?:Street|St|Avenue|Ave|Road|Rd|Place|Pl|Drive|Dr|Boulevard|Blvd|Lane|Ln|Court|Ct|Way|Terrace|Ter|Circle|Cir|NW|NE|SW|SE)\b.*)/i, '$1 $2') + ', Washington DC'
+  ];
+  for(var i=0; i<attempts.length; i++){
+    try{
+      var r=await fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(attempts[i])+'&limit=1');
+      var d=await r.json();
+      if(d&&d[0]){
+        var c=[parseFloat(d[0].lat),parseFloat(d[0].lon)];
+        GEO[addr]=c;
+        saveGeoCache();
+        return c;
+      }
+    }catch(e){}
+  }
+  console.warn('[TOPA] geocode failed for:', addr);
   return null;
 }
 
