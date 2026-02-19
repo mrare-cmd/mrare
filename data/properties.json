@@ -8,7 +8,11 @@
     "price": 3900000,
     "foia": "",
     "buyer": "",
-    "owner": "Quality Housing Group"
+    "owner": "Quality Housing Group",
+    "_coords": [
+      38.836538,
+      -77.0050818
+    ]
   },
   {
     "date": "2023-08-03",
@@ -30,7 +34,11 @@
     "price": 1310000,
     "foia": "",
     "buyer": "",
-    "owner": "Zimmerman Hoseph F"
+    "owner": "Zimmerman Hoseph F",
+    "_coords": [
+      38.9245343,
+      -77.0806303
+    ]
   },
   {
     "date": "2023-08-10",
@@ -52,7 +60,11 @@
     "price": 120750000,
     "foia": "FOIA",
     "buyer": "Kushner Companies",
-    "owner": "Prudential"
+    "owner": "Prudential",
+    "_coords": [
+      38.9177045,
+      -77.06779
+    ]
   },
   {
     "date": "2023-08-21",
@@ -63,7 +75,11 @@
     "price": 120750000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9177045,
+      -77.06779
+    ]
   },
   {
     "date": "2023-08-23",
@@ -74,7 +90,11 @@
     "price": 3120000,
     "foia": "",
     "buyer": "",
-    "owner": "Nation House Properties"
+    "owner": "Nation House Properties",
+    "_coords": [
+      38.8559817,
+      -76.9785117
+    ]
   },
   {
     "date": "2023-08-30",
@@ -85,7 +105,11 @@
     "price": 2700000,
     "foia": "",
     "buyer": "",
-    "owner": "Waggaman Corporation"
+    "owner": "Waggaman Corporation",
+    "_coords": [
+      38.9101801,
+      -77.0311444
+    ]
   },
   {
     "date": "2023-08-31",
@@ -96,7 +120,11 @@
     "price": 3120000,
     "foia": "",
     "buyer": "",
-    "owner": "Nation House Properties"
+    "owner": "Nation House Properties",
+    "_coords": [
+      38.8559817,
+      -76.9785117
+    ]
   },
   {
     "date": "2023-09-07",
@@ -129,7 +157,11 @@
     "price": 475000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8301604,
+      -77.0023073
+    ]
   },
   {
     "date": "2023-09-19",
@@ -140,7 +172,11 @@
     "price": 1579000,
     "foia": "",
     "buyer": "",
-    "owner": "Katherine Tompros"
+    "owner": "Katherine Tompros",
+    "_coords": [
+      38.8969046,
+      -76.9959028
+    ]
   },
   {
     "date": "2023-09-25",
@@ -151,7 +187,11 @@
     "price": 69521407,
     "foia": "FOIA",
     "buyer": "BMC Properties (Bernstein)",
-    "owner": "CIM Group LP"
+    "owner": "CIM Group LP",
+    "_coords": [
+      38.9261024,
+      -77.0379227
+    ]
   },
   {
     "date": "2023-09-26",
@@ -162,7 +202,11 @@
     "price": 3300000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8811318,
+      -76.9953367
+    ]
   },
   {
     "date": "2023-09-26",
@@ -173,7 +217,11 @@
     "price": 4200000,
     "foia": "",
     "buyer": "",
-    "owner": "Hampstead Kingston Partners LP"
+    "owner": "Hampstead Kingston Partners LP",
+    "_coords": [
+      38.957289,
+      -77.0216726
+    ]
   },
   {
     "date": "2023-10-02",
@@ -184,7 +232,11 @@
     "price": 2150000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": "London Michaels LLC"
+    "owner": "London Michaels LLC",
+    "_coords": [
+      38.9282086,
+      -76.9957523
+    ]
   },
   {
     "date": "2023-10-11",
@@ -239,7 +291,11 @@
     "price": 1700000,
     "foia": "FOIA",
     "buyer": "No Contract",
-    "owner": "Hadell Callands"
+    "owner": "Hadell Callands",
+    "_coords": [
+      38.9433939,
+      -76.9836585
+    ]
   },
   {
     "date": "2023-11-08",
@@ -272,7 +328,11 @@
     "price": 25000000,
     "foia": "submitted",
     "buyer": "",
-    "owner": "Van Metre Companies"
+    "owner": "Van Metre Companies",
+    "_coords": [
+      38.9250912,
+      -77.0319166
+    ]
   },
   {
     "date": "2023-11-21",
@@ -283,7 +343,11 @@
     "price": 12000000,
     "foia": "submitted",
     "buyer": "",
-    "owner": "Van Metre Companies"
+    "owner": "Van Metre Companies",
+    "_coords": [
+      38.9284229,
+      -77.0350341
+    ]
   },
   {
     "date": "2023-11-28",
@@ -294,7 +358,11 @@
     "price": 140926500,
     "foia": "FOIA",
     "buyer": "GW University",
-    "owner": "Wafra"
+    "owner": "Wafra",
+    "_coords": [
+      38.9009628,
+      -77.0496223
+    ]
   },
   {
     "date": "2023-11-28",
@@ -305,7 +373,11 @@
     "price": 12000000,
     "foia": "submitted",
     "buyer": "",
-    "owner": "Van Metre Companies"
+    "owner": "Van Metre Companies",
+    "_coords": [
+      38.9284229,
+      -77.0350341
+    ]
   },
   {
     "date": "2023-12-07",
@@ -316,7 +388,11 @@
     "price": 2075000,
     "foia": "FOIA",
     "buyer": "Nile Holdings LLC",
-    "owner": "W Street SE 38-42-43, LLC"
+    "owner": "W Street SE 38-42-43, LLC",
+    "_coords": [
+      38.8643694,
+      -76.9868488
+    ]
   },
   {
     "date": "2023-12-08",
@@ -327,7 +403,11 @@
     "price": 3264000,
     "foia": "submitted",
     "buyer": "",
-    "owner": "FM Properties"
+    "owner": "FM Properties",
+    "_coords": [
+      38.851057,
+      -76.9853684
+    ]
   },
   {
     "date": "2023-12-11",
@@ -338,7 +418,11 @@
     "price": 108750000,
     "foia": "FOIA",
     "buyer": "Foulger-Pratt Companies",
-    "owner": "Wood Partners"
+    "owner": "Wood Partners",
+    "_coords": [
+      38.9070351,
+      -77.0077051
+    ]
   },
   {
     "date": "2023-12-12",
@@ -349,7 +433,11 @@
     "price": 15000000,
     "foia": "Submitted",
     "buyer": "",
-    "owner": "Van Metre Companies"
+    "owner": "Van Metre Companies",
+    "_coords": [
+      38.9357328,
+      -77.0370145
+    ]
   },
   {
     "date": "2023-12-18",
@@ -360,7 +448,11 @@
     "price": 9419350,
     "foia": "Submitted",
     "buyer": "",
-    "owner": "Van Metre Companies"
+    "owner": "Van Metre Companies",
+    "_coords": [
+      38.9376854,
+      -77.0361009
+    ]
   },
   {
     "date": "2023-12-19",
@@ -371,7 +463,11 @@
     "price": 600000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8298371,
+      -77.003351
+    ]
   },
   {
     "date": "2023-12-22",
@@ -393,7 +489,11 @@
     "price": 3225000,
     "foia": "FOIA",
     "buyer": "Sanjay Bajaj",
-    "owner": "Urban Investment Partners"
+    "owner": "Urban Investment Partners",
+    "_coords": [
+      38.8896587,
+      -76.9564042
+    ]
   },
   {
     "date": "2023-12-26",
@@ -404,7 +504,11 @@
     "price": 31500000,
     "foia": "FOIA",
     "buyer": "G. Thomas Borger",
-    "owner": "Equity Residential"
+    "owner": "Equity Residential",
+    "_coords": [
+      38.9120954,
+      -77.0419316
+    ]
   },
   {
     "date": "2023-12-28",
@@ -426,7 +530,11 @@
     "price": 700000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": "AX Construction"
+    "owner": "AX Construction",
+    "_coords": [
+      38.8710068,
+      -76.9785361
+    ]
   },
   {
     "date": "2023-12-29",
@@ -437,7 +545,11 @@
     "price": 4824700,
     "foia": "FOIA",
     "buyer": "2-534(a)(2)",
-    "owner": "MED Developers"
+    "owner": "MED Developers",
+    "_coords": [
+      38.8646314,
+      -76.9481588
+    ]
   },
   {
     "date": "2024-01-05",
@@ -448,7 +560,11 @@
     "price": 1375000,
     "foia": "Submitted",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8885259,
+      -76.9366318
+    ]
   },
   {
     "date": "2024-01-09",
@@ -459,7 +575,11 @@
     "price": 89000000,
     "foia": "FOIA",
     "buyer": "Georgetown",
-    "owner": "Clarion Partners"
+    "owner": "Clarion Partners",
+    "_coords": [
+      38.9007882,
+      -77.0115891
+    ]
   },
   {
     "date": "2024-01-09",
@@ -470,7 +590,11 @@
     "price": 2600000,
     "foia": "Submitted",
     "buyer": "",
-    "owner": "VNV Development"
+    "owner": "VNV Development",
+    "_coords": [
+      38.9177915,
+      -77.000245
+    ]
   },
   {
     "date": "2024-01-12",
@@ -492,7 +616,11 @@
     "price": 4000000,
     "foia": "FOIA",
     "buyer": "2-534(a)(2)",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.877965,
+      -77.002039
+    ]
   },
   {
     "date": "2024-01-24",
@@ -503,7 +631,11 @@
     "price": 3400000,
     "foia": "FOIA",
     "buyer": "No Contract",
-    "owner": "Dumbarton Investments"
+    "owner": "Dumbarton Investments",
+    "_coords": [
+      38.9155889,
+      -77.0935259
+    ]
   },
   {
     "date": "2024-01-25",
@@ -514,7 +646,11 @@
     "price": 1450000,
     "foia": "FOIA",
     "buyer": "Richard Cunningham",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9027909,
+      -76.9836921
+    ]
   },
   {
     "date": "2024-01-29",
@@ -525,7 +661,11 @@
     "price": 67500000,
     "foia": "FOIA",
     "buyer": "SEMREF",
-    "owner": "JPMC"
+    "owner": "JPMC",
+    "_coords": [
+      38.9142512,
+      -77.032497
+    ]
   },
   {
     "date": "2024-01-30",
@@ -536,7 +676,11 @@
     "price": 1800000,
     "foia": "Submitted",
     "buyer": "",
-    "owner": "Vine Investments"
+    "owner": "Vine Investments",
+    "_coords": [
+      38.8701284,
+      -76.9778889
+    ]
   },
   {
     "date": "2024-01-30",
@@ -547,7 +691,11 @@
     "price": 1400000,
     "foia": "Submitted",
     "buyer": "",
-    "owner": "Vine Investments"
+    "owner": "Vine Investments",
+    "_coords": [
+      38.8415233,
+      -76.9921405
+    ]
   },
   {
     "date": "2024-02-06",
@@ -558,7 +706,11 @@
     "price": 1775000,
     "foia": "FOIA",
     "buyer": "Richard Cunningham",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8710715,
+      -76.9776204
+    ]
   },
   {
     "date": "2024-02-07",
@@ -569,7 +721,11 @@
     "price": 5200000,
     "foia": "FOIA",
     "buyer": "Velocity Development LLC - William Mohler",
-    "owner": "Adams Investment Group"
+    "owner": "Adams Investment Group",
+    "_coords": [
+      38.8897065,
+      -76.9342764
+    ]
   },
   {
     "date": "2024-02-08",
@@ -580,7 +736,11 @@
     "price": 399900,
     "foia": "FOIA",
     "buyer": "Condo Sale - Likely Mistake",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9139276,
+      -77.0445844
+    ]
   },
   {
     "date": "2024-02-08",
@@ -591,7 +751,11 @@
     "price": 460000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": "Dumbarton Investments"
+    "owner": "Dumbarton Investments",
+    "_coords": [
+      38.9320387,
+      -77.0294065
+    ]
   },
   {
     "date": "2024-02-09",
@@ -602,7 +766,11 @@
     "price": 1775000,
     "foia": "Submitted",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8710715,
+      -76.9776204
+    ]
   },
   {
     "date": "2024-02-09",
@@ -613,7 +781,11 @@
     "price": 700000,
     "foia": "FOIA",
     "buyer": "Kevin Rowley",
-    "owner": "Wallis Trust"
+    "owner": "Wallis Trust",
+    "_coords": [
+      38.8298371,
+      -77.003351
+    ]
   },
   {
     "date": "2024-02-13",
@@ -624,7 +796,11 @@
     "price": 1800000,
     "foia": "FOIA",
     "buyer": "Caleb Jackson",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9340417,
+      -77.0222553
+    ]
   },
   {
     "date": "2024-02-16",
@@ -635,7 +811,11 @@
     "price": 68750000,
     "foia": "FOIA",
     "buyer": "UpCampus",
-    "owner": "UIP"
+    "owner": "UIP",
+    "_coords": [
+      38.9002564,
+      -77.055344
+    ]
   },
   {
     "date": "2024-02-21",
@@ -646,7 +826,11 @@
     "price": 40835000,
     "foia": "FOIA",
     "buyer": "Pacific Life",
-    "owner": "Kettler"
+    "owner": "Kettler",
+    "_coords": [
+      38.9194239,
+      -77.0407299
+    ]
   },
   {
     "date": "2024-02-27",
@@ -657,7 +841,11 @@
     "price": 3000000,
     "foia": "FOIA",
     "buyer": "Louis Jacobe",
-    "owner": "MuniTrust Capital"
+    "owner": "MuniTrust Capital",
+    "_coords": [
+      38.9457132,
+      -77.0268875
+    ]
   },
   {
     "date": "2024-03-12",
@@ -668,7 +856,11 @@
     "price": 4500000,
     "foia": "Submitted",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9214132,
+      -77.0329296
+    ]
   },
   {
     "date": "2024-03-18",
@@ -679,7 +871,11 @@
     "price": 675000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": "Robert S Ward"
+    "owner": "Robert S Ward",
+    "_coords": [
+      38.8955388,
+      -76.9548018
+    ]
   },
   {
     "date": "2024-03-26",
@@ -690,7 +886,11 @@
     "price": 2950000,
     "foia": "FOIA",
     "buyer": "Ilissa Blech",
-    "owner": "Dave Gorman"
+    "owner": "Dave Gorman",
+    "_coords": [
+      38.9158607,
+      -77.0391304
+    ]
   },
   {
     "date": "2024-03-27",
@@ -701,7 +901,11 @@
     "price": 6250000,
     "foia": "",
     "buyer": "Ross Vann",
-    "owner": "Tribby Properties"
+    "owner": "Tribby Properties",
+    "_coords": [
+      38.9107533,
+      -77.0497479
+    ]
   },
   {
     "date": "2024-04-04",
@@ -712,7 +916,11 @@
     "price": 10500000,
     "foia": "FOIA",
     "buyer": "2-534(a)(2)",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9074684,
+      -77.0598791
+    ]
   },
   {
     "date": "2024-04-04",
@@ -723,7 +931,11 @@
     "price": 6250000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9107533,
+      -77.0497479
+    ]
   },
   {
     "date": "2024-04-02",
@@ -734,7 +946,11 @@
     "price": 1650000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9027909,
+      -76.9836921
+    ]
   },
   {
     "date": "2024-04-09",
@@ -745,7 +961,11 @@
     "price": 1950000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8924393,
+      -77.0015481
+    ]
   },
   {
     "date": "2024-04-12",
@@ -756,7 +976,11 @@
     "price": 1200000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9074346,
+      -76.9298132
+    ]
   },
   {
     "date": "2024-04-10",
@@ -767,7 +991,11 @@
     "price": 1500000,
     "foia": "FOIA",
     "buyer": "Preservation of Affordable Housing Inc",
-    "owner": "Landex Corporation - Peter Siegel"
+    "owner": "Landex Corporation - Peter Siegel",
+    "_coords": [
+      38.9333881,
+      -77.0243458
+    ]
   },
   {
     "date": "2024-04-10",
@@ -778,7 +1006,11 @@
     "price": 1600000,
     "foia": "FOIA",
     "buyer": "Diep Ngoc Duong & Nga Thi Hang Nguyen",
-    "owner": "Anthony Barilla"
+    "owner": "Anthony Barilla",
+    "_coords": [
+      38.9216104,
+      -77.0452732
+    ]
   },
   {
     "date": "2024-04-29",
@@ -789,7 +1021,11 @@
     "price": 525000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8966044,
+      -76.9400175
+    ]
   },
   {
     "date": "2024-04-30",
@@ -800,7 +1036,11 @@
     "price": 2300000,
     "foia": "FOIA",
     "buyer": "Eldersburg Property LLC, Hamidreza? HG",
-    "owner": "Norman Piccioni"
+    "owner": "Norman Piccioni",
+    "_coords": [
+      38.9098324,
+      -77.0272691
+    ]
   },
   {
     "date": "2024-04-30",
@@ -811,7 +1051,11 @@
     "price": 1200000,
     "foia": "FOIA",
     "buyer": "Kevin Link",
-    "owner": "Applestein Family Partnership"
+    "owner": "Applestein Family Partnership",
+    "_coords": [
+      38.9033064,
+      -76.9826104
+    ]
   },
   {
     "date": "2024-04-30",
@@ -822,7 +1066,11 @@
     "price": 1500000,
     "foia": "FOIA",
     "buyer": "Pablo H Costas Aguilera & Tatiana I Velasco Bruno",
-    "owner": "Helen Kane"
+    "owner": "Helen Kane",
+    "_coords": [
+      38.8907145,
+      -76.9945241
+    ]
   },
   {
     "date": "2024-05-02",
@@ -833,7 +1081,11 @@
     "price": 525000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8966044,
+      -76.9400175
+    ]
   },
   {
     "date": "2024-05-07",
@@ -844,7 +1096,11 @@
     "price": 1100000,
     "foia": "",
     "buyer": "",
-    "owner": "Charleta Duckett"
+    "owner": "Charleta Duckett",
+    "_coords": [
+      38.907997,
+      -76.9402729
+    ]
   },
   {
     "date": "2024-05-17",
@@ -855,7 +1111,11 @@
     "price": 1950000,
     "foia": "",
     "buyer": "",
-    "owner": "Lanae Holbrook"
+    "owner": "Lanae Holbrook",
+    "_coords": [
+      38.9196627,
+      -77.0452552
+    ]
   },
   {
     "date": "2024-05-20",
@@ -866,7 +1126,11 @@
     "price": 3525000,
     "foia": "",
     "buyer": "",
-    "owner": "Richard Cunningham"
+    "owner": "Richard Cunningham",
+    "_coords": [
+      38.895943,
+      -76.9805302
+    ]
   },
   {
     "date": "2024-06-05",
@@ -877,7 +1141,11 @@
     "price": 2350000,
     "foia": "FOIA",
     "buyer": "Jamaal Claggion",
-    "owner": "David & William Applestein"
+    "owner": "David & William Applestein",
+    "_coords": [
+      38.8628451,
+      -76.9895227
+    ]
   },
   {
     "date": "2024-06-06",
@@ -888,7 +1156,11 @@
     "price": 990000,
     "foia": "",
     "buyer": "",
-    "owner": "Lawrence W Buck"
+    "owner": "Lawrence W Buck",
+    "_coords": [
+      38.8853552,
+      -76.9271537
+    ]
   },
   {
     "date": "2024-06-13",
@@ -899,7 +1171,11 @@
     "price": 1200000,
     "foia": "",
     "buyer": "",
-    "owner": "ACB 5036 Astor PL LLC"
+    "owner": "ACB 5036 Astor PL LLC",
+    "_coords": [
+      38.8873836,
+      -76.9289081
+    ]
   },
   {
     "date": "2024-06-14",
@@ -910,7 +1186,11 @@
     "price": 1425000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9331012,
+      -77.0385632
+    ]
   },
   {
     "date": "2024-06-20",
@@ -921,7 +1201,11 @@
     "price": 16380000,
     "foia": "FOIA",
     "buyer": "American Housing",
-    "owner": "Lustine Realty Company"
+    "owner": "Lustine Realty Company",
+    "_coords": [
+      38.9583809,
+      -77.0711644
+    ]
   },
   {
     "date": "2024-06-26",
@@ -943,7 +1227,11 @@
     "price": 2075000,
     "foia": "FOIA",
     "buyer": "Seyi Ademiluyi",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8643694,
+      -76.9868488
+    ]
   },
   {
     "date": "2024-06-26",
@@ -954,7 +1242,11 @@
     "price": 1800000,
     "foia": "",
     "buyer": "",
-    "owner": "Swierdsiol B"
+    "owner": "Swierdsiol B",
+    "_coords": [
+      38.8864728,
+      -76.9277965
+    ]
   },
   {
     "date": "2024-07-01",
@@ -965,7 +1257,11 @@
     "price": 1620000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8728803,
+      -76.9760404
+    ]
   },
   {
     "date": "2024-07-02",
@@ -987,7 +1283,11 @@
     "price": 70000000,
     "foia": "FOIA",
     "buyer": "Akelius",
-    "owner": "Archstone Communities"
+    "owner": "Archstone Communities",
+    "_coords": [
+      38.9242838,
+      -77.0567069
+    ]
   },
   {
     "date": "2024-07-12",
@@ -998,7 +1298,11 @@
     "price": 1620000,
     "foia": "",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8728803,
+      -76.9760404
+    ]
   },
   {
     "date": "2024-07-26",
@@ -1009,7 +1313,11 @@
     "price": 900000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Redacted"
+    "owner": "Redacted",
+    "_coords": [
+      38.8975507,
+      -76.9157552
+    ]
   },
   {
     "date": "2024-07-26",
@@ -1020,7 +1328,11 @@
     "price": 17250000,
     "foia": "FOIA",
     "buyer": "Ernst Equities",
-    "owner": "CIM Group LP"
+    "owner": "CIM Group LP",
+    "_coords": [
+      38.9268082,
+      -77.042815
+    ]
   },
   {
     "date": "2024-07-26",
@@ -1031,7 +1343,11 @@
     "price": 18000000,
     "foia": "FOIA",
     "buyer": "Ernst Equities",
-    "owner": "CIM Group LP"
+    "owner": "CIM Group LP",
+    "_coords": [
+      38.9267719,
+      -77.0423129
+    ]
   },
   {
     "date": "2024-07-30",
@@ -1042,7 +1358,11 @@
     "price": 1850000,
     "foia": "",
     "buyer": "",
-    "owner": "James J. Lee"
+    "owner": "James J. Lee",
+    "_coords": [
+      38.8844989,
+      -76.999344
+    ]
   },
   {
     "date": "2024-07-31",
@@ -1053,7 +1373,11 @@
     "price": 975000,
     "foia": "",
     "buyer": "",
-    "owner": "Thomas Bookard"
+    "owner": "Thomas Bookard",
+    "_coords": [
+      38.8304341,
+      -77.0008707
+    ]
   },
   {
     "date": "2024-08-14",
@@ -1075,7 +1399,11 @@
     "price": 1300000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Redacted"
+    "owner": "Redacted",
+    "_coords": [
+      38.9135272,
+      -76.9741783
+    ]
   },
   {
     "date": "2024-08-21",
@@ -1086,7 +1414,11 @@
     "price": 106000000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "JBG SMITH Properties"
+    "owner": "JBG SMITH Properties",
+    "_coords": [
+      38.9182641,
+      -77.0231911
+    ]
   },
   {
     "date": "2024-08-23",
@@ -1097,7 +1429,11 @@
     "price": 750000,
     "foia": "FOIA",
     "buyer": "AMT Development",
-    "owner": "324 61st St NE LLC, \"Jeff Richards\""
+    "owner": "324 61st St NE LLC, \"Jeff Richards\"",
+    "_coords": [
+      38.8939468,
+      -76.9139842
+    ]
   },
   {
     "date": "2024-08-27",
@@ -1108,7 +1444,11 @@
     "price": 193705714,
     "foia": "FOIA",
     "buyer": "SHR Ride Square Partners I and SHR RSP II, LLC",
-    "owner": "Lauren Aiello - NASH-Roadside 3900 Wisconsin, LLC"
+    "owner": "Lauren Aiello - NASH-Roadside 3900 Wisconsin, LLC",
+    "_coords": [
+      38.9404451,
+      -77.077732
+    ]
   },
   {
     "date": "2024-08-27",
@@ -1119,7 +1459,11 @@
     "price": 129000000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": "JBG SMITH Properties"
+    "owner": "JBG SMITH Properties",
+    "_coords": [
+      38.9195254,
+      -77.0244369
+    ]
   },
   {
     "date": "2024-08-29",
@@ -1130,7 +1474,11 @@
     "price": 3500000,
     "foia": "FOIA",
     "buyer": "601 Park Road LLC",
-    "owner": "Hartford E Bealer LLC"
+    "owner": "Hartford E Bealer LLC",
+    "_coords": [
+      38.9332916,
+      -77.0221942
+    ]
   },
   {
     "date": "2024-08-29",
@@ -1152,7 +1500,11 @@
     "price": 1586000,
     "foia": "FOIA",
     "buyer": "1449 Oak St LLC/Ernst Equities",
-    "owner": "Hartford E Bealer LLC"
+    "owner": "Hartford E Bealer LLC",
+    "_coords": [
+      38.9347221,
+      -77.0350727
+    ]
   },
   {
     "date": "2024-08-29",
@@ -1163,7 +1515,11 @@
     "price": 85294286,
     "foia": "FOIA",
     "buyer": "SHR Ride Square Partners I and SHR RSP II, LLC",
-    "owner": "Lauren Aiello - NASH-Roadside 3900 Wisconsin, LLC"
+    "owner": "Lauren Aiello - NASH-Roadside 3900 Wisconsin, LLC",
+    "_coords": [
+      38.9404451,
+      -77.077732
+    ]
   },
   {
     "date": "2024-09-05",
@@ -1174,7 +1530,11 @@
     "price": 1920000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8670244,
+      -76.9819939
+    ]
   },
   {
     "date": "2024-09-09",
@@ -1185,7 +1545,11 @@
     "price": 4500000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.884558,
+      -76.9424282
+    ]
   },
   {
     "date": "2024-09-12",
@@ -1207,7 +1571,11 @@
     "price": 6500000,
     "foia": "FOIA",
     "buyer": "Community Realty Co/ 51st PP LLC",
-    "owner": "Rams Investment Company, LLC"
+    "owner": "Rams Investment Company, LLC",
+    "_coords": [
+      38.9337043,
+      -77.0396854
+    ]
   },
   {
     "date": "2024-09-12",
@@ -1218,7 +1586,11 @@
     "price": 1920000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8670244,
+      -76.9819939
+    ]
   },
   {
     "date": "2024-09-12",
@@ -1229,7 +1601,11 @@
     "price": 1800000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9487617,
+      -77.015519
+    ]
   },
   {
     "date": "2024-09-20",
@@ -1240,7 +1616,11 @@
     "price": 916000,
     "foia": "FOIA",
     "buyer": "John Hanna",
-    "owner": "ACB 5036 Astor PL LLC"
+    "owner": "ACB 5036 Astor PL LLC",
+    "_coords": [
+      38.8873836,
+      -76.9289081
+    ]
   },
   {
     "date": "2024-10-03",
@@ -1251,7 +1631,11 @@
     "price": 3800000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "O Street Corporation"
+    "owner": "O Street Corporation",
+    "_coords": [
+      38.908396,
+      -77.0468161
+    ]
   },
   {
     "date": "2024-10-21",
@@ -1262,7 +1646,11 @@
     "price": 4150000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Redacted"
+    "owner": "Redacted",
+    "_coords": [
+      38.9163743,
+      -77.043241
+    ]
   },
   {
     "date": "2024-10-24",
@@ -1273,7 +1661,11 @@
     "price": 1300000,
     "foia": "FOIA",
     "buyer": "Collaborative Solutions for Communities",
-    "owner": "Bethany, Inc."
+    "owner": "Bethany, Inc.",
+    "_coords": [
+      38.8638462,
+      -76.979304
+    ]
   },
   {
     "date": "2024-11-08",
@@ -1284,7 +1676,11 @@
     "price": 6796175,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9083817,
+      -77.0839135
+    ]
   },
   {
     "date": "2024-11-15",
@@ -1295,7 +1691,11 @@
     "price": 975000,
     "foia": "FOIA",
     "buyer": "DMV Realty Partners",
-    "owner": "Peggie Powers"
+    "owner": "Peggie Powers",
+    "_coords": [
+      38.9120267,
+      -76.984731
+    ]
   },
   {
     "date": "2024-11-21",
@@ -1328,7 +1728,11 @@
     "price": 1820000,
     "foia": "Greysteel",
     "buyer": "Brooks Staley - Black Tern Investments LLC",
-    "owner": "Lisa N Allen - LNA Enterprises"
+    "owner": "Lisa N Allen - LNA Enterprises",
+    "_coords": [
+      38.8645374,
+      -76.9779062
+    ]
   },
   {
     "date": "2024-12-17",
@@ -1339,7 +1743,11 @@
     "price": 2300000,
     "foia": "FOIA",
     "buyer": "747 Tenth LLC c/o Aman Singh",
-    "owner": "Redacted"
+    "owner": "Redacted",
+    "_coords": [
+      38.880015,
+      -76.9929194
+    ]
   },
   {
     "date": "2024-12-26",
@@ -1350,7 +1758,11 @@
     "price": 4300000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9198456,
+      -77.042684
+    ]
   },
   {
     "date": "2025-01-03",
@@ -1361,7 +1773,11 @@
     "price": 2550000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9516409,
+      -77.0262756
+    ]
   },
   {
     "date": "2025-01-08",
@@ -1372,7 +1788,11 @@
     "price": 900000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8362115,
+      -77.0069592
+    ]
   },
   {
     "date": "2025-01-10",
@@ -1383,7 +1803,11 @@
     "price": 666600,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Synthia A. Wilson"
+    "owner": "Synthia A. Wilson",
+    "_coords": [
+      38.8930059,
+      -76.9213899
+    ]
   },
   {
     "date": "2025-01-14",
@@ -1394,7 +1818,11 @@
     "price": 5300000,
     "foia": "FOIA",
     "buyer": "AG Capital Partners, LLC; Gauhar Naseem",
-    "owner": "RP 3701 NW, LLC - Michael Rooney"
+    "owner": "RP 3701 NW, LLC - Michael Rooney",
+    "_coords": [
+      38.9365558,
+      -77.0239653
+    ]
   },
   {
     "date": "2025-01-14",
@@ -1416,7 +1844,11 @@
     "price": 20000000,
     "foia": "FOIA",
     "buyer": "listed as 20,000 - Keener Squire",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.925304,
+      -77.0736496
+    ]
   },
   {
     "date": "2025-01-22",
@@ -1427,7 +1859,11 @@
     "price": 7075000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.932672,
+      -77.0293421
+    ]
   },
   {
     "date": "2025-01-22",
@@ -1438,7 +1874,11 @@
     "price": 800000,
     "foia": "FOIA",
     "buyer": "Sara Tessa - Radical Faith properties",
-    "owner": "Charles Murphy - Meridian Gate Company LLC"
+    "owner": "Charles Murphy - Meridian Gate Company LLC",
+    "_coords": [
+      38.8866182,
+      -76.9573022
+    ]
   },
   {
     "date": "2025-01-27",
@@ -1449,7 +1889,11 @@
     "price": 730000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8762551,
+      -76.9315011
+    ]
   },
   {
     "date": "2025-01-27",
@@ -1460,7 +1904,11 @@
     "price": 20000000,
     "foia": "FOIA",
     "buyer": "Keener Squire - KSP Development LLC",
-    "owner": "TRUSTEE OF THE MARITAL TRUST UNDER FRED W. SMITH LIVING TRUST"
+    "owner": "TRUSTEE OF THE MARITAL TRUST UNDER FRED W. SMITH LIVING TRUST",
+    "_coords": [
+      38.925304,
+      -77.0736496
+    ]
   },
   {
     "date": "2025-01-30",
@@ -1471,7 +1919,11 @@
     "price": 2150000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8922235,
+      -76.9878685
+    ]
   },
   {
     "date": "2025-02-04",
@@ -1482,7 +1934,11 @@
     "price": 1600000,
     "foia": "FOIA",
     "buyer": "Blackmail Properties LLC c/o Scott Simpson",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9223665,
+      -77.0801152
+    ]
   },
   {
     "date": "2025-02-06",
@@ -1493,7 +1949,11 @@
     "price": 2150000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8922235,
+      -76.9878685
+    ]
   },
   {
     "date": "2025-02-07",
@@ -1504,7 +1964,11 @@
     "price": 660600,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Synthia A. Wilson"
+    "owner": "Synthia A. Wilson",
+    "_coords": [
+      38.8930059,
+      -76.9213899
+    ]
   },
   {
     "date": "2025-02-14",
@@ -1515,7 +1979,11 @@
     "price": 2450000,
     "foia": "FOIA",
     "buyer": "BWG Investment Holdings, Barrett Gold (?)",
-    "owner": "Matthew Carcone, Blue Water Capitol LLC"
+    "owner": "Matthew Carcone, Blue Water Capitol LLC",
+    "_coords": [
+      38.9057912,
+      -77.0279
+    ]
   },
   {
     "date": "2025-02-18",
@@ -1526,7 +1994,11 @@
     "price": 181750000,
     "foia": "FOIA",
     "buyer": "Foulger-Pratt Development, LLC",
-    "owner": "AvalonBay Communities"
+    "owner": "AvalonBay Communities",
+    "_coords": [
+      38.9042188,
+      -77.0058862
+    ]
   },
   {
     "date": "2025-02-18",
@@ -1537,7 +2009,11 @@
     "price": 36000000,
     "foia": "FOIA",
     "buyer": "Foulger-Pratt Development, LLC",
-    "owner": "AvalonBay Communities"
+    "owner": "AvalonBay Communities",
+    "_coords": [
+      38.901698,
+      -77.0008208
+    ]
   },
   {
     "date": "2025-02-19",
@@ -1548,7 +2024,11 @@
     "price": 1749000,
     "foia": "FOIA",
     "buyer": "Flats at South Capitol LLC, successor-in-int by as to Kaye Stern Properties LLC",
-    "owner": "Jason Stern"
+    "owner": "Jason Stern",
+    "_coords": [
+      38.8685183,
+      -77.0055809
+    ]
   },
   {
     "date": "2025-02-19",
@@ -1559,7 +2039,11 @@
     "price": 3021000,
     "foia": "FOIA",
     "buyer": "Flats at South Capitol LLC, successor-in-int by as to Kaye Stern Properties LLC",
-    "owner": "Jason Stern"
+    "owner": "Jason Stern",
+    "_coords": [
+      38.8685183,
+      -77.0055809
+    ]
   },
   {
     "date": "2025-02-19",
@@ -1570,7 +2054,11 @@
     "price": 850000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9319759,
+      -77.0378838
+    ]
   },
   {
     "date": "2025-02-19",
@@ -1581,7 +2069,11 @@
     "price": 142480000,
     "foia": "FOIA",
     "buyer": "Foulger-Pratt Development, LLC",
-    "owner": "AvalonBay Communities"
+    "owner": "AvalonBay Communities",
+    "_coords": [
+      38.9051517,
+      -77.0070355
+    ]
   },
   {
     "date": "2025-02-19",
@@ -1592,7 +2084,11 @@
     "price": 87100000,
     "foia": "FOIA",
     "buyer": "Foulger-Pratt Development, LLC",
-    "owner": "AvalonBay Communities"
+    "owner": "AvalonBay Communities",
+    "_coords": [
+      38.8988765,
+      -77.0191098
+    ]
   },
   {
     "date": "2025-02-21",
@@ -1603,7 +2099,11 @@
     "price": 4000000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9158004,
+      -77.0425552
+    ]
   },
   {
     "date": "2025-02-24",
@@ -1614,7 +2114,11 @@
     "price": 36000000,
     "foia": "FOIA",
     "buyer": "Foulger-Pratt Development, LLC",
-    "owner": "AvalonBay Communities"
+    "owner": "AvalonBay Communities",
+    "_coords": [
+      38.901698,
+      -77.0008208
+    ]
   },
   {
     "date": "2025-02-24",
@@ -1625,7 +2129,11 @@
     "price": 2245000,
     "foia": "FOIA",
     "buyer": "BWG Investment Holdings, Barrett Gold (?)",
-    "owner": "Matthew Carcone, Blue Water Capitol LLC"
+    "owner": "Matthew Carcone, Blue Water Capitol LLC",
+    "_coords": [
+      38.9057912,
+      -77.0279
+    ]
   },
   {
     "date": "2025-02-25",
@@ -1636,7 +2144,11 @@
     "price": 70000000,
     "foia": "FOIA",
     "buyer": "APAH Acquisitions, LLC (Arlington Partnership for Affordable Housing",
-    "owner": "Smith Property Holdings Five (D.C.), L.P. c/o AvalonBay Communities"
+    "owner": "Smith Property Holdings Five (D.C.), L.P. c/o AvalonBay Communities",
+    "_coords": [
+      38.9484433,
+      -77.0651459
+    ]
   },
   {
     "date": "2025-02-28",
@@ -1647,7 +2159,11 @@
     "price": 500000,
     "foia": "FOIA",
     "buyer": "WE 2359 Ontario Road LLC",
-    "owner": "Adam Lobene - American Housing"
+    "owner": "Adam Lobene - American Housing",
+    "_coords": [
+      38.9216304,
+      -77.0398321
+    ]
   },
   {
     "date": "2025-02-28",
@@ -1658,7 +2174,11 @@
     "price": 1200000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9355721,
+      -77.0253491
+    ]
   },
   {
     "date": "2025-02-28",
@@ -1669,7 +2189,11 @@
     "price": 500000,
     "foia": "FOIA",
     "buyer": "WE 2359 Ontario Road LLC",
-    "owner": "Adam Lobene - American Housing"
+    "owner": "Adam Lobene - American Housing",
+    "_coords": [
+      38.9217574,
+      -77.0398599
+    ]
   },
   {
     "date": "2025-03-06",
@@ -1680,7 +2204,11 @@
     "price": 3368421,
     "foia": "FOIA",
     "buyer": "ARCTRUST - Project DC Holdings LLC",
-    "owner": "Adam Lobene - American Housing"
+    "owner": "Adam Lobene - American Housing",
+    "_coords": [
+      38.9585571,
+      -77.0290355
+    ]
   },
   {
     "date": "2025-03-06",
@@ -1691,7 +2219,11 @@
     "price": 3519210,
     "foia": "FOIA",
     "buyer": "ARCTRUST - Project DC Holdings LLC",
-    "owner": "Adam Lobene - American Housing"
+    "owner": "Adam Lobene - American Housing",
+    "_coords": [
+      38.9242574,
+      -77.0336663
+    ]
   },
   {
     "date": "2025-03-07",
@@ -1702,7 +2234,11 @@
     "price": 1600000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8700999,
+      -76.9686595
+    ]
   },
   {
     "date": "2025-03-10",
@@ -1713,7 +2249,11 @@
     "price": 17270444,
     "foia": "FOIA",
     "buyer": "ARCTRUST - Project DC Holdings LLC",
-    "owner": "Adam Lobene - American Housing"
+    "owner": "Adam Lobene - American Housing",
+    "_coords": [
+      38.932662,
+      -77.0341569
+    ]
   },
   {
     "date": "2025-03-11",
@@ -1724,7 +2264,11 @@
     "price": 500000,
     "foia": "FOIA",
     "buyer": "WE 2401 Ontario Road LLC",
-    "owner": "Adam Lobene - American Housing"
+    "owner": "Adam Lobene - American Housing",
+    "_coords": [
+      38.9217574,
+      -77.0398599
+    ]
   },
   {
     "date": "2025-03-11",
@@ -1735,7 +2279,11 @@
     "price": 1749000,
     "foia": "FOIA",
     "buyer": "Flats at South Capitol LLC, successor-in-int by as to Kaye Stern Properties LLC",
-    "owner": "Jason Stern"
+    "owner": "Jason Stern",
+    "_coords": [
+      38.8685183,
+      -77.0055809
+    ]
   },
   {
     "date": "2025-03-13",
@@ -1746,7 +2294,11 @@
     "price": 200000000,
     "foia": "FOIA",
     "buyer": "No actual contract.",
-    "owner": "JBG Smith"
+    "owner": "JBG Smith",
+    "_coords": [
+      38.9062626,
+      -77.0531883
+    ]
   },
   {
     "date": "2025-03-14",
@@ -1757,7 +2309,11 @@
     "price": 1500000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8700999,
+      -76.9686595
+    ]
   },
   {
     "date": "2025-03-18",
@@ -1768,7 +2324,11 @@
     "price": 181750000,
     "foia": "FOIA",
     "buyer": "Foulger-Pratt Development, LLC",
-    "owner": "AvalonBay Communities"
+    "owner": "AvalonBay Communities",
+    "_coords": [
+      38.9042188,
+      -77.0058862
+    ]
   },
   {
     "date": "2025-03-19",
@@ -1779,7 +2339,11 @@
     "price": 180000000,
     "foia": "FOIA",
     "buyer": "No actual contract.",
-    "owner": "JBG Smith"
+    "owner": "JBG Smith",
+    "_coords": [
+      38.9088899,
+      -76.9997171
+    ]
   },
   {
     "date": "2025-03-19",
@@ -1790,7 +2354,11 @@
     "price": 5200000,
     "foia": "FOIA",
     "buyer": "Mike Taylor - AMT Development LLC",
-    "owner": "Steve Snider"
+    "owner": "Steve Snider",
+    "_coords": [
+      38.8680522,
+      -76.9802019
+    ]
   },
   {
     "date": "2025-03-20",
@@ -1801,7 +2369,11 @@
     "price": 299000000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": "Shalom Barnes Associates"
+    "owner": "Shalom Barnes Associates",
+    "_coords": [
+      38.9404451,
+      -77.077732
+    ]
   },
   {
     "date": "2025-03-21",
@@ -1812,7 +2384,11 @@
     "price": 4675000,
     "foia": "FOIA",
     "buyer": "Cameron Webb - Webb Ventures",
-    "owner": "Sirius LLC"
+    "owner": "Sirius LLC",
+    "_coords": [
+      38.9425921,
+      -77.0621083
+    ]
   },
   {
     "date": "2025-03-28",
@@ -1823,7 +2399,11 @@
     "price": 299000000,
     "foia": "FOIA",
     "buyer": "SHR Ride Square Partners I and SHR RSP II, LLC (Sekisui House Asset Management)",
-    "owner": "Nash Roadside"
+    "owner": "Nash Roadside",
+    "_coords": [
+      38.9404451,
+      -77.077732
+    ]
   },
   {
     "date": "2025-04-01",
@@ -1834,7 +2414,11 @@
     "price": 17270444,
     "foia": "FOIA",
     "buyer": "Project DC Holdings LLC - ARCTRUST",
-    "owner": "American Housing - Adam Lobene"
+    "owner": "American Housing - Adam Lobene",
+    "_coords": [
+      38.932662,
+      -77.0341569
+    ]
   },
   {
     "date": "2025-04-01",
@@ -1845,7 +2429,11 @@
     "price": 5600000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9046492,
+      -77.0603408
+    ]
   },
   {
     "date": "2025-04-07",
@@ -1856,7 +2444,11 @@
     "price": 3400000,
     "foia": "FOIA",
     "buyer": "MNM Investments 2021 LLC",
-    "owner": "2515 P LLC"
+    "owner": "2515 P LLC",
+    "_coords": [
+      38.9096215,
+      -77.054026
+    ]
   },
   {
     "date": "2025-04-08",
@@ -1867,7 +2459,11 @@
     "price": 1525000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8965326,
+      -76.916706
+    ]
   },
   {
     "date": "2025-04-09",
@@ -1878,7 +2474,11 @@
     "price": 10504350,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9636588,
+      -77.0355067
+    ]
   },
   {
     "date": "2025-04-09",
@@ -1889,7 +2489,11 @@
     "price": 12626263,
     "foia": "FOIA",
     "buyer": "The Lenkin Company",
-    "owner": "Monument Realty LLC"
+    "owner": "Monument Realty LLC",
+    "_coords": [
+      38.9192219,
+      -77.0702912
+    ]
   },
   {
     "date": "2025-04-11",
@@ -1900,7 +2504,11 @@
     "price": 1525000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8965326,
+      -76.916706
+    ]
   },
   {
     "date": "2025-04-15",
@@ -1911,7 +2519,11 @@
     "price": 10504350,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9636588,
+      -77.0355067
+    ]
   },
   {
     "date": "2025-04-21",
@@ -1922,7 +2534,11 @@
     "price": 520000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8821969,
+      -76.9245621
+    ]
   },
   {
     "date": "2025-04-21",
@@ -1933,7 +2549,11 @@
     "price": 800000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8245521,
+      -77.0102582
+    ]
   },
   {
     "date": "2025-04-24",
@@ -1944,7 +2564,11 @@
     "price": 1350000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9077047,
+      -76.9341213
+    ]
   },
   {
     "date": "2025-04-25",
@@ -1955,7 +2579,11 @@
     "price": 2300000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9210343,
+      -77.0289867
+    ]
   },
   {
     "date": "2025-05-01",
@@ -1966,7 +2594,11 @@
     "price": 2900000,
     "foia": "FOIA",
     "buyer": "Mila Realty Group LLC - Michael McGregor",
-    "owner": "Saied Jamshidi - Amir Afshar"
+    "owner": "Saied Jamshidi - Amir Afshar",
+    "_coords": [
+      38.9214132,
+      -77.0329296
+    ]
   },
   {
     "date": "2025-05-02",
@@ -1977,7 +2609,11 @@
     "price": 1350000,
     "foia": "-",
     "buyer": "",
-    "owner": "Ali \"Sam\" Razjooyan"
+    "owner": "Ali \"Sam\" Razjooyan",
+    "_coords": [
+      38.9077047,
+      -76.9341213
+    ]
   },
   {
     "date": "2025-05-08",
@@ -1999,7 +2635,11 @@
     "price": 2000000,
     "foia": "FOIA",
     "buyer": "Omer and Yasemin Zirekoglu",
-    "owner": "Randle Highlands LLC"
+    "owner": "Randle Highlands LLC",
+    "_coords": [
+      38.8697403,
+      -76.9667523
+    ]
   },
   {
     "date": "2025-05-22",
@@ -2010,7 +2650,11 @@
     "price": 3750000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Khalid Alizzi"
+    "owner": "Khalid Alizzi",
+    "_coords": [
+      38.9158004,
+      -77.0425552
+    ]
   },
   {
     "date": "2025-05-22",
@@ -2021,7 +2665,11 @@
     "price": 1300000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8303603,
+      -77.0033617
+    ]
   },
   {
     "date": "2025-05-29",
@@ -2032,7 +2680,11 @@
     "price": 3750000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Khalid Alizzi"
+    "owner": "Khalid Alizzi",
+    "_coords": [
+      38.9158004,
+      -77.0425552
+    ]
   },
   {
     "date": "2025-05-30",
@@ -2043,7 +2695,11 @@
     "price": 3375000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9209264,
+      -77.0800466
+    ]
   },
   {
     "date": "2025-06-02",
@@ -2054,7 +2710,11 @@
     "price": 2400000,
     "foia": "FOIA",
     "buyer": "Michael Taylor",
-    "owner": "Robert McCulloch"
+    "owner": "Robert McCulloch",
+    "_coords": [
+      38.8896587,
+      -76.9564042
+    ]
   },
   {
     "date": "2025-06-03",
@@ -2065,7 +2725,11 @@
     "price": 2100000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9322055,
+      -77.0383523
+    ]
   },
   {
     "date": "2025-06-03",
@@ -2076,7 +2740,11 @@
     "price": 1100000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9562167,
+      -77.0307266
+    ]
   },
   {
     "date": "2025-06-03",
@@ -2087,7 +2755,11 @@
     "price": 850000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9614756,
+      -77.0159477
+    ]
   },
   {
     "date": "2025-06-03",
@@ -2109,7 +2781,11 @@
     "price": 2829000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9385053,
+      -76.994684
+    ]
   },
   {
     "date": "2025-06-09",
@@ -2120,7 +2796,11 @@
     "price": 1350000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9077047,
+      -76.9341213
+    ]
   },
   {
     "date": "2025-06-12",
@@ -2131,7 +2811,11 @@
     "price": 3179824,
     "foia": "FOIA",
     "buyer": "Project DC Holdings LLC - ARCTRUST - Gary S Baumann",
-    "owner": "Musa Utku Aslanturk"
+    "owner": "Musa Utku Aslanturk",
+    "_coords": [
+      38.8985235,
+      -76.9756658
+    ]
   },
   {
     "date": "2025-06-16",
@@ -2142,7 +2826,11 @@
     "price": 3895000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Milano Dezign - Abraham Ors"
+    "owner": "Milano Dezign - Abraham Ors",
+    "_coords": [
+      38.901708,
+      -76.9773299
+    ]
   },
   {
     "date": "2025-06-20",
@@ -2153,7 +2841,11 @@
     "price": 7372160,
     "foia": "FOIA",
     "buyer": "Project DC Holdings LLC - ARCTRUST - Gary S Baumann",
-    "owner": "Sanjay Bajaj"
+    "owner": "Sanjay Bajaj",
+    "_coords": [
+      38.9243266,
+      -77.0343854
+    ]
   },
   {
     "date": "2025-06-20",
@@ -2164,7 +2856,11 @@
     "price": 4173750,
     "foia": "FOIA",
     "buyer": "Project DC Holdings LLC - ARCTRUST - Gary S Baumann",
-    "owner": "Adam Lobene - American Housing"
+    "owner": "Adam Lobene - American Housing",
+    "_coords": [
+      38.9019235,
+      -76.9758225
+    ]
   },
   {
     "date": "2025-06-24",
@@ -2175,7 +2871,11 @@
     "price": 3050000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9362864,
+      -77.0324101
+    ]
   },
   {
     "date": "2025-06-25",
@@ -2186,7 +2886,11 @@
     "price": 5000000,
     "foia": "FOIA",
     "buyer": "Project DC Holdings LLC - ARCTRUST - Gary S Baumann",
-    "owner": "Sanjay Bajaj"
+    "owner": "Sanjay Bajaj",
+    "_coords": [
+      38.8777125,
+      -76.9877385
+    ]
   },
   {
     "date": "2025-07-07",
@@ -2197,7 +2901,11 @@
     "price": 3750000,
     "foia": "FOIA",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9158004,
+      -77.0425552
+    ]
   },
   {
     "date": "2025-07-17",
@@ -2219,7 +2927,11 @@
     "price": 515000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8722427,
+      -76.965105
+    ]
   },
   {
     "date": "2025-07-22",
@@ -2230,7 +2942,11 @@
     "price": 5600000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9046492,
+      -77.0603408
+    ]
   },
   {
     "date": "2025-07-29",
@@ -2252,7 +2968,11 @@
     "price": 1050000,
     "foia": "FOIA",
     "buyer": "Stax Development LLC / YES Equity / Mike Azimi",
-    "owner": "Conservator for xxxx, Kendra Rose, Esq."
+    "owner": "Conservator for xxxx, Kendra Rose, Esq.",
+    "_coords": [
+      38.934342,
+      -77.0416567
+    ]
   },
   {
     "date": "2025-07-30",
@@ -2263,7 +2983,11 @@
     "price": 3400000,
     "foia": "FOIA",
     "buyer": "Stax Development LLC / YES Equity / Mike Azimi",
-    "owner": "Conservator for xxxx, Kendra Rose, Esq."
+    "owner": "Conservator for xxxx, Kendra Rose, Esq.",
+    "_coords": [
+      38.9277699,
+      -77.0342209
+    ]
   },
   {
     "date": "2025-08-12",
@@ -2274,7 +2998,11 @@
     "price": 600000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Redacted"
+    "owner": "Redacted",
+    "_coords": [
+      38.851101,
+      -76.968367
+    ]
   },
   {
     "date": "2025-08-25",
@@ -2285,7 +3013,11 @@
     "price": 163000000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": "Mid-America Apartment Communities, Inc."
+    "owner": "Mid-America Apartment Communities, Inc.",
+    "_coords": [
+      38.9068748,
+      -77.0342481
+    ]
   },
   {
     "date": "2025-09-04",
@@ -2296,7 +3028,11 @@
     "price": 1610000,
     "foia": "Greysteel",
     "buyer": "Michael Taylor",
-    "owner": "Dean Smothers"
+    "owner": "Dean Smothers",
+    "_coords": [
+      38.8214125,
+      -77.001116
+    ]
   },
   {
     "date": "2025-09-09",
@@ -2307,7 +3043,11 @@
     "price": 2900000,
     "foia": "FOIA",
     "buyer": "Mila Realty Group LLC - Michael McGregor",
-    "owner": "Saied Jamshidi - Amir Afshar"
+    "owner": "Saied Jamshidi - Amir Afshar",
+    "_coords": [
+      38.9214132,
+      -77.0329296
+    ]
   },
   {
     "date": "2025-09-11",
@@ -2318,7 +3058,11 @@
     "price": 1610000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8214125,
+      -77.001116
+    ]
   },
   {
     "date": "2025-09-12",
@@ -2329,7 +3073,11 @@
     "price": 7700000,
     "foia": "FOIA",
     "buyer": "Community Realty Co., Inc.",
-    "owner": "Steve Schwat - UIP"
+    "owner": "Steve Schwat - UIP",
+    "_coords": [
+      38.9329687,
+      -77.0347097
+    ]
   },
   {
     "date": "2025-09-18",
@@ -2340,7 +3088,11 @@
     "price": 3000000,
     "foia": "FOIA",
     "buyer": "J. M. & A. H. - out of Denver",
-    "owner": "Ezra Glass, Adam Bernstein, David Duber"
+    "owner": "Ezra Glass, Adam Bernstein, David Duber",
+    "_coords": [
+      38.9061045,
+      -77.0614846
+    ]
   },
   {
     "date": "2025-09-22",
@@ -2351,7 +3103,11 @@
     "price": 655000,
     "foia": "FOIA",
     "buyer": "Carnoustie Holdings - Redacted",
-    "owner": "201 57th Investment LLC - Jim Strasbourger"
+    "owner": "201 57th Investment LLC - Jim Strasbourger",
+    "_coords": [
+      38.8912933,
+      -76.919817
+    ]
   },
   {
     "date": "2025-09-24",
@@ -2362,7 +3118,11 @@
     "price": 950000,
     "foia": "FOIA",
     "buyer": "RJ Realty Partners - Ronald Vasquez and Jose Huerta",
-    "owner": "D. N."
+    "owner": "D. N.",
+    "_coords": [
+      38.8512138,
+      -76.9652516
+    ]
   },
   {
     "date": "2025-09-24",
@@ -2373,7 +3133,11 @@
     "price": 750000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8877799,
+      -76.9391213
+    ]
   },
   {
     "date": "2025-09-29",
@@ -2384,7 +3148,11 @@
     "price": 1955000,
     "foia": "FOIA",
     "buyer": "Al Davis - 418 Missouri Avenue Development LLC",
-    "owner": "Aaron McCarley/Deborah Tate"
+    "owner": "Aaron McCarley/Deborah Tate",
+    "_coords": [
+      38.9578339,
+      -77.0192278
+    ]
   },
   {
     "date": "2025-09-29",
@@ -2395,7 +3163,11 @@
     "price": 950000,
     "foia": "FOIA",
     "buyer": "RJ Realty Partners - Ronald Vasquez and Jose Huerta",
-    "owner": "D. N."
+    "owner": "D. N.",
+    "_coords": [
+      38.8512138,
+      -76.9652516
+    ]
   },
   {
     "date": "2025-10-06",
@@ -2406,7 +3178,11 @@
     "price": 675000,
     "foia": "FOIA",
     "buyer": "TAMM Investments LLC - Akeem Dyson?",
-    "owner": "SI Investors 5 LLC - hidden, same as below"
+    "owner": "SI Investors 5 LLC - hidden, same as below",
+    "_coords": [
+      38.8603001,
+      -76.9876795
+    ]
   },
   {
     "date": "2025-10-07",
@@ -2417,7 +3193,11 @@
     "price": 800000,
     "foia": "FOIA",
     "buyer": "TAMM Investments LLC - Akeem Dyson?",
-    "owner": "3465 Minnesota LLC - hidden"
+    "owner": "3465 Minnesota LLC - hidden",
+    "_coords": [
+      38.8852418,
+      -76.9559983
+    ]
   },
   {
     "date": "2025-10-10",
@@ -2428,7 +3208,11 @@
     "price": 750000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9355721,
+      -77.0253491
+    ]
   },
   {
     "date": "2025-10-16",
@@ -2439,7 +3223,11 @@
     "price": 127000000,
     "foia": "FOIA",
     "buyer": "Redacted",
-    "owner": "Grosvenor"
+    "owner": "Grosvenor",
+    "_coords": [
+      38.9087635,
+      -77.000818
+    ]
   },
   {
     "date": "2025-10-16",
@@ -2450,7 +3238,11 @@
     "price": 879500,
     "foia": "FOIA",
     "buyer": "Moors Holding LLC - Greg West",
-    "owner": "Mimi Gulelat"
+    "owner": "Mimi Gulelat",
+    "_coords": [
+      38.8681662,
+      -76.9687064
+    ]
   },
   {
     "date": "2025-10-27",
@@ -2461,7 +3253,11 @@
     "price": 1550000,
     "foia": "FOIA",
     "buyer": "UC - Redacted",
-    "owner": "JB - Redacted"
+    "owner": "JB - Redacted",
+    "_coords": [
+      38.9435276,
+      -77.0242789
+    ]
   },
   {
     "date": "2025-10-27",
@@ -2472,7 +3268,11 @@
     "price": 14200000,
     "foia": "FOIA",
     "buyer": "Tryko Partners - Uri Kahanow",
-    "owner": "Horning"
+    "owner": "Horning",
+    "_coords": [
+      38.8949507,
+      -76.9488947
+    ]
   },
   {
     "date": "2025-10-29",
@@ -2483,7 +3283,11 @@
     "price": 3150000,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.8980626,
+      -76.9767165
+    ]
   },
   {
     "date": "2025-10-31",
@@ -2505,7 +3309,11 @@
     "price": 3700000,
     "foia": "FOIA",
     "buyer": "LB - Redacted",
-    "owner": "Alvin Gross"
+    "owner": "Alvin Gross",
+    "_coords": [
+      38.9633217,
+      -77.0244944
+    ]
   },
   {
     "date": "2025-11-06",
@@ -2516,7 +3324,11 @@
     "price": 1820000,
     "foia": "FOIA",
     "buyer": "5615 TG Real Estate Investments LLC - Negest Dawit - TG Cigar Lounge",
-    "owner": "Solid Properties - Madison Investments"
+    "owner": "Solid Properties - Madison Investments",
+    "_coords": [
+      38.8981601,
+      -76.9194609
+    ]
   },
   {
     "date": "2025-11-26",
@@ -2527,7 +3339,11 @@
     "price": 3175000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9570638,
+      -77.0242939
+    ]
   },
   {
     "date": "2025-11-26",
@@ -2538,7 +3354,11 @@
     "price": 3120000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9388509,
+      -77.0292827
+    ]
   },
   {
     "date": "2025-11-26",
@@ -2549,7 +3369,11 @@
     "price": 3375000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9450699,
+      -77.0146848
+    ]
   },
   {
     "date": "2025-12-02",
@@ -2560,7 +3384,11 @@
     "price": 905000,
     "foia": "FOIA",
     "buyer": "Paul Fon and Joshua Douglas",
-    "owner": "Redacted"
+    "owner": "Redacted",
+    "_coords": [
+      38.9105208,
+      -76.9866879
+    ]
   },
   {
     "date": "2025-12-03",
@@ -2571,7 +3399,11 @@
     "price": 1246300,
     "foia": "FOIA",
     "buyer": "Kris Sankar",
-    "owner": "James Suh"
+    "owner": "James Suh",
+    "_coords": [
+      38.8317984,
+      -77.0044357
+    ]
   },
   {
     "date": "2025-12-03",
@@ -2604,7 +3436,11 @@
     "price": 1250000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.871028,
+      -76.9782179
+    ]
   },
   {
     "date": "2025-12-15",
@@ -2615,7 +3451,11 @@
     "price": null,
     "foia": "-",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9612333,
+      -77.0294372
+    ]
   },
   {
     "date": "2025-12-17",
@@ -2626,7 +3466,11 @@
     "price": 715000,
     "foia": "FOIA",
     "buyer": "KB, Marcus Stringer",
-    "owner": "SH"
+    "owner": "SH",
+    "_coords": [
+      38.9157821,
+      -77.0403472
+    ]
   },
   {
     "date": "2025-12-29",
@@ -2637,7 +3481,11 @@
     "price": 9000000,
     "foia": "FOIA",
     "buyer": "Mikhail Phillips",
-    "owner": "UIP"
+    "owner": "UIP",
+    "_coords": [
+      38.9249468,
+      -77.0350809
+    ]
   },
   {
     "date": "2025-12-31",
@@ -2648,7 +3496,11 @@
     "price": 8968750,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9188743,
+      -77.0332329
+    ]
   },
   {
     "date": "2026-01-06",
@@ -2670,7 +3522,11 @@
     "price": 3700000,
     "foia": "Requested",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.884558,
+      -76.9424282
+    ]
   },
   {
     "date": "2026-01-30",
@@ -2681,7 +3537,11 @@
     "price": 10200000,
     "foia": "Requested",
     "buyer": "",
-    "owner": ""
+    "owner": "",
+    "_coords": [
+      38.9079687,
+      -77.0632741
+    ]
   },
   {
     "date": "2026-02-05",
@@ -2692,7 +3552,11 @@
     "price": 630000,
     "foia": "Greysteel",
     "buyer": "",
-    "owner": "Jerome Bailey"
+    "owner": "Jerome Bailey",
+    "_coords": [
+      38.8687405,
+      -76.9660372
+    ]
   },
   {
     "date": "2023-07-26",
