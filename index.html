@@ -1118,7 +1118,15 @@ var map;
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function daysIn(dateStr){ if(!dateStr) return 0; var d=new Date(dateStr); d.setHours(0,0,0,0); return Math.floor((TODAY-d)/86400000); }
-function isArc(p){ return daysIn(p.date)>TOPA_LIMIT && getCompsForTopa(p._idx).length===0; }
+// A TOPA entry is superseded if another entry exists for the same address with a later date
+function isSuperseded(p){
+  return allData.some(function(q){
+    return q._idx !== p._idx &&
+      normalizeAddr(q.address) === normalizeAddr(p.address) &&
+      q.date > p.date;
+  });
+}
+function isArc(p){ return daysIn(p.date)>TOPA_LIMIT && getCompsForTopa(p._idx).length===0 && !isSuperseded(p); }
 function fmt$(n){ if(n==null||isNaN(n)) return '—'; if(n>=1e9) return '$'+(n/1e9).toFixed(2)+'B'; if(n>=1e6) return '$'+(n/1e6).toFixed(n%1e6===0?0:1)+'M'; if(n>=1000) return '$'+Math.round(n/1000)+'K'; return '$'+n.toLocaleString(); }
 function fmtFull$(n){ return (n==null||isNaN(n))?'—':'$'+n.toLocaleString(); }
 function getPPU(p){ return (p.price&&p.units)?Math.round(p.price/p.units):null; }
@@ -1416,6 +1424,7 @@ function applyFilters(){
   var daysMaxV=document.getElementById('days-max').value;
   var searchTerm = (document.getElementById('prop-search').value||'').toLowerCase().trim();
   var pool=allData.filter(function(p){
+    if(isSuperseded(p)) return false; // never show superseded duplicates
     if(showingArchive ? !isArc(p) : isArc(p)) return false;
     if(searchTerm){
       var hay = ((p.address||'')+' '+(p.name||'')).toLowerCase();
@@ -1898,22 +1907,36 @@ function addrSimilarity(a, b){
   return union ? inter/union : 0;
 }
 
-function findCandidates(compAddr){
-  var results = [];
-  allData.forEach(function(p, idx){
+function findCandidates(comp){
+  // For each address group, only consider the most recent TOPA entry that predates the comp sale
+  // If no sale date on comp, allow all entries but still prefer most recent per address
+  var compAddr = typeof comp === 'string' ? comp : comp.address;
+  var saleDate = (comp && comp.date) ? comp.date : null;
+
+  // Group allData by normalized address, pick best (most recent valid) per group
+  var groups = {};
+  allData.forEach(function(p){
+    var norm = normalizeAddr(p.address);
     var score = addrSimilarity(compAddr, p.address);
-    if(score > 0.3) results.push({idx:idx, prop:p, score:score});
+    if(score <= 0.3) return;
+    // If sale date exists, TOPA must predate it
+    if(saleDate && p.date && p.date >= saleDate) return;
+    if(!groups[norm] || p.date > groups[norm].prop.date){
+      groups[norm] = {idx: p._idx, prop: p, score: score};
+    }
   });
+
+  var results = Object.values(groups);
   results.sort(function(a,b){ return b.score - a.score; });
   return results.slice(0,4);
 }
 
-// Auto-match comps where score is >= 0.85 (essentially same address, different abbreviation)
+// Auto-match comps where score >= 0.85 against the most recent valid TOPA entry
 function autoMatchHighConfidence(){
   var autoMatched = 0;
   compsData.forEach(function(c){
     if(c.topaId !== null && c.topaId !== undefined) return;
-    var candidates = findCandidates(c.address);
+    var candidates = findCandidates(c);
     if(candidates.length && candidates[0].score >= 0.85){
       c.topaId = candidates[0].idx;
       autoMatched++;
@@ -1928,10 +1951,10 @@ function runMatching(){
   // Only queue comps that are unmatched AND have at least one candidate — skip ones with zero options
   matchQueue = compsData.filter(function(c){
     if(c.topaId !== null && c.topaId !== undefined) return false;
-    return findCandidates(c.address).length > 0;
+    return findCandidates(c).length > 0;
   });
   var skipped = compsData.filter(function(c){
-    return (c.topaId === null || c.topaId === undefined) && findCandidates(c.address).length === 0;
+    return (c.topaId === null || c.topaId === undefined) && findCandidates(c).length === 0;
   }).length;
   matchQueueIdx = 0;
   if(!matchQueue.length){
@@ -1970,7 +1993,7 @@ function showMatchStep(){
 
   matchSelectedCandidate = null;
   var comp = matchQueue[matchQueueIdx];
-  var candidates = findCandidates(comp.address);
+  var candidates = findCandidates(comp);
   progressLbl.textContent = 'Comp '+(matchQueueIdx+1)+' of '+total+' — review and approve or skip';
   btnAccept.style.display='block'; btnSkip.style.display='block'; btnDone.style.display='none';
 
