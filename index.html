@@ -103,10 +103,10 @@ header {
 }
 .hdr-btn.hdr-btn-timeline:hover { background: rgba(255,255,255,0.22); }
 .hdr-btn.hdr-btn-archive {
-  background: #d97706; border-color: #f59e0b; color: white; font-weight: 700;
+  background: #cbd5e1; border-color: #94a3b8; color: #1e293b; font-weight: 700;
 }
-.hdr-btn.hdr-btn-archive:hover { background: #b45309; border-color: #d97706; }
-.hdr-btn.hdr-btn-archive.active { background: #b45309; border-color: #f59e0b; }
+.hdr-btn.hdr-btn-archive:hover { background: #94a3b8; border-color: #64748b; color: #0f172a; }
+.hdr-btn.hdr-btn-archive.active { background: #94a3b8; border-color: #64748b; color: #0f172a; }
 .badge-cnt { background: rgba(255,255,255,0.25); color: white; border-radius: 9px; padding: 1px 6px; font-size: 0.6rem; font-weight: 700; }
 
 /* ════════════════ LAYOUT ════════════════ */
@@ -1280,27 +1280,42 @@ function renderList(){
       items.push({kind:'comp',c:c,ci:compsData.indexOf(c),color:'#d97706'});
     });
   });
-  // Unmatched comps at the bottom — only in non-archive view, filtered by search/filters
+  // Unmatched comps — shown only when no TOPA-specific filters are active
   if(!showingArchive){
     var searchTerm = (document.getElementById('prop-search').value||'').toLowerCase().trim();
     var uMin=parseFloat(document.getElementById('u-min').value)||null;
     var uMax=parseFloat(document.getElementById('u-max').value)||null;
     var pMin=parseFloat(document.getElementById('p-min').value)||null;
     var pMax=parseFloat(document.getElementById('p-max').value)||null;
-    compsData.filter(function(c){
-      if(c.topaId!==null && c.topaId!==undefined) return false;
-      if(searchTerm){
-        var hay=((c.address||'')+' '+(c.name||'')).toLowerCase();
-        if(!hay.includes(searchTerm)) return false;
-      }
-      if(uMin!=null && (c.units==null||c.units<uMin)) return false;
-      if(uMax!=null && (c.units==null||c.units>uMax)) return false;
-      if(pMin!=null && (c.price==null||c.price<pMin)) return false;
-      if(pMax!=null && (c.price==null||c.price>pMax)) return false;
-      return true;
-    }).forEach(function(c){
-      items.push({kind:'comp',c:c,ci:compsData.indexOf(c),color:'#7c3aed'});
-    });
+    var ppuMin=parseFloat(document.getElementById('ppu-min').value)||null;
+    var ppuMax=parseFloat(document.getElementById('ppu-max').value)||null;
+    var topaOnlyActive = !!(
+      document.getElementById('filter-foia').value ||
+      document.getElementById('d-min').value ||
+      document.getElementById('d-max').value ||
+      document.getElementById('days-min').value ||
+      document.getElementById('days-max').value ||
+      (activeType && activeType !== 'all')
+    );
+    if(!topaOnlyActive){
+      compsData.filter(function(c){
+        if(c.topaId!==null && c.topaId!==undefined) return false;
+        if(searchTerm){
+          var hay=((c.address||'')+' '+(c.name||'')).toLowerCase();
+          if(!hay.includes(searchTerm)) return false;
+        }
+        if(uMin!=null && (c.units==null||c.units<uMin)) return false;
+        if(uMax!=null && (c.units==null||c.units>uMax)) return false;
+        if(pMin!=null && (c.price==null||c.price<pMin)) return false;
+        if(pMax!=null && (c.price==null||c.price>pMax)) return false;
+        var cppu = (c.price&&c.units) ? c.price/c.units : (c.ppu||null);
+        if(ppuMin!=null && (cppu==null||cppu<ppuMin)) return false;
+        if(ppuMax!=null && (cppu==null||cppu>ppuMax)) return false;
+        return true;
+      }).forEach(function(c){
+        items.push({kind:'comp',c:c,ci:compsData.indexOf(c),color:'#7c3aed'});
+      });
+    }
   }
 
   var topaCount=filteredData.length;
@@ -2026,6 +2041,17 @@ async function renderCompMarkers(){
   var uMax=parseFloat(document.getElementById('u-max').value)||null;
   var pMin=parseFloat(document.getElementById('p-min').value)||null;
   var pMax=parseFloat(document.getElementById('p-max').value)||null;
+  var ppuMin=parseFloat(document.getElementById('ppu-min').value)||null;
+  var ppuMax=parseFloat(document.getElementById('ppu-max').value)||null;
+  var topaOnlyActive = !!(
+    document.getElementById('filter-foia').value ||
+    document.getElementById('d-min').value ||
+    document.getElementById('d-max').value ||
+    document.getElementById('days-min').value ||
+    document.getElementById('days-max').value ||
+    (activeType && activeType !== 'all')
+  );
+  if(topaOnlyActive){ return; }
   var toShow = compsData.filter(function(c){
     if(c.topaId !== null && c.topaId !== undefined) return false;
     if(searchTerm){
@@ -2036,6 +2062,9 @@ async function renderCompMarkers(){
     if(uMax!=null && (c.units==null||c.units>uMax)) return false;
     if(pMin!=null && (c.price==null||c.price<pMin)) return false;
     if(pMax!=null && (c.price==null||c.price>pMax)) return false;
+    var cppu = (c.price&&c.units) ? c.price/c.units : (c.ppu||null);
+    if(ppuMin!=null && (cppu==null||cppu<ppuMin)) return false;
+    if(ppuMax!=null && (cppu==null||cppu>ppuMax)) return false;
     return true;
   });
   for(var i=0; i<toShow.length; i++){
