@@ -2138,19 +2138,12 @@ document.getElementById('btn-clr-props').addEventListener('click', function(){
     btn.textContent = '↑ Saving…';
 
     try {
-      var results = await Promise.all([
-        pushFile(c, 'data/properties.json', buildPropsJson()),
-        pushFile(c, 'data/sales_comps.json', buildCompsJson())
-      ]);
-      var ok = results.every(function(r){ return r.ok; });
-      if(ok){
-        showSyncToast('✓ Saved to GitHub — users will see changes on next refresh.', true);
-        dot.className = 'gh-sync-dot configured';
-      } else {
-        var errs = results.filter(function(r){ return !r.ok; }).map(function(r){ return r.msg; }).join(' | ');
-        showSyncToast('Error: ' + errs, false);
-        dot.className = 'gh-sync-dot error';
-      }
+      var r1 = await pushFile(c, 'data/properties.json', buildPropsJson());
+      if(!r1.ok){ showSyncToast('Error: ' + r1.msg, false); dot.className='gh-sync-dot error'; btn.classList.remove('syncing'); btn.innerHTML='<span class="gh-sync-dot configured"></span> ↑ Save to GitHub'; return; }
+      var r2 = await pushFile(c, 'data/sales_comps.json', buildCompsJson());
+      if(!r2.ok){ showSyncToast('Error: ' + r2.msg, false); dot.className='gh-sync-dot error'; btn.classList.remove('syncing'); btn.innerHTML='<span class="gh-sync-dot configured"></span> ↑ Save to GitHub'; return; }
+      showSyncToast('✓ Saved to GitHub — users will see changes on next refresh.', true);
+      dot.className = 'gh-sync-dot configured';
     } catch(err){
       showSyncToast('Error: ' + err.message, false);
       dot.className = 'gh-sync-dot error';
