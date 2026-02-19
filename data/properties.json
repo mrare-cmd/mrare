@@ -2693,5 +2693,16 @@
     "foia": "Greysteel",
     "buyer": "",
     "owner": "Jerome Bailey"
+  },
+  {
+    "date": "2023-07-26",
+    "address": "1311 Madison Street NW",
+    "name": "",
+    "type": "w/ contract",
+    "units": 28,
+    "price": 4580000,
+    "foia": "",
+    "buyer": "",
+    "owner": "Lock 7 Development"
   }
 ]
