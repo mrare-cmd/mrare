@@ -1825,14 +1825,14 @@ function renderStatsModal(){
             '<div style="position:relative;margin-bottom:4px">'+
               '<div style="height:6px;background:var(--border);border-radius:3px;overflow:visible;position:relative">'+
                 '<div style="height:100%;border-radius:3px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626);width:100%"></div>'+
-                (avgSoldDays!=null?'<div style="position:absolute;top:-4px;left:'+Math.min(98,Math.round(avgSoldDays/420*100))+'%;transform:translateX(-50%);width:3px;height:14px;background:#1e293b;border-radius:2px;border:1px solid white;" title="Average: '+avgSoldDays+'d"></div>':'')+
-                (medSoldDays!=null?'<div style="position:absolute;top:-4px;left:'+Math.min(98,Math.round(medSoldDays/420*100))+'%;transform:translateX(-50%);width:3px;height:14px;background:#7c3aed;border-radius:2px;border:1px solid white;" title="Median: '+medSoldDays+'d"></div>':'')+
+                (avgSoldDays!=null?'<div style="position:absolute;top:-4px;left:'+Math.min(98,Math.round(avgSoldDays/420*100))+'%;transform:translateX(-50%);width:10px;height:10px;background:#1e293b;border-radius:50%;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.4);" title="Average: '+avgSoldDays+'d"></div>':'')+
+                (medSoldDays!=null?'<div style="position:absolute;top:-4px;left:'+Math.min(98,Math.round(medSoldDays/420*100))+'%;transform:translateX(-50%);width:10px;height:10px;background:#1e293b;border-radius:1px;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.4);" title="Median: '+medSoldDays+'d"></div>':'')+
               '</div>'+
             '</div>'+
             '<div style="display:flex;justify-content:space-between;font-size:0.55rem;color:var(--muted)"><span>Day 0</span><span>Day 210</span><span>Day 420</span></div>'+
             '<div style="display:flex;gap:12px;margin-top:6px;font-size:0.58rem;color:var(--muted)">'+
-              '<span><span style="display:inline-block;width:3px;height:10px;background:#1e293b;border-radius:1px;vertical-align:middle;margin-right:3px"></span>Avg</span>'+
-              '<span><span style="display:inline-block;width:3px;height:10px;background:#7c3aed;border-radius:1px;vertical-align:middle;margin-right:3px"></span>Median</span>'+
+              '<span><span style="display:inline-block;width:8px;height:8px;background:#1e293b;border-radius:50%;vertical-align:middle;margin-right:3px"></span>Avg</span>'+
+              '<span><span style="display:inline-block;width:8px;height:8px;background:#1e293b;border-radius:1px;vertical-align:middle;margin-right:3px"></span>Median</span>'+
             '</div>'
           : '<div style="font-size:0.75rem;color:var(--muted);padding:16px 0">No sold properties with matched comps yet.</div>')+
       '</div>'+
