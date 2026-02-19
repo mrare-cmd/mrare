@@ -263,7 +263,30 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
 .imp-msg.ok { background: var(--green-bg); color: var(--green); display: block; }
 .imp-msg.err { background: var(--red-bg); color: var(--red); display: block; }
 
-/* ════════════════ COMPS ════════════════ */
+/* ════════════════ GITHUB SYNC ════════════════ */
+.gh-sync-btn { position: fixed; bottom: 18px; right: 420px; z-index: 1000; background: #24292f; color: var(--white); border: none; padding: 9px 13px; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 7px; box-shadow: 0 4px 16px rgba(0,0,0,0.25); transition: all 0.14s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.gh-sync-btn:hover { background: #383f47; transform: translateY(-1px); }
+.gh-sync-btn.syncing { opacity: 0.7; cursor: wait; }
+.gh-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 2000; display: none; align-items: center; justify-content: center; }
+.gh-modal-overlay.open { display: flex; }
+.gh-modal { background: var(--white); border-radius: 12px; padding: 24px; width: 420px; box-shadow: 0 16px 48px rgba(0,0,0,0.25); }
+.gh-modal h3 { font-size: 1rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.gh-modal p { font-size: 0.7rem; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+.gh-field { margin-bottom: 12px; }
+.gh-field label { display: block; font-size: 0.65rem; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+.gh-field input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; font-family: var(--font); font-size: 0.75rem; color: var(--navy); outline: none; transition: border-color 0.12s; box-sizing: border-box; }
+.gh-field input:focus { border-color: #24292f; }
+.gh-field input[type=password] { font-family: monospace; letter-spacing: 0.05em; }
+.gh-modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+.gh-btn-save { flex: 1; padding: 9px; background: #24292f; color: white; border: none; font-family: var(--font); font-size: 0.72rem; font-weight: 700; cursor: pointer; border-radius: 5px; transition: background 0.12s; }
+.gh-btn-save:hover { background: #383f47; }
+.gh-btn-cancel { padding: 9px 14px; background: transparent; color: var(--muted); border: 1px solid var(--border); font-family: var(--font); font-size: 0.72rem; font-weight: 600; cursor: pointer; border-radius: 5px; }
+.gh-status { font-size: 0.65rem; font-weight: 600; padding: 7px 10px; border-radius: 5px; margin-top: 10px; display: none; }
+.gh-status.ok { background: var(--green-bg); color: var(--green); display: block; }
+.gh-status.err { background: var(--red-bg); color: var(--red); display: block; }
+.gh-sync-dot { width: 7px; height: 7px; border-radius: 50%; background: #6b7280; display: inline-block; flex-shrink: 0; }
+.gh-sync-dot.configured { background: #22c55e; }
+.gh-sync-dot.error { background: #ef4444; }
 :root { --comp: #7c3aed; --comp-bg: #ede9fe; --comp-light: #a78bfa; }
 .comp-toggle { position: fixed; bottom: 18px; right: 215px; z-index: 1000; background: var(--comp); color: var(--white); border: none; padding: 9px 13px; font-family: var(--font); font-size: 0.67rem; font-weight: 700; cursor: pointer; border-radius: 7px; box-shadow: 0 4px 16px rgba(124,58,237,0.35); transition: all 0.14s; white-space: nowrap; }
 .comp-toggle:hover { background: #6d28d9; transform: translateY(-1px); }
@@ -728,6 +751,41 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
       </div>
 
       <div class="tl-total">420 DAYS MAX TIMELINE FOR TOPA PROCESS <span>· Progress bars on each property track all 420 days · Properties archived after 420 days · Phases may collapse earlier if TA exits</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ GITHUB SYNC ════ -->
+<button class="gh-sync-btn" id="gh-sync-btn">
+  <span class="gh-sync-dot" id="gh-sync-dot"></span>
+  ↑ Save to GitHub
+</button>
+
+<!-- GitHub settings modal -->
+<div class="gh-modal-overlay" id="gh-modal-overlay">
+  <div class="gh-modal">
+    <h3>⚙ GitHub Sync Settings</h3>
+    <p>Enter your GitHub repo details and a Personal Access Token with <strong>Contents: Read &amp; Write</strong> permission. These are stored only in your browser.</p>
+    <div class="gh-field">
+      <label>GitHub Username / Org</label>
+      <input type="text" id="gh-owner" placeholder="e.g. johndoe" autocomplete="off">
+    </div>
+    <div class="gh-field">
+      <label>Repository Name</label>
+      <input type="text" id="gh-repo" placeholder="e.g. topa-dashboard" autocomplete="off">
+    </div>
+    <div class="gh-field">
+      <label>Branch (usually "main")</label>
+      <input type="text" id="gh-branch" placeholder="main" autocomplete="off">
+    </div>
+    <div class="gh-field">
+      <label>Personal Access Token</label>
+      <input type="password" id="gh-token" placeholder="github_pat_..." autocomplete="off">
+    </div>
+    <div id="gh-modal-status" class="gh-status"></div>
+    <div class="gh-modal-btns">
+      <button class="gh-btn-cancel" id="gh-modal-cancel">Cancel</button>
+      <button class="gh-btn-save" id="gh-modal-save">Save Settings</button>
     </div>
   </div>
 </div>
@@ -1993,7 +2051,180 @@ document.getElementById('btn-clr-props').addEventListener('click', function(){
   showCompMsg('All properties and comps cleared.','ok');
 });
 
-// ── BOOT ──────────────────────────────────────────────────────────────────────
+// ── GITHUB SYNC ──────────────────────────────────────────────────────────────
+(function(){
+  var LS = 'topa_gh_';
+  var dot = document.getElementById('gh-sync-dot');
+  var btn = document.getElementById('gh-sync-btn');
+
+  function getConf(){
+    return {
+      owner: localStorage.getItem(LS+'owner')||'',
+      repo:  localStorage.getItem(LS+'repo')||'',
+      branch:localStorage.getItem(LS+'branch')||'main',
+      token: localStorage.getItem(LS+'token')||''
+    };
+  }
+
+  function isConfigured(){
+    var c=getConf(); return !!(c.owner && c.repo && c.token);
+  }
+
+  function updateDot(){
+    dot.className = 'gh-sync-dot' + (isConfigured() ? ' configured' : '');
+    btn.title = isConfigured()
+      ? 'Save properties + comps to GitHub'
+      : 'Click to configure GitHub sync';
+  }
+  updateDot();
+
+  // Open modal on button click — if not configured go straight to settings,
+  // if configured ask whether to save or open settings
+  btn.addEventListener('click', function(){
+    if(!isConfigured()){
+      openModal();
+      return;
+    }
+    pushToGitHub();
+  });
+
+  // Long-press or right-click to open settings when already configured
+  var pressTimer;
+  btn.addEventListener('mousedown', function(){ pressTimer = setTimeout(openModal, 600); });
+  btn.addEventListener('mouseup',   function(){ clearTimeout(pressTimer); });
+  btn.addEventListener('mouseleave',function(){ clearTimeout(pressTimer); });
+  btn.addEventListener('contextmenu',function(e){ e.preventDefault(); openModal(); });
+
+  function openModal(){
+    var c=getConf();
+    document.getElementById('gh-owner').value  = c.owner;
+    document.getElementById('gh-repo').value   = c.repo;
+    document.getElementById('gh-branch').value = c.branch||'main';
+    document.getElementById('gh-token').value  = c.token;
+    document.getElementById('gh-modal-status').className='gh-status';
+    document.getElementById('gh-modal-overlay').classList.add('open');
+  }
+
+  document.getElementById('gh-modal-cancel').addEventListener('click', function(){
+    document.getElementById('gh-modal-overlay').classList.remove('open');
+  });
+  document.getElementById('gh-modal-overlay').addEventListener('click', function(e){
+    if(e.target===this) this.classList.remove('open');
+  });
+
+  document.getElementById('gh-modal-save').addEventListener('click', function(){
+    var owner  = document.getElementById('gh-owner').value.trim();
+    var repo   = document.getElementById('gh-repo').value.trim();
+    var branch = document.getElementById('gh-branch').value.trim()||'main';
+    var token  = document.getElementById('gh-token').value.trim();
+    var st = document.getElementById('gh-modal-status');
+    if(!owner||!repo||!token){
+      st.className='gh-status err'; st.textContent='All fields except Branch are required.'; return;
+    }
+    localStorage.setItem(LS+'owner',  owner);
+    localStorage.setItem(LS+'repo',   repo);
+    localStorage.setItem(LS+'branch', branch);
+    localStorage.setItem(LS+'token',  token);
+    st.className='gh-status ok'; st.textContent='Settings saved. Click "Save to GitHub" to sync.';
+    updateDot();
+    setTimeout(function(){ document.getElementById('gh-modal-overlay').classList.remove('open'); }, 1200);
+  });
+
+  // ── Core push function ────────────────────────────────────────────────────
+  async function pushToGitHub(){
+    if(!isConfigured()){ openModal(); return; }
+    var c = getConf();
+    btn.classList.add('syncing');
+    btn.textContent = '↑ Saving…';
+
+    try {
+      var results = await Promise.all([
+        pushFile(c, 'data/properties.json', buildPropsJson()),
+        pushFile(c, 'data/sales_comps.json', buildCompsJson())
+      ]);
+      var ok = results.every(function(r){ return r.ok; });
+      if(ok){
+        showSyncToast('✓ Saved to GitHub — users will see changes on next refresh.', true);
+        dot.className = 'gh-sync-dot configured';
+      } else {
+        var errs = results.filter(function(r){ return !r.ok; }).map(function(r){ return r.msg; }).join(' | ');
+        showSyncToast('Error: ' + errs, false);
+        dot.className = 'gh-sync-dot error';
+      }
+    } catch(err){
+      showSyncToast('Error: ' + err.message, false);
+      dot.className = 'gh-sync-dot error';
+    }
+
+    btn.classList.remove('syncing');
+    btn.innerHTML = '<span class="gh-sync-dot'+(isConfigured()?' configured':'')+'"></span> ↑ Save to GitHub';
+    dot = document.getElementById('gh-sync-dot'); // re-grab after innerHTML reset
+  }
+
+  async function pushFile(c, path, content){
+    var base64 = btoa(unescape(encodeURIComponent(content)));
+    var apiUrl = 'https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+path;
+
+    // Get current SHA (needed to update existing file)
+    var sha = null;
+    try {
+      var getResp = await fetch(apiUrl+'?ref='+c.branch, {
+        headers: { 'Authorization': 'Bearer '+c.token, 'Accept': 'application/vnd.github+json' }
+      });
+      if(getResp.ok){
+        var existing = await getResp.json();
+        sha = existing.sha;
+      }
+    } catch(e){ /* file may not exist yet — that's fine */ }
+
+    var body = { message: 'Update '+path+' via TOPA Dashboard', content: base64, branch: c.branch };
+    if(sha) body.sha = sha;
+
+    var putResp = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer '+c.token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if(putResp.ok) return {ok:true};
+    var errData = await putResp.json().catch(function(){ return {}; });
+    return {ok:false, msg: path+': '+(errData.message||putResp.status)};
+  }
+
+  function buildPropsJson(){
+    var clean = allData.map(function(p){
+      var o=Object.assign({},p); delete o._idx; delete o._marker; return o;
+    });
+    return JSON.stringify(clean, null, 2);
+  }
+
+  function buildCompsJson(){
+    return JSON.stringify(compsData, null, 2);
+  }
+
+  function showSyncToast(msg, success){
+    var t = document.getElementById('gh-toast');
+    if(!t){
+      t = document.createElement('div');
+      t.id = 'gh-toast';
+      t.style.cssText = 'position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:3000;padding:10px 18px;border-radius:8px;font-size:0.72rem;font-weight:700;font-family:var(--font);box-shadow:0 4px 20px rgba(0,0,0,0.2);transition:opacity 0.3s;white-space:nowrap;';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.style.background = success ? '#f0fdf4' : '#fef2f2';
+    t.style.color = success ? '#15803d' : '#b91c1c';
+    t.style.border = '1px solid ' + (success ? '#bbf7d0' : '#fecaca');
+    t.style.opacity = '1';
+    clearTimeout(t._hide);
+    t._hide = setTimeout(function(){ t.style.opacity='0'; }, 4000);
+  }
+})();
+
+
 document.addEventListener('DOMContentLoaded', function(){
   initMap();
   // Load TOPA properties from data/properties.json, then load comps, then render
