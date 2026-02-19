@@ -173,6 +173,35 @@ select.full:focus { border-color: var(--accent); background: var(--white); }
 .pi-comp:hover { opacity:1; background: rgba(124,58,237,0.06) !important; }
 .bdg-gr { background: var(--gray-bg); color: var(--gray); border: 1px solid var(--border); }
 .bdg-arc { background: #fef3c7; color: #92400e; }
+
+/* Comp hover panel on TOPA sidebar row */
+.pi-comp-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 5px; padding: 3px 8px;
+  background: #fef3c7; border: 1px solid #fbbf24; border-radius: 4px;
+  font-size: 0.58rem; font-weight: 700; color: #92400e;
+  cursor: default; user-select: none; white-space: nowrap;
+  position: relative; z-index: 1;
+}
+#comp-hover-panel {
+  display: none;
+  position: fixed; z-index: 3000;
+  width: 260px;
+  background: var(--white); border: 1px solid #fbbf24;
+  border-left: 3px solid #d97706;
+  border-radius: 7px;
+  box-shadow: 4px 4px 18px rgba(0,0,0,0.15);
+  padding: 11px 13px;
+  pointer-events: none;
+}
+#comp-hover-panel.visible { display: block; }
+.pi-comp-panel-name { font-size: 0.7rem; font-weight: 800; color: #92400e; margin-bottom: 4px; line-height: 1.3; }
+.pi-comp-panel-sub { font-size: 0.6rem; color: var(--muted); margin-bottom: 6px; }
+.pi-comp-panel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; }
+.pi-comp-panel-f label { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: #b45309; display: block; margin-bottom: 1px; }
+.pi-comp-panel-f span { font-size: 0.68rem; font-weight: 600; color: var(--navy); }
+.pi-comp-panel-f.wide { grid-column: 1/-1; }
+.pi-comp-panel-notes { font-size: 0.6rem; color: var(--muted); font-style: italic; margin-top: 6px; padding-top: 6px; border-top: 1px solid #fde68a; line-height: 1.4; }
 .pi-price { font-size: 0.7rem; font-weight: 700; color: var(--navy); margin-left: auto; }
 .pi-days { font-size: 0.6rem; color: var(--muted); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
 .pi-days strong { font-weight: 700; color: var(--navy); }
@@ -1280,13 +1309,7 @@ function renderList(){
     var hasComps=compsList.length>0;
     var markerColor=hasComps?'#d97706':(arc?'#94a3b8':'#059669');
     items.push({kind:'topa',p:p,i:i,color:markerColor,compsList:compsList});
-    // Show matched comp rows beneath the TOPA property
-    // In archive view, only show comps whose linked TOPA is also archived
-    compsList.forEach(function(c){
-      var linkedProp = allData[c.topaId];
-      if(showingArchive && linkedProp && !isArc(linkedProp)) return;
-      items.push({kind:'comp',c:c,ci:compsData.indexOf(c),color:'#d97706'});
-    });
+    // Matched comp rows are now shown as hover panels on the TOPA row — not as separate items
   });
   // Unmatched comps — shown only when no TOPA-specific filters are active
   if(!showingArchive){
@@ -1360,6 +1383,13 @@ function renderList(){
       var rightLabel=sold
         ?'<span style="color:#d97706;font-weight:700;">Sold · '+fmtDate(soldDate)+'</span>'
         :(arc?'<span class="bdg bdg-arc">Archived</span>':'<span>'+Math.max(0,TOPA_LIMIT-days)+'d left</span>');
+      // Build hover button for matched comps (panel rendered via JS on hover)
+      var compPanels = '';
+      if(hasComps){
+        var ci0 = compsData.indexOf(compsList[0]);
+        var label = '🏷 Sale Comp' + (compsList.length > 1 ? ' ('+compsList.length+')' : '');
+        compPanels = '<div class="pi-comp-btn" data-comp-ci="'+ci0+'">'+label+' ›</div>';
+      }
       return '<div class="pi'+(arc?' arc':'')+'" data-idx="'+i+'" onclick="focusProp('+i+')" style="border-left:3px solid '+item.color+';"> '
         +'<div class="pi-addr">'+p.address+'</div>'
         +(p.name?'<div class="pi-name">'+p.name+'</div>':'')+
@@ -1373,6 +1403,7 @@ function renderList(){
         +rightLabel
         +'</div>'
         +'<div class="pi-phase">'+phaseLabel+'</div>'
+        +(hasComps?compPanels:'')
         +'</div>';
     } else {
       var c=item.c; var ci=item.ci;
@@ -1539,6 +1570,62 @@ document.getElementById('arc-close').addEventListener('click',function(){
 });
 
 // Timeline modal
+// ── COMP HOVER PANEL ─────────────────────────────────────────────────────────
+(function(){
+  var panel = document.getElementById('comp-hover-panel');
+  var hideTimer;
+
+  function buildPanelHtml(c){
+    var cppu = (c.price&&c.units) ? Math.round(c.price/c.units) : (c.ppu||null);
+    var cppsf = c.ppsf || (c.price&&c.sf ? Math.round(c.price/c.sf*100)/100 : null);
+    return '<div class="pi-comp-panel-name">'+(c.name||c.address)+'</div>'+
+      (c.name ? '<div class="pi-comp-panel-sub">'+c.address+'</div>' : '')+
+      '<div class="pi-comp-panel-grid">'+
+        (c.date    ? '<div class="pi-comp-panel-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
+        (c.price   ? '<div class="pi-comp-panel-f"><label>Price</label><span>'+fmt$(c.price)+'</span></div>' : '')+
+        (c.units   ? '<div class="pi-comp-panel-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
+        (cppu      ? '<div class="pi-comp-panel-f"><label>$/Unit</label><span>$'+cppu.toLocaleString()+'</span></div>' : '')+
+        (c.sf      ? '<div class="pi-comp-panel-f"><label>SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
+        (cppsf     ? '<div class="pi-comp-panel-f"><label>$/SF</label><span>$'+cppsf+'</span></div>' : '')+
+        (c.capRate ? '<div class="pi-comp-panel-f"><label>Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
+        (c.buyer   ? '<div class="pi-comp-panel-f wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
+        (c.seller  ? '<div class="pi-comp-panel-f wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
+      '</div>'+
+      (c.notes ? '<div class="pi-comp-panel-notes">'+c.notes+'</div>' : '');
+  }
+
+  document.getElementById('prop-list').addEventListener('mouseover', function(e){
+    var btn = e.target.closest('.pi-comp-btn');
+    if(!btn) return;
+    clearTimeout(hideTimer);
+    var ci = parseInt(btn.getAttribute('data-comp-ci'), 10);
+    var c = compsData[ci];
+    if(!c) return;
+    panel.innerHTML = buildPanelHtml(c);
+    // Position: right of sidebar, vertically aligned to the button
+    var sidebar = document.querySelector('.sidebar');
+    var sRect = sidebar.getBoundingClientRect();
+    var bRect = btn.getBoundingClientRect();
+    panel.style.left = (sRect.right + 6) + 'px';
+    // Align top of panel to top of the button row, clamped to viewport
+    var top = bRect.top;
+    var maxTop = window.innerHeight - panel.offsetHeight - 8;
+    panel.style.top = Math.max(8, Math.min(top, maxTop)) + 'px';
+    panel.classList.add('visible');
+  });
+
+  document.getElementById('prop-list').addEventListener('mouseleave', function(){
+    hideTimer = setTimeout(function(){ panel.classList.remove('visible'); }, 80);
+  });
+
+  document.getElementById('prop-list').addEventListener('mouseout', function(e){
+    var btn = e.target.closest('.pi-comp-btn');
+    if(btn && !btn.contains(e.relatedTarget)){
+      hideTimer = setTimeout(function(){ panel.classList.remove('visible'); }, 80);
+    }
+  });
+})();
+
 document.getElementById('btn-stats').addEventListener('click', openStatsModal);
 document.getElementById('stats-close').addEventListener('click',function(){document.getElementById('stats-modal').classList.remove('open');});
 document.getElementById('stats-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
@@ -2101,6 +2188,7 @@ async function renderCompMarkers(){
     });
     var html = buildCompPopupHtml(c);
     var mk = L.marker(coords, {icon:icon}).bindPopup(html, {maxWidth:290});
+    mk._compIdx = compsData.indexOf(c);
     mk.addTo(map);
     compMarkers.push(mk);
   }
@@ -2160,8 +2248,19 @@ function renderCompsSidebar(){
 window.focusComp = async function(ci){
   var c = compsData[ci];
   var coords = await geocode(c.address);
-  if(coords) map.flyTo(coords, 16, {animate:true, duration:0.8});
-  openCompDetail(ci);
+  var isUnmatched = (c.topaId === null || c.topaId === undefined);
+  if(isUnmatched){
+    // Find the marker for this comp and open its Leaflet popup
+    var mk = compMarkers.find(function(m){ return m._compIdx === ci; });
+    if(coords) map.flyTo(coords, 16, {animate:true, duration:0.8});
+    if(mk){
+      clearTimeout(window._compPopupTimer);
+      window._compPopupTimer = setTimeout(function(){ mk.openPopup(); }, coords ? 950 : 0);
+    }
+  } else {
+    if(coords) map.flyTo(coords, 16, {animate:true, duration:0.8});
+    openCompDetail(ci);
+  }
 };
 
 // Ensure the mixed list re-renders when comp data changes
@@ -2802,5 +2901,6 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 });
 </script>
+<div id="comp-hover-panel"></div>
 </body>
 </html>
