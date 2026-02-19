@@ -359,25 +359,7 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
 .match-no-candidates { padding: 14px; background: var(--off-white); border-radius: 7px; text-align: center; font-size: 0.7rem; color: var(--muted); }
 .match-progress { font-size: 0.7rem; color: rgba(255,255,255,0.7); margin-top: 4px; }
 
-/* Comp accordion in popup (below TOPA info, collapsible) */
-.pu-comp-accordion { margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 8px; }
-.pu-comp-accordion-hdr {
-  display: flex; align-items: center; justify-content: space-between;
-  cursor: pointer; padding: 3px 0; user-select: none;
-}
-.pu-comp-accordion-lbl {
-  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
-  color: #c4b5fd; display: flex; align-items: center; gap: 6px;
-}
-.pu-comp-accordion-badge {
-  background: #7c3aed; color: white; border-radius: 8px;
-  padding: 1px 6px; font-size: 0.55rem; font-weight: 700;
-}
-.pu-comp-chevron { font-size: 0.65rem; color: rgba(255,255,255,0.4); transition: transform 0.18s; display: inline-block; }
-.pu-comp-chevron.open { transform: rotate(180deg); }
-.pu-comp-accordion-body { overflow: hidden; max-height: 0; transition: max-height 0.22s ease; }
-.pu-comp-accordion-body.open { max-height: 600px; }
-.pu-comp-accordion-inner { padding-top: 8px; }
+/* Comp accordion in popup — replaced by gold sidebar panel */
 .pu-comp-card { background: rgba(124,58,237,0.18); border: 1px solid rgba(167,139,250,0.3); border-radius: 6px; padding: 9px 11px; margin-bottom: 7px; }
 .pu-comp-card:last-child { margin-bottom: 0; }
 .pu-comp-addr { font-size: 0.68rem; font-weight: 700; color: #c4b5fd; line-height: 1.3; margin-bottom: 5px; }
@@ -386,6 +368,58 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
 .pu-comp-f span { font-size: 0.7rem; font-weight: 500; color: rgba(255,255,255,0.9); }
 .pu-comp-f.wide { grid-column: 1/-1; }
 .pu-comp-notes { font-size: 0.62rem; color: rgba(255,255,255,0.55); margin-top: 5px; font-style: italic; line-height: 1.4; }
+
+/* View comps button inside popup */
+.pu-comp-sidebar-btn {
+  margin-top: 10px; padding: 8px 12px;
+  background: #d97706; color: white; border-radius: 5px;
+  font-size: 0.65rem; font-weight: 700; cursor: pointer;
+  text-align: center; letter-spacing: 0.03em;
+  transition: background 0.12s;
+}
+.pu-comp-sidebar-btn:hover { background: #b45309; }
+
+/* Gold comp sidebar panel */
+.comp-sidebar-panel {
+  position: fixed; top: 70px; right: 0; z-index: 1100;
+  width: 320px; max-height: calc(100vh - 88px);
+  background: var(--white); border-left: 4px solid #d97706;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.13);
+  display: flex; flex-direction: column; overflow: hidden;
+  transform: translateX(100%); transition: transform 0.22s ease;
+  border-radius: 0;
+}
+.comp-sidebar-panel.open { transform: translateX(0); }
+.comp-sidebar-hdr {
+  background: #d97706; color: white; padding: 14px 16px 12px;
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-shrink: 0;
+}
+.comp-sidebar-hdr-inner { flex: 1; min-width: 0; }
+.comp-sidebar-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 3px; }
+.comp-sidebar-addr { font-size: 0.88rem; font-weight: 800; line-height: 1.3; color: white; }
+.comp-sidebar-close {
+  background: rgba(255,255,255,0.2); border: none; color: white;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 0.85rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-left: 10px; font-family: var(--font);
+  transition: background 0.12s;
+}
+.comp-sidebar-close:hover { background: rgba(255,255,255,0.35); }
+.comp-sidebar-body { overflow-y: auto; padding: 14px 16px; flex: 1; }
+.comp-sidebar-body::-webkit-scrollbar { width: 3px; }
+.comp-sidebar-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.comp-sidebar-card {
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: 7px; padding: 11px 13px; margin-bottom: 10px;
+}
+.comp-sidebar-card:last-child { margin-bottom: 0; }
+.comp-sidebar-card-name { font-size: 0.7rem; font-weight: 800; color: #92400e; margin-bottom: 6px; line-height: 1.3; }
+.comp-sidebar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; }
+.comp-sidebar-f label { font-size: 0.52rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: #b45309; display: block; margin-bottom: 1px; }
+.comp-sidebar-f span { font-size: 0.72rem; font-weight: 600; color: #1c1917; }
+.comp-sidebar-f.wide { grid-column: 1/-1; }
+.comp-sidebar-notes { font-size: 0.63rem; color: #78716c; margin-top: 7px; font-style: italic; line-height: 1.4; padding-top: 7px; border-top: 1px solid #fde68a; }
 
 /* Floating comps detail panel (opens when clicking a comp in sidebar) */
 .comp-detail-panel {
@@ -753,6 +787,18 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
       <div class="tl-total">420 DAYS MAX TIMELINE FOR TOPA PROCESS <span>· Progress bars on each property track all 420 days · Properties archived after 420 days · Phases may collapse earlier if TA exits</span></div>
     </div>
   </div>
+</div>
+
+<!-- ════ COMP SIDEBAR ════ -->
+<div class="comp-sidebar-panel" id="comp-sidebar-panel">
+  <div class="comp-sidebar-hdr">
+    <div class="comp-sidebar-hdr-inner">
+      <div class="comp-sidebar-title">Sale Comps</div>
+      <div class="comp-sidebar-addr" id="comp-sidebar-addr"></div>
+    </div>
+    <button class="comp-sidebar-close" id="comp-sidebar-close">✕</button>
+  </div>
+  <div class="comp-sidebar-body" id="comp-sidebar-body"></div>
 </div>
 
 <!-- ════ GITHUB SYNC ════ -->
@@ -1710,53 +1756,44 @@ function buildCompsTabHtml(topaPropIdx){
   }).join('');
 }
 
-// ── COMP ACCORDION in TOPA popup ─────────────────────────────────────────────
-function buildCompsAccordionHtml(topaPropIdx, accordionId){
+// ── COMP SIDEBAR ─────────────────────────────────────────────────────────────
+window.openCompSidebar = function(topaPropIdx){
   var cs = getCompsForTopa(topaPropIdx);
-  if(!cs.length) return '';
-  var cardsHtml = cs.map(function(c){
+  if(!cs.length) return;
+  var prop = allData.find(function(p){ return p._idx === topaPropIdx; });
+  var label = (prop && (prop.name || prop.address)) ? (prop.name || prop.address) : 'Sale Comps';
+  document.getElementById('comp-sidebar-addr').textContent = label;
+
+  var html = cs.map(function(c){
     var ppu = (c.price && c.units) ? Math.round(c.price/c.units) : c.ppu;
     var ppsf = c.ppsf || (c.price && c.sf ? Math.round(c.price/c.sf*100)/100 : null);
-    return '<div class="pu-comp-card">'+
-      '<div class="pu-comp-addr">'+(c.name ? c.name+' — ' : '')+c.address+'</div>'+
-      '<div class="pu-comp-grid">'+
-      (c.date ? '<div class="pu-comp-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
-      (c.price ? '<div class="pu-comp-f"><label>Sale Price</label><span>'+fmtFull$(c.price)+'</span></div>' : '')+
-      (c.units ? '<div class="pu-comp-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
-      (ppu ? '<div class="pu-comp-f"><label>Price / Unit</label><span>$'+ppu.toLocaleString()+'</span></div>' : '')+
-      (c.sf ? '<div class="pu-comp-f"><label>Bldg SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
-      (ppsf ? '<div class="pu-comp-f"><label>Price / SF</label><span>$'+ppsf+'</span></div>' : '')+
-      (c.yearBuilt ? '<div class="pu-comp-f"><label>Year Built</label><span>'+c.yearBuilt+'</span></div>' : '')+
-      (c.capRate ? '<div class="pu-comp-f"><label>Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
-      (c.pfCapRate ? '<div class="pu-comp-f"><label>PF Cap Rate</label><span>'+c.pfCapRate+'%</span></div>' : '')+
-      (c.buyer ? '<div class="pu-comp-f wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
-      (c.seller ? '<div class="pu-comp-f wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
-      (c.broker ? '<div class="pu-comp-f wide"><label>Listing Broker</label><span>'+c.broker+'</span></div>' : '')+
+    return '<div class="comp-sidebar-card">'+
+      '<div class="comp-sidebar-card-name">'+(c.name ? c.name+' — ' : '')+c.address+'</div>'+
+      '<div class="comp-sidebar-grid">'+
+      (c.date    ? '<div class="comp-sidebar-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
+      (c.price   ? '<div class="comp-sidebar-f"><label>Sale Price</label><span>'+fmtFull$(c.price)+'</span></div>' : '')+
+      (c.units   ? '<div class="comp-sidebar-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
+      (ppu       ? '<div class="comp-sidebar-f"><label>Price / Unit</label><span>$'+ppu.toLocaleString()+'</span></div>' : '')+
+      (c.sf      ? '<div class="comp-sidebar-f"><label>Bldg SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
+      (ppsf      ? '<div class="comp-sidebar-f"><label>Price / SF</label><span>$'+ppsf+'</span></div>' : '')+
+      (c.yearBuilt ? '<div class="comp-sidebar-f"><label>Year Built</label><span>'+c.yearBuilt+'</span></div>' : '')+
+      (c.capRate ? '<div class="comp-sidebar-f"><label>Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
+      (c.pfCapRate ? '<div class="comp-sidebar-f"><label>PF Cap Rate</label><span>'+c.pfCapRate+'%</span></div>' : '')+
+      (c.buyer   ? '<div class="comp-sidebar-f wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
+      (c.seller  ? '<div class="comp-sidebar-f wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
+      (c.broker  ? '<div class="comp-sidebar-f wide"><label>Listing Broker</label><span>'+c.broker+'</span></div>' : '')+
       '</div>'+
-      (c.notes ? '<div class="pu-comp-notes">'+c.notes+'</div>' : '')+
+      (c.notes ? '<div class="comp-sidebar-notes">'+c.notes+'</div>' : '')+
     '</div>';
   }).join('');
-  return '<div class="pu-comp-accordion">'+
-    '<div class="pu-comp-accordion-hdr" data-acc="'+accordionId+'" onclick="toggleCompAccordion(this)">'+
-      '<span class="pu-comp-accordion-lbl">'+
-        '🏷 Sale Comps <span class="pu-comp-accordion-badge">'+cs.length+'</span>'+
-      '</span>'+
-      '<span class="pu-comp-chevron" id="chev-'+accordionId+'">▼</span>'+
-    '</div>'+
-    '<div class="pu-comp-accordion-body" id="body-'+accordionId+'">'+
-      '<div class="pu-comp-accordion-inner">'+cardsHtml+'</div>'+
-    '</div>'+
-  '</div>';
-}
 
-window.toggleCompAccordion = function(el){
-  var id = el.dataset ? el.dataset.acc : el.getAttribute('data-acc');
-  var body = document.getElementById('body-'+id);
-  var chev = document.getElementById('chev-'+id);
-  if(!body) return;
-  body.classList.toggle('open');
-  if(chev) chev.classList.toggle('open');
+  document.getElementById('comp-sidebar-body').innerHTML = html;
+  document.getElementById('comp-sidebar-panel').classList.add('open');
 };
+
+document.getElementById('comp-sidebar-close').addEventListener('click', function(){
+  document.getElementById('comp-sidebar-panel').classList.remove('open');
+});
 
 // Patch renderMarkers: three color states + collapsible accordion popup
 var _origRenderMarkers = renderMarkers;
@@ -1792,7 +1829,7 @@ renderMarkers = async function(){
       }).join('');
     }
     var ms=getMilestonePhase(days);
-    var accordionId='acc-'+i;
+    
 
     var html='<div class="pu-addr">'+p.address+'</div>'+
       (p.name?'<div class="pu-name">'+p.name+'</div>':'')+
@@ -1818,7 +1855,7 @@ renderMarkers = async function(){
       '<div style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px">'+(sold?'Outcome':'Current Phase')+'</div>'+
       '<div style="font-size:0.75rem;font-weight:700;color:white">'+(sold?'✓ Sold — Process Complete':ms.label)+'</div>'+
       '</div>'+
-      (hasComps ? buildCompsAccordionHtml(topaOrigIdx, accordionId) : '');
+      (hasComps ? '<div class="pu-comp-sidebar-btn" onclick="openCompSidebar('+topaOrigIdx+')">🏷 View Sale Comps ('+getCompsForTopa(topaOrigIdx).length+')</div>' : '');
 
     (function(idx){
       var opacity=arc?'0.5':'1';
