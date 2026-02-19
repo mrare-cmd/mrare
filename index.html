@@ -87,13 +87,27 @@ header {
 
 .hdr-btns { display: flex; gap: 8px; margin-left: 16px; align-items: center; }
 .hdr-btn {
-  padding: 6px 13px; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.65);
-  background: transparent; font-family: var(--font); font-size: 0.68rem; font-weight: 600;
-  cursor: pointer; border-radius: 5px; transition: all 0.14s; white-space: nowrap;
+  padding: 7px 14px; border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.07); font-family: var(--font); font-size: 0.68rem; font-weight: 600;
+  cursor: pointer; border-radius: 6px; transition: all 0.14s; white-space: nowrap;
   display: flex; align-items: center; gap: 5px;
 }
-.hdr-btn:hover, .hdr-btn.active { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.45); color: var(--white); }
-.badge-cnt { background: var(--gold); color: var(--white); border-radius: 9px; padding: 1px 6px; font-size: 0.6rem; font-weight: 700; }
+.hdr-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); color: var(--white); }
+.hdr-btn.active { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); color: var(--white); }
+.hdr-btn.hdr-btn-stats {
+  background: #2563eb; border-color: #3b82f6; color: white; font-weight: 700;
+}
+.hdr-btn.hdr-btn-stats:hover { background: #1d4ed8; border-color: #60a5fa; }
+.hdr-btn.hdr-btn-timeline {
+  background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.4); color: white; font-weight: 700;
+}
+.hdr-btn.hdr-btn-timeline:hover { background: rgba(255,255,255,0.22); }
+.hdr-btn.hdr-btn-archive {
+  background: #d97706; border-color: #f59e0b; color: white; font-weight: 700;
+}
+.hdr-btn.hdr-btn-archive:hover { background: #b45309; border-color: #d97706; }
+.hdr-btn.hdr-btn-archive.active { background: #b45309; border-color: #f59e0b; }
+.badge-cnt { background: rgba(255,255,255,0.25); color: white; border-radius: 9px; padding: 1px 6px; font-size: 0.6rem; font-weight: 700; }
 
 /* ════════════════ LAYOUT ════════════════ */
 .layout { display: grid; grid-template-columns: 278px 1fr; flex: 1; overflow: hidden; }
@@ -661,9 +675,9 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
     <div class="stat-blk"><span class="v" id="stat-ppu">—</span><span class="l">Avg $/Unit</span></div>
   </div>
   <div class="hdr-btns">
-    <button class="hdr-btn" id="btn-stats">📊 Market Stats</button>
-    <button class="hdr-btn" id="btn-timeline">📋 TOPA Timeline</button>
-    <button class="hdr-btn" id="btn-archive">🗂 Archived <span class="badge-cnt" id="arc-cnt">0</span></button>
+    <button class="hdr-btn hdr-btn-stats" id="btn-stats">📊 Market Stats</button>
+    <button class="hdr-btn hdr-btn-timeline" id="btn-timeline">📋 TOPA Timeline</button>
+    <button class="hdr-btn hdr-btn-archive" id="btn-archive">🗂 Archived <span class="badge-cnt" id="arc-cnt">0</span></button>
   </div>
 </header>
 
@@ -1512,7 +1526,8 @@ function renderStatsModal(){
   var compPpuArr = compsData.filter(function(c){ return c.price&&c.units; }).map(function(c){ return c.price/c.units; });
   var avgCompPpu = compPpuArr.length ? compPpuArr.reduce(function(a,b){return a+b;},0)/compPpuArr.length : null;
   var medCompPpu = median(compPpuArr);
-  var compUnits = compsData.reduce(function(s,c){ return s+(c.units||0); }, 0);
+  var compsWithUnits = compsData.filter(function(c){ return c.units; });
+  var avgCompUnits = compsWithUnits.length ? Math.round(compsWithUnits.reduce(function(s,c){ return s+(c.units||0); }, 0) / compsWithUnits.length) : null;
 
   // Oldest sale comp that has a TOPA match
   var matchedCompsWithDates = matched.filter(function(c){ return c.date; }).sort(function(a,b){ return a.date.localeCompare(b.date); });
@@ -1572,7 +1587,7 @@ function renderStatsModal(){
   var maxU = Math.max.apply(null, unitBuckets.map(function(b){return b.n;}).concat([1]));
 
   // Contract type
-  var withContract = active.filter(function(p){ return p.type='w/ Contract'; }).length;
+  var withContract = active.filter(function(p){ return p.type==='w/ Contract'; }).length;
   var withoutContract = active.length - withContract;
 
   var html =
@@ -1591,7 +1606,7 @@ function renderStatsModal(){
       '<div class="stats-kpi"><div class="kv">'+( medPpu?'$'+Math.round(medPpu).toLocaleString():'—')+'</div><div class="kl">Median Contract $/Unit</div></div>'+
       '<div class="stats-kpi gold"><div class="kv">'+( avgCompPpu?'$'+Math.round(avgCompPpu).toLocaleString():'—')+'</div><div class="kl">Avg Sale $/Unit</div></div>'+
       '<div class="stats-kpi gold"><div class="kv">'+( medCompPpu?'$'+Math.round(medCompPpu).toLocaleString():'—')+'</div><div class="kl">Median Sale $/Unit</div></div>'+
-      '<div class="stats-kpi"><div class="kv">'+compUnits.toLocaleString()+'</div><div class="kl">Units Sold via Comps</div></div>'+
+      '<div class="stats-kpi"><div class="kv">'+(avgCompUnits||'—')+'</div><div class="kl">Avg Units (Sales)</div></div>'+
     '</div>'+
 
     '<div class="stats-section-lbl" style="margin-top:20px">Active Pipeline — Phase Breakdown</div>'+
@@ -1989,9 +2004,10 @@ document.getElementById('match-modal').addEventListener('click', function(e){ if
 async function renderCompMarkers(){
   compMarkers.forEach(function(m){ map.removeLayer(m); });
   compMarkers = [];
-  // In archive view, comp markers are never shown — comps appear only as sidebar sub-rows
-  // In active view, show unmatched comps as purple markers only
+  // In archive view, or when search is active, comp markers are not shown
   if(showingArchive) return;
+  var searchTerm = (document.getElementById('prop-search').value||'').toLowerCase().trim();
+  if(searchTerm) return; // search is TOPA-focused; hide unmatched comp dots
   var toShow = compsData.filter(function(c){ return c.topaId === null || c.topaId === undefined; });
   for(var i=0; i<toShow.length; i++){
     var c = toShow[i];
