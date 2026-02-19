@@ -4684,5 +4684,27 @@
     "broker": "MAC Realty Advisors, LLC",
     "notes": "Private individual sold the 56 unit multi-family property to Ernst Equities for $7,500,000 or $133,929 per unit. There were two extension fees so the total purchase was $7,530,968. The property was on the market for 21 months. The information in the sale comparable was confirmed with the listing agency.",
     "topaId": null
+  },
+  {
+    "id": 1771515231101.678,
+    "name": "7/26/2023",
+    "address": "1311 Madison Street NW",
+    "price": null,
+    "date": "",
+    "units": 28,
+    "ppu": 4580000,
+    "sf": null,
+    "ppsf": null,
+    "affType": "",
+    "vacancy": "Lock 7 Development",
+    "yearBuilt": null,
+    "pfCapRate": null,
+    "capRate": null,
+    "bldgClass": "",
+    "buyer": "",
+    "seller": "",
+    "broker": "",
+    "notes": "",
+    "topaId": null
   }
 ]
