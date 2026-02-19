@@ -1669,15 +1669,16 @@ function openStatsModal(){
 }
 
 function renderStatsModal(){
-  var active = allData.filter(function(p){ return !isArc(p); });
+  var active = allData.filter(function(p){ return !isArc(p) && !isSuperseded(p); });
+  var greenOnly = active.filter(function(p){ return getCompsForTopa(p._idx).length === 0; }); // green: in window, no comp
   var archived = allData.filter(function(p){ return isArc(p); });
-  var sold = allData.filter(function(p){ return getCompsForTopa(p._idx).length > 0; });
+  var sold = allData.filter(function(p){ return getCompsForTopa(p._idx).length > 0 && !isSuperseded(p); });
   var matched = compsData.filter(function(c){ return c.topaId !== null && c.topaId !== undefined; });
 
-  // KPIs
-  var totalUnits = active.reduce(function(s,p){ return s+(p.units||0); }, 0);
-  var totalVol = active.reduce(function(s,p){ return s+(p.price||0); }, 0);
-  var ppuArr = active.filter(function(p){ return p.price&&p.units; }).map(function(p){ return p.price/p.units; });
+  // KPIs — green only for pipeline figures
+  var totalUnits = greenOnly.reduce(function(s,p){ return s+(p.units||0); }, 0);
+  var totalVol = greenOnly.reduce(function(s,p){ return s+(p.price||0); }, 0);
+  var ppuArr = greenOnly.filter(function(p){ return p.price&&p.units; }).map(function(p){ return p.price/p.units; });
   var avgPpu = ppuArr.length ? ppuArr.reduce(function(a,b){ return a+b; },0)/ppuArr.length : null;
   function median(arr){ if(!arr.length) return null; var s=arr.slice().sort(function(a,b){return a-b;}); var m=Math.floor(s.length/2); return s.length%2?s[m]:(s[m-1]+s[m])/2; }
   var medPpu = median(ppuArr);
@@ -1695,17 +1696,16 @@ function renderStatsModal(){
 
   // Quadrant breakdown
   var quads = {NW:0, NE:0, SW:0, SE:0, other:0};
-  active.forEach(function(p){
+  greenOnly.forEach(function(p){
     var m = (p.address||'').match(/\b(NW|NE|SW|SE)\b/i);
     if(m) quads[m[1].toUpperCase()]++;
     else quads.other++;
   });
   var maxQ = Math.max(quads.NW, quads.NE, quads.SW, quads.SE, quads.other, 1);
 
-  // Phase breakdown (active unsold)
-  var unsold = active.filter(function(p){ return getCompsForTopa(p._idx).length === 0; });
+  // Phase breakdown (green only — active, unsold, within window)
   var phases = [0,0,0,0,0];
-  unsold.forEach(function(p){
+  greenOnly.forEach(function(p){
     var d = daysIn(p.date);
     if(d < 5) phases[0]++;
     else if(d < 50) phases[1]++;
@@ -1730,7 +1730,7 @@ function renderStatsModal(){
   var medSoldDays = soldDays.length ? Math.round(median(soldDays)) : null;
   var maxSoldDays = soldDays.length ? Math.max.apply(null, soldDays) : null;
 
-  // Unit size buckets
+  // Unit size buckets (green only)
   var unitBuckets = [
     {lbl:'5–10',min:5,max:10,n:0},
     {lbl:'10–25',min:10,max:25,n:0},
@@ -1738,7 +1738,7 @@ function renderStatsModal(){
     {lbl:'75–150',min:75,max:150,n:0},
     {lbl:'150+',min:150,max:Infinity,n:0}
   ];
-  active.forEach(function(p){
+  greenOnly.forEach(function(p){
     var u=p.units||0;
     for(var i=0;i<unitBuckets.length;i++){
       if(u>=unitBuckets[i].min && u<unitBuckets[i].max){ unitBuckets[i].n++; break; }
@@ -1746,14 +1746,14 @@ function renderStatsModal(){
   });
   var maxU = Math.max.apply(null, unitBuckets.map(function(b){return b.n;}).concat([1]));
 
-  // Contract type
-  var withContract = active.filter(function(p){ return p.type==='w/ Contract'; }).length;
-  var withoutContract = active.length - withContract;
+  // Contract type (green only)
+  var withContract = greenOnly.filter(function(p){ return p.type==='w/ Contract'; }).length;
+  var withoutContract = greenOnly.length - withContract;
 
   var html =
     '<div class="stats-section-lbl">Pipeline Overview</div>'+
     '<div class="stats-kpi-row">'+
-      '<div class="stats-kpi accent"><div class="kv">'+active.length+'</div><div class="kl">Active TOPAs</div></div>'+
+      '<div class="stats-kpi accent"><div class="kv">'+greenOnly.length+'</div><div class="kl">Active TOPAs</div></div>'+
       '<div class="stats-kpi"><div class="kv">'+totalUnits.toLocaleString()+'</div><div class="kl">Units in TOPA</div></div>'+
       '<div class="stats-kpi"><div class="kv">'+fmt$(totalVol)+'</div><div class="kl">Volume in TOPA</div></div>'+
       '<div class="stats-kpi"><div class="kv">'+archived.length+'</div><div class="kl">Expired TOPA Contracts</div></div>'+
@@ -1762,14 +1762,16 @@ function renderStatsModal(){
 
     '<div class="stats-section-lbl" style="margin-top:20px">Pricing</div>'+
     '<div class="stats-kpi-row">'+
-      '<div class="stats-kpi"><div class="kv">'+( avgPpu?'$'+Math.round(avgPpu).toLocaleString():'—')+'</div><div class="kl">Avg Contract $/Unit</div></div>'+
-      '<div class="stats-kpi"><div class="kv">'+( medPpu?'$'+Math.round(medPpu).toLocaleString():'—')+'</div><div class="kl">Median Contract $/Unit</div></div>'+
+      '<div class="stats-kpi"><div class="kv">'+( avgPpu?'$'+Math.round(avgPpu).toLocaleString():'—')+'</div><div class="kl">Avg Contract $/Unit <span style="font-weight:500;font-size:0.85em">*</span></div></div>'+
+      '<div class="stats-kpi"><div class="kv">'+( medPpu?'$'+Math.round(medPpu).toLocaleString():'—')+'</div><div class="kl">Median Contract $/Unit <span style="font-weight:500;font-size:0.85em">*</span></div></div>'+
       '<div class="stats-kpi gold"><div class="kv">'+( avgCompPpu?'$'+Math.round(avgCompPpu).toLocaleString():'—')+'</div><div class="kl">Avg Sale $/Unit</div></div>'+
       '<div class="stats-kpi gold"><div class="kv">'+( medCompPpu?'$'+Math.round(medCompPpu).toLocaleString():'—')+'</div><div class="kl">Median Sale $/Unit</div></div>'+
       '<div class="stats-kpi gold"><div class="kv">'+(avgCompUnits||'—')+'</div><div class="kl">Avg Units (Sales)</div></div>'+
     '</div>'+
 
-    '<div class="stats-section-lbl" style="margin-top:20px">Active Pipeline — Phase Breakdown</div>'+
+    '<div style="font-size:0.6rem;color:var(--muted);margin-top:6px;margin-bottom:2px">* Properties currently under contract (green markers only)</div>'+
+
+    '<div class="stats-section-lbl" style="margin-top:16px">Active Pipeline — Phase Breakdown</div>'+
     '<div class="stats-phase-row">'+
     phases.map(function(n,i){
       return '<div class="stats-phase-card">'+
@@ -1842,13 +1844,13 @@ function renderStatsModal(){
         '<div class="stats-bar-group-title">Contract Type &amp; Comp Coverage</div>'+
         '<div class="stats-bar-row">'+
           '<div class="stats-bar-lbl wide">w/ Contract</div>'+
-          '<div class="stats-bar-track"><div class="stats-bar-fill" style="width:'+Math.round(withContract/Math.max(active.length,1)*100)+'%;background:var(--accent)"></div></div>'+
-          '<div class="stats-bar-val wide">'+withContract+' / '+active.length+'</div>'+
+          '<div class="stats-bar-track"><div class="stats-bar-fill" style="width:'+Math.round(withContract/Math.max(greenOnly.length,1)*100)+'%;background:var(--accent)"></div></div>'+
+          '<div class="stats-bar-val wide">'+withContract+' / '+greenOnly.length+'</div>'+
         '</div>'+
         '<div class="stats-bar-row">'+
           '<div class="stats-bar-lbl wide">No Contract</div>'+
-          '<div class="stats-bar-track"><div class="stats-bar-fill" style="width:'+Math.round(withoutContract/Math.max(active.length,1)*100)+'%;background:#94a3b8"></div></div>'+
-          '<div class="stats-bar-val wide">'+withoutContract+' / '+active.length+'</div>'+
+          '<div class="stats-bar-track"><div class="stats-bar-fill" style="width:'+Math.round(withoutContract/Math.max(greenOnly.length,1)*100)+'%;background:#94a3b8"></div></div>'+
+          '<div class="stats-bar-val wide">'+withoutContract+' / '+greenOnly.length+'</div>'+
         '</div>'+
         '<div class="stats-bar-row" style="margin-top:8px">'+
           '<div class="stats-bar-lbl wide">Comps Matched</div>'+
