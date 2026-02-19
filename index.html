@@ -929,7 +929,7 @@ var map;
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function daysIn(dateStr){ if(!dateStr) return 0; var d=new Date(dateStr); d.setHours(0,0,0,0); return Math.floor((TODAY-d)/86400000); }
-function isArc(p){ return daysIn(p.date)>TOPA_LIMIT; }
+function isArc(p){ return daysIn(p.date)>TOPA_LIMIT && getCompsForTopa(p._idx).length===0; }
 function fmt$(n){ if(n==null||isNaN(n)) return '—'; if(n>=1e9) return '$'+(n/1e9).toFixed(2)+'B'; if(n>=1e6) return '$'+(n/1e6).toFixed(n%1e6===0?0:1)+'M'; if(n>=1000) return '$'+Math.round(n/1000)+'K'; return '$'+n.toLocaleString(); }
 function fmtFull$(n){ return (n==null||isNaN(n))?'—':'$'+n.toLocaleString(); }
 function getPPU(p){ return (p.price&&p.units)?Math.round(p.price/p.units):null; }
