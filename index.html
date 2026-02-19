@@ -1504,8 +1504,11 @@ function applyFilters(){
     if(ppuMin!=null&&(pp==null||pp<ppuMin)) return false;
     if(ppuMax!=null&&(pp==null||pp>ppuMax)) return false;
     if(dMin&&p.date<dMin) return false;
-    if(daysMinV&&daysIn(p.date)<parseInt(daysMinV)) return false;
-    if(daysMaxV&&daysIn(p.date)>parseInt(daysMaxV)) return false;
+    var compsList=getCompsForTopa(p._idx);
+    var sold=compsList.length>0&&compsList[0].date;
+    var effectiveDays=sold?Math.max(0,Math.round((new Date(compsList[0].date)-new Date(p.date))/86400000)):daysIn(p.date);
+    if(daysMinV&&effectiveDays<parseInt(daysMinV)) return false;
+    if(daysMaxV&&effectiveDays>parseInt(daysMaxV)) return false;
     if(dMax&&p.date>dMax) return false;
     return true;
   });
