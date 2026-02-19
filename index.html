@@ -1381,7 +1381,7 @@ function renderList(){
 
   var topaCount=filteredData.length;
   var shownComps=compsData.length;
-  cnt.textContent=topaCount+' '+lbl+'propert'+(topaCount===1?'y':'ies')+(shownComps&&!showingArchive?' · '+shownComps+' comp'+(shownComps===1?'':' s'):'');
+  cnt.textContent=topaCount+' '+lbl+'propert'+(topaCount===1?'y':'ies')+(shownComps&&!showingArchive?' · '+shownComps+' comp'+(shownComps===1?'':'s'):'');
 
   if(!items.length){
     el.innerHTML='<div class="no-res">'+(showingArchive?'No archived properties yet. These appear once a TOPA date is more than 420 days ago.':'No properties match the current filters.')+'</div>';
@@ -1756,8 +1756,8 @@ function renderStatsModal(){
       '<div class="stats-kpi accent"><div class="kv">'+active.length+'</div><div class="kl">Active TOPAs</div></div>'+
       '<div class="stats-kpi"><div class="kv">'+totalUnits.toLocaleString()+'</div><div class="kl">Units in TOPA</div></div>'+
       '<div class="stats-kpi"><div class="kv">'+fmt$(totalVol)+'</div><div class="kl">Volume in TOPA</div></div>'+
-      '<div class="stats-kpi gold"><div class="kv">'+sold.length+'</div><div class="kl">Buildings TOPA Completed and Sold '+(oldestCompDate?'<span style="font-weight:500;font-size:0.9em">* since '+oldestCompDate+'</span>':'')+'</div></div>'+
-      '<div class="stats-kpi"><div class="kv">'+archived.length+'</div><div class="kl">TOPA Contracts with No Sale</div></div>'+
+      '<div class="stats-kpi"><div class="kv">'+archived.length+'</div><div class="kl">Expired TOPA Contracts</div></div>'+
+      '<div class="stats-kpi gold"><div class="kv">'+sold.length+'</div><div class="kl">Sales with TOPA Contracts '+(oldestCompDate?'<span style="font-weight:500;font-size:0.9em">* since '+oldestCompDate+'</span>':'')+'</div></div>'+
     '</div>'+
 
     '<div class="stats-section-lbl" style="margin-top:20px">Pricing</div>'+
@@ -1766,7 +1766,7 @@ function renderStatsModal(){
       '<div class="stats-kpi"><div class="kv">'+( medPpu?'$'+Math.round(medPpu).toLocaleString():'—')+'</div><div class="kl">Median Contract $/Unit</div></div>'+
       '<div class="stats-kpi gold"><div class="kv">'+( avgCompPpu?'$'+Math.round(avgCompPpu).toLocaleString():'—')+'</div><div class="kl">Avg Sale $/Unit</div></div>'+
       '<div class="stats-kpi gold"><div class="kv">'+( medCompPpu?'$'+Math.round(medCompPpu).toLocaleString():'—')+'</div><div class="kl">Median Sale $/Unit</div></div>'+
-      '<div class="stats-kpi"><div class="kv">'+(avgCompUnits||'—')+'</div><div class="kl">Avg Units (Sales)</div></div>'+
+      '<div class="stats-kpi gold"><div class="kv">'+(avgCompUnits||'—')+'</div><div class="kl">Avg Units (Sales)</div></div>'+
     '</div>'+
 
     '<div class="stats-section-lbl" style="margin-top:20px">Active Pipeline — Phase Breakdown</div>'+
@@ -1822,10 +1822,18 @@ function renderStatsModal(){
               '<div><div style="font-size:1.2rem;font-weight:800;color:var(--navy)">'+medSoldDays+'d</div><div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:700">Median</div></div>'+
               '<div><div style="font-size:1.2rem;font-weight:800;color:var(--navy)">'+maxSoldDays+'d</div><div style="font-size:0.58rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);font-weight:700">Longest</div></div>'+
             '</div>'+
-            '<div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px">'+
-              '<div style="height:100%;border-radius:3px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626);width:100%"></div>'+
+            '<div style="position:relative;margin-bottom:4px">'+
+              '<div style="height:6px;background:var(--border);border-radius:3px;overflow:visible;position:relative">'+
+                '<div style="height:100%;border-radius:3px;background:linear-gradient(90deg,#16a34a,#d97706,#dc2626);width:100%"></div>'+
+                (avgSoldDays!=null?'<div style="position:absolute;top:-4px;left:'+Math.min(98,Math.round(avgSoldDays/420*100))+'%;transform:translateX(-50%);width:3px;height:14px;background:#1e293b;border-radius:2px;border:1px solid white;" title="Average: '+avgSoldDays+'d"></div>':'')+
+                (medSoldDays!=null?'<div style="position:absolute;top:-4px;left:'+Math.min(98,Math.round(medSoldDays/420*100))+'%;transform:translateX(-50%);width:3px;height:14px;background:#7c3aed;border-radius:2px;border:1px solid white;" title="Median: '+medSoldDays+'d"></div>':'')+
+              '</div>'+
             '</div>'+
-            '<div style="display:flex;justify-content:space-between;font-size:0.55rem;color:var(--muted)"><span>Day 0</span><span>Day 210</span><span>Day 420</span></div>'
+            '<div style="display:flex;justify-content:space-between;font-size:0.55rem;color:var(--muted)"><span>Day 0</span><span>Day 210</span><span>Day 420</span></div>'+
+            '<div style="display:flex;gap:12px;margin-top:6px;font-size:0.58rem;color:var(--muted)">'+
+              '<span><span style="display:inline-block;width:3px;height:10px;background:#1e293b;border-radius:1px;vertical-align:middle;margin-right:3px"></span>Avg</span>'+
+              '<span><span style="display:inline-block;width:3px;height:10px;background:#7c3aed;border-radius:1px;vertical-align:middle;margin-right:3px"></span>Median</span>'+
+            '</div>'
           : '<div style="font-size:0.75rem;color:var(--muted);padding:16px 0">No sold properties with matched comps yet.</div>')+
       '</div>'+
 
