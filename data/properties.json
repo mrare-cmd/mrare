@@ -3514,7 +3514,11 @@
     "price": 7500000,
     "foia": "FOIA",
     "buyer": "Radiant Property Management",
-    "owner": "Enterprise Community Development"
+    "owner": "Enterprise Community Development",
+    "_coords": [
+      38.8371315,
+      -76.9902496
+    ]
   },
   {
     "date": "2025-12-10",
