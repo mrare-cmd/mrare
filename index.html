@@ -2165,7 +2165,7 @@ document.getElementById('btn-clr-props').addEventListener('click', function(){
     var base64 = btoa(unescape(encodeURIComponent(content)));
     var apiUrl = 'https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+path;
 
-    // Get current SHA (needed to update existing file)
+    // Get current SHA (needed to update an existing file; skip if file doesn't exist yet)
     var sha = null;
     try {
       var getResp = await fetch(apiUrl+'?ref='+c.branch, {
@@ -2174,8 +2174,12 @@ document.getElementById('btn-clr-props').addEventListener('click', function(){
       if(getResp.ok){
         var existing = await getResp.json();
         sha = existing.sha;
+      } else if(getResp.status !== 404){
+        // Unexpected error on GET — surface it
+        return {ok:false, msg: path+' (GET '+getResp.status+'): check token permissions and repo name'};
       }
-    } catch(e){ /* file may not exist yet — that's fine */ }
+      // 404 = file doesn't exist yet, proceed with create (no sha needed)
+    } catch(e){ /* network error — try anyway */ }
 
     var body = { message: 'Update '+path+' via TOPA Dashboard', content: base64, branch: c.branch };
     if(sha) body.sha = sha;
@@ -2192,7 +2196,7 @@ document.getElementById('btn-clr-props').addEventListener('click', function(){
 
     if(putResp.ok) return {ok:true};
     var errData = await putResp.json().catch(function(){ return {}; });
-    return {ok:false, msg: path+': '+(errData.message||putResp.status)};
+    return {ok:false, msg: path+' ('+putResp.status+'): '+(errData.message||'unknown error')+(errData.errors?(' — '+JSON.stringify(errData.errors)):'')};
   }
 
   function buildPropsJson(){
