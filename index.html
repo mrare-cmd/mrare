@@ -2249,8 +2249,13 @@ document.addEventListener('DOMContentLoaded', function(){
       }
     })
     .catch(function(){ /* no properties file — start empty */ })
-    .finally(function(){
-      // Now load comps (whether or not properties loaded)
+    .finally(async function(){
+      // Geocode any properties missing from GEO cache before first render
+      var missing = allData.filter(function(p){ return !GEO[p.address]; });
+      for(var i=0; i<missing.length; i++){
+        await geocode(missing[i].address);
+      }
+      // Now load comps
       fetch('data/sales_comps.json' + bust, {cache: 'no-store'})
         .then(function(r){ if(!r.ok) throw new Error('no comps file'); return r.json(); })
         .then(function(d){
