@@ -1415,7 +1415,7 @@ function renderList(){
         :(arc?'<span class="bdg bdg-arc">Archived</span>':'<span>'+Math.max(0,TOPA_LIMIT-days)+'d left</span>');
       // Build hover button for matched comps (panel rendered via JS on hover)
       var compPanels = '';
-      if(hasComps){
+      if(compsList.length > 0){
         var ci0 = compsData.indexOf(compsList[0]);
         var label = '🏷 Sale Comp' + (compsList.length > 1 ? ' ('+compsList.length+')' : '');
         compPanels = '<div class="pi-comp-btn" data-comp-ci="'+ci0+'">'+label+' ›</div>';
