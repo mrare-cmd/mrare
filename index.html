@@ -1147,6 +1147,36 @@ var map;
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 function daysIn(dateStr){ if(!dateStr) return 0; var d=new Date(dateStr); d.setHours(0,0,0,0); return Math.floor((TODAY-d)/86400000); }
+function normalizeAddr(s){
+  return (s||'').toLowerCase()
+    .replace(/\./g,'').replace(/,/g,' ')
+    .replace(/[-–—]/g,' ')
+    // Expand full words to canonical short form FIRST (so both sides become identical)
+    .replace(/\bstreet\b/g,'st')
+    .replace(/\bavenue\b/g,'ave')
+    .replace(/\bboulevard\b/g,'blvd')
+    .replace(/\bplace\b/g,'pl')
+    .replace(/\broad\b/g,'rd')
+    .replace(/\bdrive\b/g,'dr')
+    .replace(/\bcourt\b/g,'ct')
+    .replace(/\blane\b/g,'ln')
+    .replace(/\bterrace\b/g,'ter')
+    .replace(/\bcircle\b/g,'cir')
+    .replace(/\bsquare\b/g,'sq')
+    .replace(/\bway\b/g,'wy')
+    .replace(/\bhighway\b/g,'hwy')
+    .replace(/\bparkway\b/g,'pkwy')
+    .replace(/\bnorthwest\b/g,'nw')
+    .replace(/\bnortheast\b/g,'ne')
+    .replace(/\bsouthwest\b/g,'sw')
+    .replace(/\bsoutheast\b/g,'se')
+    .replace(/\bnorth\b/g,'n')
+    .replace(/\bsouth\b/g,'s')
+    .replace(/\beast\b/g,'e')
+    .replace(/\bwest\b/g,'w')
+    .replace(/\s+/g,' ').trim();
+}
+
 // A TOPA entry is superseded if another entry exists for the same address with a later date
 function isSuperseded(p){
   return allData.some(function(q){
@@ -1949,35 +1979,6 @@ function showCompMsg(t,tp){
 }
 
 // ── FUZZY MATCHING ────────────────────────────────────────────────────────────
-function normalizeAddr(s){
-  return (s||'').toLowerCase()
-    .replace(/\./g,'').replace(/,/g,' ')
-    .replace(/[-–—]/g,' ')
-    // Expand full words to canonical short form FIRST (so both sides become identical)
-    .replace(/\bstreet\b/g,'st')
-    .replace(/\bavenue\b/g,'ave')
-    .replace(/\bboulevard\b/g,'blvd')
-    .replace(/\bplace\b/g,'pl')
-    .replace(/\broad\b/g,'rd')
-    .replace(/\bdrive\b/g,'dr')
-    .replace(/\bcourt\b/g,'ct')
-    .replace(/\blane\b/g,'ln')
-    .replace(/\bterrace\b/g,'ter')
-    .replace(/\bcircle\b/g,'cir')
-    .replace(/\bsquare\b/g,'sq')
-    .replace(/\bway\b/g,'wy')
-    .replace(/\bhighway\b/g,'hwy')
-    .replace(/\bparkway\b/g,'pkwy')
-    .replace(/\bnorthwest\b/g,'nw')
-    .replace(/\bnortheast\b/g,'ne')
-    .replace(/\bsouthwest\b/g,'sw')
-    .replace(/\bsoutheast\b/g,'se')
-    .replace(/\bnorth\b/g,'n')
-    .replace(/\bsouth\b/g,'s')
-    .replace(/\beast\b/g,'e')
-    .replace(/\bwest\b/g,'w')
-    .replace(/\s+/g,' ').trim();
-}
 
 function addrSimilarity(a, b){
   var na = normalizeAddr(a), nb = normalizeAddr(b);
