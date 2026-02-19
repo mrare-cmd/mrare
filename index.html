@@ -369,6 +369,40 @@ textarea:focus { border-color: var(--accent); background: var(--white); }
 .pu-comp-f.wide { grid-column: 1/-1; }
 .pu-comp-notes { font-size: 0.62rem; color: rgba(255,255,255,0.55); margin-top: 5px; font-style: italic; line-height: 1.4; }
 
+/* Two-column popup: TOPA info left, comps right */
+.pop-outer { display: flex; gap: 0; align-items: stretch; }
+.pop-topa-col { flex: 0 0 300px; min-width: 0; }
+.pop-comp-col {
+  flex: 0 0 280px; min-width: 0;
+  border-left: 3px solid #d97706;
+  margin-left: 12px; padding-left: 14px;
+  display: flex; flex-direction: column;
+}
+.pop-comp-col-hdr {
+  font-size: 0.58rem; font-weight: 800; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #d97706;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+}
+.pop-comp-count {
+  background: #d97706; color: white; border-radius: 8px;
+  padding: 1px 6px; font-size: 0.55rem; font-weight: 700;
+}
+.pop-comp-col-body { overflow-y: auto; flex: 1; max-height: 320px; }
+.pop-comp-col-body::-webkit-scrollbar { width: 3px; }
+.pop-comp-col-body::-webkit-scrollbar-thumb { background: rgba(217,119,6,0.3); border-radius: 2px; }
+.pop-comp-card {
+  background: rgba(217,119,6,0.12); border: 1px solid rgba(217,119,6,0.25);
+  border-radius: 5px; padding: 8px 10px; margin-bottom: 7px;
+}
+.pop-comp-card:last-child { margin-bottom: 0; }
+.pop-comp-name { font-size: 0.67rem; font-weight: 700; color: #fbbf24; line-height: 1.3; margin-bottom: 2px; }
+.pop-comp-sub { font-size: 0.58rem; color: rgba(255,255,255,0.45); margin-bottom: 5px; }
+.pop-comp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; }
+.pop-comp-f label { font-size: 0.5rem; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: rgba(255,255,255,0.3); display: block; margin-bottom: 1px; }
+.pop-comp-f span { font-size: 0.67rem; font-weight: 500; color: rgba(255,255,255,0.88); }
+.pop-comp-wide { grid-column: 1/-1; }
+.pop-comp-notes { font-size: 0.58rem; color: rgba(255,255,255,0.4); margin-top: 5px; font-style: italic; line-height: 1.4; }
+
 /* View comps button inside popup */
 .pu-comp-sidebar-btn {
   margin-top: 10px; padding: 8px 12px;
@@ -1831,7 +1865,37 @@ renderMarkers = async function(){
     var ms=getMilestonePhase(days);
     
 
-    var html='<div class="pu-addr">'+p.address+'</div>'+
+    // Build comps column HTML if property has matched comps
+    var compsColHtml = '';
+    if(hasComps){
+      var cs = getCompsForTopa(topaOrigIdx);
+      var compCards = cs.map(function(c){
+        var cppu = (c.price && c.units) ? Math.round(c.price/c.units) : c.ppu;
+        var cppsf = c.ppsf || (c.price && c.sf ? Math.round(c.price/c.sf*100)/100 : null);
+        return '<div class="pop-comp-card">'+
+          '<div class="pop-comp-name">'+(c.name||c.address)+'</div>'+
+          (c.name && c.address !== c.name ? '<div class="pop-comp-sub">'+c.address+'</div>' : '')+
+          '<div class="pop-comp-grid">'+
+          (c.date    ? '<div class="pop-comp-f"><label>Sale Date</label><span>'+fmtDate(c.date)+'</span></div>' : '')+
+          (c.price   ? '<div class="pop-comp-f"><label>Price</label><span>'+fmtFull$(c.price)+'</span></div>' : '')+
+          (c.units   ? '<div class="pop-comp-f"><label>Units</label><span>'+c.units+'</span></div>' : '')+
+          (cppu      ? '<div class="pop-comp-f"><label>$/Unit</label><span>$'+cppu.toLocaleString()+'</span></div>' : '')+
+          (c.sf      ? '<div class="pop-comp-f"><label>SF</label><span>'+c.sf.toLocaleString()+'</span></div>' : '')+
+          (cppsf     ? '<div class="pop-comp-f"><label>$/SF</label><span>$'+cppsf+'</span></div>' : '')+
+          (c.capRate ? '<div class="pop-comp-f"><label>Cap Rate</label><span>'+c.capRate+'%</span></div>' : '')+
+          (c.buyer   ? '<div class="pop-comp-f pop-comp-wide"><label>Buyer</label><span>'+c.buyer+'</span></div>' : '')+
+          (c.seller  ? '<div class="pop-comp-f pop-comp-wide"><label>Seller</label><span>'+c.seller+'</span></div>' : '')+
+          '</div>'+
+          (c.notes ? '<div class="pop-comp-notes">'+c.notes+'</div>' : '')+
+        '</div>';
+      }).join('');
+      compsColHtml = '<div class="pop-comp-col">'+
+        '<div class="pop-comp-col-hdr">🏷 Sale Comps <span class="pop-comp-count">'+cs.length+'</span></div>'+
+        '<div class="pop-comp-col-body">'+compCards+'</div>'+
+      '</div>';
+    }
+
+    var topaContent = '<div class="pu-addr">'+p.address+'</div>'+
       (p.name?'<div class="pu-name">'+p.name+'</div>':'')+
       '<div class="pu-grid">'+
       '<div class="pu-f"><label>TOPA Date</label><span>'+fmtDate(p.date)+'</span></div>'+
@@ -1854,8 +1918,11 @@ renderMarkers = async function(){
       '<div class="pu-milestones" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1)">'+
       '<div style="font-size:0.55rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.38);margin-bottom:5px">'+(sold?'Outcome':'Current Phase')+'</div>'+
       '<div style="font-size:0.75rem;font-weight:700;color:white">'+(sold?'✓ Sold — Process Complete':ms.label)+'</div>'+
-      '</div>'+
-      (hasComps ? '<div class="pu-comp-sidebar-btn" onclick="openCompSidebar('+topaOrigIdx+')">🏷 View Sale Comps ('+getCompsForTopa(topaOrigIdx).length+')</div>' : '');
+      '</div>';
+
+    var html = hasComps
+      ? '<div class="pop-outer">'+'<div class="pop-topa-col">'+topaContent+'</div>'+compsColHtml+'</div>'
+      : topaContent;
 
     (function(idx){
       var opacity=arc?'0.5':'1';
@@ -1864,7 +1931,7 @@ renderMarkers = async function(){
         html:'<div style="width:16px;height:16px;border-radius:50%;background:'+color+';border:2.5px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.35);opacity:'+opacity+';cursor:pointer;"></div>',
         iconSize:[16,16],iconAnchor:[8,8],popupAnchor:[0,-10]
       });
-      var mk=L.marker(coords,{icon:icon}).bindPopup(html,{maxWidth:320});
+      var mk=L.marker(coords,{icon:icon}).bindPopup(html,{maxWidth:hasComps?620:320,className:hasComps?'pop-wide-popup':''});
       mk.on('click',function(){hlItem(idx);});
       mk.addTo(map);
       markers.push(mk);
